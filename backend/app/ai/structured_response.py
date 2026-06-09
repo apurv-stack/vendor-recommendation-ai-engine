@@ -226,11 +226,9 @@ class StructuredResponseBuilder:
 
         ):
 
-            if not filters.get(
-
+            if filters.get(
                 "budget"
-
-            ):
+            ) is None:
 
                 missing.append(
 
@@ -238,11 +236,9 @@ class StructuredResponseBuilder:
 
                 )
 
-            if not filters.get(
-
+            if filters.get(
                 "guest_count"
-
-            ):
+            ) is None:
 
                 missing.append(
 
@@ -292,11 +288,11 @@ class StructuredResponseBuilder:
 
         ):
 
-            if not filters.get(
+            if filters.get(
 
                 "budget"
 
-            ):
+            ) is None:
 
                 missing.append(
 

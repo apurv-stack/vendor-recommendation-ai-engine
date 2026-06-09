@@ -1,4 +1,5 @@
 import logging
+import time
 from app.graphs.graph_state import AgentState
 from app.tools.tool_registry import ToolRegistry
 from app.utils.vendor_adapter import VendorAdapter
@@ -6,16 +7,16 @@ from app.utils.vendor_adapter import VendorAdapter
 logger = logging.getLogger(__name__)
 
 # OPTIMIZATION: Module-level cache for tool results
-# key = (tool_name, frozenset of params) | value = (result, timestamp)
-import time
 _tool_cache: dict = {}
 _CACHE_TTL_SECONDS = 300  # 5 minutes
+
 
 def _get_cache_key(tool_name: str, params: dict) -> str:
     sorted_params = sorted(
         (k, str(v)) for k, v in params.items() if v is not None
     )
     return f"{tool_name}:{sorted_params}"
+
 
 def _get_from_cache(key: str):
     entry = _tool_cache.get(key)
@@ -29,9 +30,22 @@ def _get_from_cache(key: str):
             logger.debug(f"[ToolCache] EXPIRED: {key}")
     return None
 
+
 def _set_cache(key: str, value):
     _tool_cache[key] = (value, time.time())
     logger.debug(f"[ToolCache] SET: {key}")
+
+
+def _is_valid_for_cache(tool_input: dict) -> bool:
+    """
+    Only cache results when both category AND city are present.
+    Prevents invalid/incomplete queries from polluting the cache
+    or serving wrong cached results.
+    """
+    return bool(
+        tool_input.get("category")
+        and tool_input.get("city")
+    )
 
 
 class ToolCallingAgent:
@@ -47,9 +61,6 @@ class ToolCallingAgent:
             token = state.get("access_token")
             intent = state.get("intent")
 
-            # OPTIMIZATION: ToolRegistry initialized once per call
-            # token is per-request so we can't avoid this
-            # but internal tool lookup is O(1) dict access
             registry = ToolRegistry(token=token)
 
             tool_name = ""
@@ -63,20 +74,49 @@ class ToolCallingAgent:
             if intent in ["vendor_recommendation", "service_query"]:
 
                 tool_name = "search_vendors"
+
+                budget = filters.get("budget")
+
+                # VALIDATION: never pass negative budget to API
+                max_price = None
+                if budget is not None:
+                    try:
+                        if float(budget) > 0:
+                            max_price = budget
+                    except (ValueError, TypeError):
+                        pass
+
+                # VALIDATION: never pass negative guest count to API
+                guest_count = filters.get("guest_count")
+                if guest_count is not None:
+                    try:
+                        if int(guest_count) <= 0:
+                            guest_count = None
+                    except (ValueError, TypeError):
+                        guest_count = None
+
                 tool_input = {
                     "category": filters.get("category"),
                     "city": filters.get("city"),
-                    "min_price": filters.get("price_min"),
-                    "max_price": filters.get("price_max")
+                    "min_price": None,
+                    "max_price": max_price
                 }
 
-                # OPTIMIZATION: check cache before API call
-                cache_key = _get_cache_key(tool_name, tool_input)
-                cached = _get_from_cache(cache_key)
+                # OPTIMIZATION: only use cache for complete valid queries
+                # Incomplete queries (missing city or category) must
+                # never be cached or served from cache
+                use_cache = _is_valid_for_cache(tool_input)
+                cached = None
+
+                if use_cache:
+                    cache_key = _get_cache_key(tool_name, tool_input)
+                    cached = _get_from_cache(cache_key)
 
                 if cached is not None:
                     tool_output = cached
-                    logger.debug(f"[ToolCallingAgent] search_vendors served from cache")
+                    logger.debug(
+                        f"[ToolCallingAgent] search_vendors served from cache"
+                    )
                 else:
                     tool = registry.get_tool(tool_name)
                     if not tool:
@@ -89,8 +129,14 @@ class ToolCallingAgent:
                         max_price=tool_input["max_price"]
                     )
 
-                    logger.debug(f"[ToolCallingAgent] search_vendors raw output: {tool_output}")
-                    _set_cache(cache_key, tool_output)
+                    logger.debug(
+                        f"[ToolCallingAgent] search_vendors raw output: {tool_output}"
+                    )
+
+                    # Only cache valid complete results
+                    if use_cache:
+                        cache_key = _get_cache_key(tool_name, tool_input)
+                        _set_cache(cache_key, tool_output)
 
                 vendors = []
                 if isinstance(tool_output, dict):
@@ -109,15 +155,20 @@ class ToolCallingAgent:
                 session_id = state.get("session_id")
                 tool_name = "get_session_context"
 
-                logger.debug(f"[ToolCallingAgent] session_query | session_id={session_id}")
+                logger.debug(
+                    f"[ToolCallingAgent] session_query | session_id={session_id}"
+                )
 
-                # Session context is per-session so cache key includes session_id
-                cache_key = _get_cache_key(tool_name, {"session_id": session_id})
+                cache_key = _get_cache_key(
+                    tool_name, {"session_id": session_id}
+                )
                 cached = _get_from_cache(cache_key)
 
                 if cached is not None:
                     normalized_context = cached
-                    logger.debug(f"[ToolCallingAgent] session_context served from cache")
+                    logger.debug(
+                        "[ToolCallingAgent] session_context served from cache"
+                    )
                 else:
                     tool = registry.get_tool(tool_name)
                     if not tool:
@@ -128,7 +179,9 @@ class ToolCallingAgent:
                         token=token
                     )
 
-                    logger.debug(f"[ToolCallingAgent] session_context raw output: {tool_output}")
+                    logger.debug(
+                        f"[ToolCallingAgent] session_context raw output: {tool_output}"
+                    )
 
                     if isinstance(tool_output, dict):
                         if "context" in tool_output:
@@ -142,7 +195,9 @@ class ToolCallingAgent:
 
                     _set_cache(cache_key, normalized_context)
 
-                logger.debug(f"[ToolCallingAgent] normalized session_context: {normalized_context}")
+                logger.debug(
+                    f"[ToolCallingAgent] normalized session_context: {normalized_context}"
+                )
 
                 state["session_context"] = normalized_context
                 state["vendors"] = []
@@ -186,10 +241,7 @@ class ToolCallingAgent:
                 "agent": "tool_calling_agent",
                 "status": "success",
                 "tool": tool_name,
-                "intent": intent,
-                "cache_hit": _get_from_cache(
-                    _get_cache_key(tool_name, tool_input)
-                ) is not None if tool_name else False
+                "intent": intent
             })
             state["workflow_trace"] = trace
 

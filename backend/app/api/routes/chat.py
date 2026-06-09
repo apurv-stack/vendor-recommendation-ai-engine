@@ -138,35 +138,21 @@ async def chat(
             )
 
         if (
-
-            result.get(
-
-                "success"
-
-            )
-
+            result.get("success")
             is False
-
+            and
+            result.get("response_type") not in (
+                "validation_error",
+                "error"
+            )
         ):
-
             raise HTTPException(
-
                 status_code=
-
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
-
                 detail=
-
-                result.get(
-
-                    "error"
-
-                )
-
+                result.get("error")
                 or
-
                 "Chat processing failed"
-
             )
 
         return result

@@ -117,22 +117,20 @@ class QueryPreprocessor:
         return query
 
     @staticmethod
-    def _clean_text(
-        query: str
-    ) -> str:
-
+    def _clean_text(query: str) -> str:
+    # Preserve minus sign before numbers for negative value detection
         query = re.sub(
-            r"[^\w\s]",
+            r"[^\w\s\-]",
             " ",
             query
         )
-
+    # Clean up orphan hyphens (not followed by digits)
         query = re.sub(
-            r"\s+",
+            r"-(?!\d)",
             " ",
             query
         )
-
+        query = re.sub(r"\s+", " ", query)
         return query.strip()
 
     @classmethod

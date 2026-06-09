@@ -200,16 +200,54 @@ class ChatService:
                     combined_context
                 )
 
+                # Early validation error — return immediately, no Ollama, no graph
+                errors = structured.get("errors", [])
+                if errors:
+                    return {
+                        "success": False,
+                        "message": errors[0],
+                        "session_id": session_id,
+                        "response_type": "error",
+                        "current_question": None,
+                        "missing_fields": [],
+                        "recommendations": [],
+                        "error": None
+                    }
+
             except Exception:
+                import traceback
+                traceback.print_exc()
                 structured = {
                     "filters": previous or {},
                     "intent": "vendor_recommendation",
-                    "missing_fields": []
+                    "missing_fields": [],
+                    "errors": []
                 }
 
             filters = structured.get("filters", {})
             intent = structured.get("intent")
+            validation = structured.get("validation", {})
 
+            errors = (
+                structured.get("errors", [])
+                or validation.get("errors", [])
+            )
+
+            if errors:
+                assistant = errors[0]
+                SessionManager.add_message(
+                    session_id, "assistant", assistant
+                )
+                return {
+                    "success": False,
+                    "message": assistant,
+                    "session_id": session_id,
+                    "response_type": "validation_error",
+                    "current_question": None,
+                    "missing_fields": [],
+                    "recommendations": [],
+                    "error": assistant
+                }
             filters = {
                 k: v
                 for k, v in filters.items()
@@ -579,11 +617,9 @@ class ChatService:
             }
 
         except Exception as e:
-
-            print(
-                "CHAT ERROR:",
-                str(e)
-            )
+            import traceback
+            traceback.print_exc()
+            print("CHAT ERROR:", str(e))
 
             print(
                 f"TOTAL REQUEST TIME: {round(time.time() - start_time, 2)}s"

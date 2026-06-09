@@ -281,6 +281,22 @@ class QueryParser:
         if category:
             filters["category"] = category
 
+        else:
+    # Detect unknown category attempt
+            unknown = re.search(
+                r"(\w+)\s+vendor",
+                query_lower
+            )
+            if unknown:
+                word = unknown.group(1)
+                skip = {
+                    "need","find","best","top","good",
+                    "cheap","premium","any","some","a",
+                    "the","my","our","for","new","all"
+                }
+                if word not in skip:
+                    filters["raw_category_attempt"] = word
+
         city = (
             QueryParser
             ._extract_city(
@@ -298,7 +314,7 @@ class QueryParser:
             )
         )
 
-        if budget:
+        if budget is not None:
             filters["budget"] = budget
 
         guests = (
@@ -309,7 +325,7 @@ class QueryParser:
             )
         )
 
-        if guests:
+        if guests is not None:
             filters["guest_count"] = guests
 
         cuisine = next(
@@ -421,6 +437,27 @@ class QueryParser:
     def _extract_budget(
         query: str
     ):
+        
+        negative_lakh = re.search(
+            r"under\s*-\s*(\d+(?:\.\d+)?)\s*lakh",
+            query
+        )
+        if negative_lakh:
+            return -int(float(negative_lakh.group(1)) * 100000)
+
+        negative_k = re.search(
+            r"under\s*-\s*(\d+(?:\.\d+)?)\s*k",
+            query
+        )
+        if negative_k:
+            return -int(float(negative_k.group(1)) * 1000)
+
+        negative_plain = re.search(
+            r"under\s*-\s*(\d+)",
+            query
+        )
+        if negative_plain:
+            return -int(negative_plain.group(1))
 
         lakh = re.search(
             r"(\d+(?:\.\d+)?)\s*lakh",
@@ -522,16 +559,12 @@ class QueryParser:
     ):
 
         explicit = re.search(
-            r"(\d+)\s*(guest|guests|people|persons|attendees)",
+            r"(-?\d+)\s*(guest|guests|people|persons|attendees)",
             query
         )
 
         if explicit:
-
-            return int(
-                explicit.group(1)
-            )
-
+            return int(explicit.group(1))
     # ----------------------------------
     # SAFE MODE
     # ----------------------------------

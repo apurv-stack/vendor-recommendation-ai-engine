@@ -373,16 +373,59 @@ class AIService:
             )
         )
 
+        # Define these immediately after parser_filters
+        # so they are available everywhere below
+        has_category = bool(parser_filters.get("category"))
+        has_city = bool(parser_filters.get("city"))
+
         # -----------------------------------
         # PROMPT CHAIN
         # -----------------------------------
 
-        chain = PromptChain.build(normalized_query, previous or {})
+        chain = PromptChain.build(
+            normalized_query,
+            previous or {}
+        )
 
-# Intent extracted BEFORE context injection ← FIX
+        # -----------------------------------
+        # INTENT — extracted from clean query
+        # BEFORE context injection
+        # -----------------------------------
+
         intent_data = IntentExtractor.extract(normalized_query)
         intent = intent_data.get("intent", "vendor_recommendation")
         intent_filters = intent_data.get("filters", {})
+
+        # -----------------------------------
+        # EARLY VALIDATION
+        # Runs before Ollama — invalid queries
+        # never reach LLM
+        # -----------------------------------
+
+        from app.ai.query_validator import QueryValidator
+
+        early_validation = QueryValidator.validate(
+            intent,
+            parser_filters
+        )
+
+        if early_validation.get("errors"):
+            return {
+                "intent": intent,
+                "filters": parser_filters,
+                "validation": early_validation,
+                "errors": early_validation.get("errors", []),
+                "needs_clarification": False,
+                "missing_fields": [],
+                "search_payload": {},
+                "normalized_query": normalized_query
+            }
+
+        # -----------------------------------
+        # CONTEXT INJECTION
+        # After validation — context words
+        # won't affect intent classification
+        # -----------------------------------
 
         if conversation_context:
             normalized_query = (
@@ -392,30 +435,23 @@ class AIService:
                 f"{normalized_query}"
             )
 
+        # -----------------------------------
+        # LLM FILTER EXTRACTION
+        # Only called when filters incomplete
+        # Skipped for complete queries
+        # -----------------------------------
+
         llm_filters = {}
-        has_category = bool(parser_filters.get("category"))
-        has_city = bool(parser_filters.get("city"))
+
         if not (has_category and has_city) and intent != "comparison_query":
             for step in chain:
-                if (
-                    step["stage"]
-                    ==
-                    "filter_extraction"
-                ):
+                if step["stage"] == "filter_extraction":
                     llm_filters = await (
                         self._extract_llm_filters(
                             normalized_query
                         )
                     )
                     break
-        
-        intent_filters = (
-            intent_data.get(
-                "filters",
-                {}
-            )
-        )
-
         final_filters = {
             **parser_filters
         }
