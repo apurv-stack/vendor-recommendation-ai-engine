@@ -1,0 +1,45 @@
+{
+  "editor.formatOnSave": true,
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  "python.analysis.typeCheckingMode": "basic",
+
+  "python.analysis.autoImportCompletions": true,
+
+  "python.defaultInterpreterPath": "backend/venv/Scripts/python.exe",
+
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+  "git.autofetch": true,
+
+  "git.confirmSync": false,
+
+  "editor.inlineSuggest.enabled": true,
+
+  "editor.minimap.enabled": false,
+
+  "breadcrumbs.enabled": true,
+
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
+  },
+
+  "python.formatting.provider": "none"
+}

@@ -178,21 +178,10 @@ error.response.status;
 
 
 if (
-
-originalRequest?.url?.includes(
-
-"/auth/login"
-
-)
-
+    originalRequest?.url?.includes("/auth/login") ||
+    originalRequest?.url?.includes("/auth/register")
 ) {
-
-return Promise.reject(
-
-error
-
-);
-
+    return Promise.reject(error);
 }
 
 

@@ -10,7 +10,7 @@ from sqlalchemy import (
     Text
 )
 
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -75,6 +75,11 @@ class Conversation(Base):
 
     context_summary = Column(
         Text,
+        nullable=True
+    )
+
+    recommendations = Column(
+        JSONB,
         nullable=True
     )
 

@@ -19,7 +19,8 @@ class ConversationService:
         detected_intent: Optional[str] = None,
         applied_filters: Optional[dict] = None,
         is_follow_up: bool = False,
-        context_summary: Optional[str] = None
+        context_summary: Optional[str] = None,
+        recommendations: Optional[list] = None
     ) -> Conversation:
 
         conversation = Conversation(
@@ -42,8 +43,10 @@ class ConversationService:
 
             is_follow_up=is_follow_up,
 
-            context_summary=context_summary
-        )
+            context_summary=context_summary,
+
+            recommendations=recommendations
+)       
 
         db.add(conversation)
 

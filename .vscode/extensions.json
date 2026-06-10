@@ -1,0 +1,31 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    "bradlc.vscode-tailwindcss",
+
+    "ms-azuretools.vscode-docker",
+
+    "eamodio.gitlens",
+
+    "rangav.vscode-thunder-client",
+
+    "humao.rest-client",
+
+    "usernamehw.errorlens",
+
+    "pkief.material-icon-theme",
+
+    "christian-kohler.path-intellisense",
+
+    "formulahendry.auto-rename-tag",
+
+    "gruntfuggly.todo-tree",
+
+    "github.copilot"
+  ]
+}

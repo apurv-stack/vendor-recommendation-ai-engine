@@ -205,10 +205,16 @@ const normalizeError = (
     ) {
 
         return {
-
             success: false,
 
-            message: "",
+            message:
+                error.response.data?.message
+                ||
+                error.response.data?.detail
+                ||
+                error.response.data?.error
+                ||
+                "Unable to process request.",
 
             session_id: null,
 
@@ -221,17 +227,9 @@ const normalizeError = (
             recommendations: [],
 
             error:
-
                 error.response.data?.error
-
                 ||
-
-                error.response.data?.detail
-
-                ||
-
-                "Backend error"
-
+                null
         };
 
     }

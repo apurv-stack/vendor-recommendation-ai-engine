@@ -138,7 +138,27 @@ class ToolCallingAgent:
                         cache_key = _get_cache_key(tool_name, tool_input)
                         _set_cache(cache_key, tool_output)
 
+                # ---------------------------------
+                # Vendor API Failure Handling
+                # ---------------------------------
+
+                if (
+                    isinstance(tool_output, dict)
+                    and tool_output.get("success") is False
+                ):
+                    state["tool_status"] = "failed"
+                    state["tool_error"] = tool_output.get(
+                        "message",
+                        "Vendor service unavailable"
+                    )
+
+                    state["vendors"] = []
+                    state["ranked_vendors"] = []
+
+                    return state
+
                 vendors = []
+
                 if isinstance(tool_output, dict):
                     vendors = tool_output.get("vendors", [])
                     vendors = [VendorAdapter.adapt(v) for v in vendors]
@@ -234,7 +254,8 @@ class ToolCallingAgent:
             state["tool_name"] = tool_name
             state["tool_input"] = tool_input
             state["tool_output"] = tool_output
-            state["tool_status"] = "success"
+            if state.get("tool_status") != "failed":
+                state["tool_status"] = "success"
 
             trace = state.get("workflow_trace", [])
             trace.append({

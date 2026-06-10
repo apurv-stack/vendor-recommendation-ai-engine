@@ -1,26 +1,25 @@
 import { useState } from "react";
 
 import {
-Eye,
-EyeOff,
-Shield,
-User,
-Building2
+    Building2,
+    Eye,
+    EyeOff,
+    Shield,
+    User
 } from "lucide-react";
 
 import {
-Link,
-useNavigate
+    Link,
+    useNavigate
 } from "react-router-dom";
 
 import {
-registerService,
-checkUsernameService,
-checkEmailService
+    checkEmailService,
+    checkUsernameService,
+    registerService
 } from "../../../services/authService";
 
 import Input from "../../common/Input/Input";
-import Button from "../../common/Button/Button";
 
 import i1 from "../../../assets/login/i1.png";
 
@@ -283,16 +282,7 @@ error="Username already exists";
 
 }
 
-if(
-
-name==="email"&&
-
-updated&&
-
-!error
-
-){
-
+if (name === "email" && updated && !error && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updated)) {
 try{
 
 const response=
@@ -319,21 +309,40 @@ setErrors(prev=>({
 
 };
 
-const handleSubmit=async(e)=>{
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("SUBMIT FIRED", formData, errors);
 
-e.preventDefault();
+    // Required fields check
+    const required = ["username", "full_name", "email", "password", "confirm_password"];
+    const newErrors = {};
 
-if(
+    required.forEach((field) => {
+        if (!formData[field]) {
+            newErrors[field] = "This field is required";
+        }
+    });
 
-Object.values(errors)
+    if (formData.role === "vendor" && !formData.business_email) {
+        newErrors["business_email"] = "Business email is required";
+    }
 
-.some(Boolean)
+    if (Object.keys(newErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...newErrors }));
+        return;
+    }
 
-){
+    // Block if existing validation errors
+    const submitErrors = {};
+    Object.keys(formData).forEach((field) => {
+        const err = validateField(field, formData[field]);
+        if (err) submitErrors[field] = err;
+    });
 
-return;
-
-}
+    if (Object.keys(submitErrors).length > 0) {
+        setErrors(submitErrors);
+        return;
+    }
 
 try{
 
@@ -341,10 +350,13 @@ setLoading(true);
 
 setMessage("");
 
-const response=
+const cleanedData = {
+    ...formData,
+    business_email: formData.business_email || null,
+    phone_number: formData.phone_number || null,
+};
 
-await registerService(formData);
-
+const response = await registerService(cleanedData);
 setSuccess(true);
 
 setMessage(response.message);

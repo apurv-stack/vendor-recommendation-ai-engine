@@ -203,9 +203,7 @@ async def database_exception_handler(
 ) -> JSONResponse:
 
     logger.exception(
-
-        exc
-
+        f"Request failed: {request.url.path}"
     )
 
     return JSONResponse(
@@ -244,9 +242,7 @@ async def integrity_exception_handler(
 ) -> JSONResponse:
 
     logger.exception(
-
-        exc
-
+        f"Request failed: {request.url.path}"
     )
 
     return JSONResponse(
@@ -285,9 +281,7 @@ async def internal_exception_handler(
 ) -> JSONResponse:
 
     logger.exception(
-
-        exc
-
+        f"Request failed: {request.url.path}"
     )
 
     return JSONResponse(
@@ -300,9 +294,10 @@ async def internal_exception_handler(
 
         error_response(
 
-            message=
-
-            "Internal server error",
+            message=(
+                "Something went wrong while processing your request. "
+                "Please try again."
+            ),
 
             code=
 

@@ -1,5 +1,7 @@
 import uuid
 import time
+import logging
+logger = logging.getLogger(__name__)
 
 from sqlalchemy.orm import Session
 
@@ -433,6 +435,26 @@ class ChatService:
                         filters=filters,    
                     )
 
+                    # ── Task 34: Vendor API failure propagation ──────────
+                    if graph_result.get("tool_status") == "failed":
+                        tool_error = graph_result.get(
+                            "tool_error",
+                            "Vendor service is temporarily unavailable."
+                        )
+                        logger.error(f"[ChatService] Tool failure detected: {tool_error}")
+                        return {
+                            "success": False,
+                            "message": "Vendor service is temporarily unavailable. Please try again shortly.",
+                            "session_id": session_id,
+                            "response_type": "error",
+                            "error_code": "VENDOR_API_FAILURE",
+                            "current_question": None,
+                            "missing_fields": [],
+                            "recommendations": [],
+                            "error": tool_error
+                        }
+                    # ─────────────────────────────────────────────────────
+
                     recommendations = (
                         graph_result.get(
                             "ranked_vendors",
@@ -533,7 +555,12 @@ class ChatService:
                         detected_intent=intent,
                         applied_filters=filters,
                         is_follow_up=False,
-                        context_summary="Vendor recommendations generated"
+                        context_summary="Vendor recommendations generated",
+                        recommendations=
+                            RecommendationFormatter.format_vendors(
+                                recommendations[:self.MAX_VENDOR_CARDS],
+                                filters
+                            )
                     )
 
                     for vendor in recommendations:

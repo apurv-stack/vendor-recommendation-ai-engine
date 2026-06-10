@@ -158,8 +158,12 @@ useEffect(
                         loadedMessages.push({
                             role:"assistant",
                             text:item.ai_response,
-                            recommendations:[],
-                            responseType:"chat"
+                            recommendations:
+                                item.recommendations || [],
+                            responseType:
+                                item.recommendations?.length > 0
+                                    ? "recommendation"
+                                    : "chat"
                         });
                     }
                 );
@@ -368,10 +372,10 @@ role:"error",
 
 text:
 
-result?.error
-
+result?.message
 ||
-
+result?.error
+||
 "Unable to process request.",
 
 responseType:
@@ -599,48 +603,6 @@ msg.text
 
 }
 
-{
-
-msg.responseType==="followup"
-
-&&
-
-msg.missingFields?.length > 0
-
-&&
-
-(
-
-<div
-
-className="
-
-mt-2
-text-xs
-text-yellow-700
-
-"
-
->
-
-Required:
-
-{
-
-msg.missingFields.join(
-
-", "
-
-)
-
-}
-
-</div>
-
-)
-
-}
-
 </div>
 
 {
@@ -713,10 +675,7 @@ loading
 
 &&(
 
-<div
-
-className="
-
+<div className="
 bg-white
 border
 px-4
@@ -724,10 +683,11 @@ py-3
 rounded-2xl
 w-fit
 text-gray-500
-
-"
-
->
+shadow-sm
+">
+    <div className="mb-2 text-sm">
+        Searching vendors...
+    </div>
 
 <div
 
