@@ -36,7 +36,10 @@ const MainLayout = ({ children }) => {
     };
 
     return (
-        <div className={`h-screen flex overflow-hidden relative ${theme.colors.background}`}>
+        <div
+            className="h-screen flex relative"
+            style={{ background: theme.pageBg }}
+        >
 
             {mobileSidebar && (
                 <div
@@ -64,7 +67,12 @@ const MainLayout = ({ children }) => {
                     setSidebarOpen={setMobileSidebar}
                 />
 
-                <main className="flex-1 overflow-hidden flex flex-col p-4">
+                <main
+                    className="flex-1 flex flex-col p-4 overflow-y-auto"
+                    style={{
+                        background: theme.pageBg
+                    }}
+                >
                     {children}
                 </main>
 

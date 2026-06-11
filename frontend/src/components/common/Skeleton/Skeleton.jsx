@@ -1,75 +1,63 @@
-const Skeleton=({
+import { useTheme } from "../../../context/ThemeContext";
 
-height="h-6",
+const Skeleton = ({
+    height = "24px",
+    width = "100%",
+    rounded = "16px",
+    className = ""
+}) => {
 
-width="w-full",
+    const theme = useTheme();
 
-rounded="rounded-2xl",
+    return (
+        <>
+            <div
+                className={className}
+                style={{
+                    position: "relative",
+                    overflow: "hidden",
 
-className=""
+                    width,
+                    height,
 
-})=>{
+                    borderRadius: rounded,
 
-return(
+                    background: theme.isDark
+                        ? "#17172A"
+                        : "#F1F5F9",
 
-<div
+                    border: `1px solid ${theme.border}`
+                }}
+            >
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
 
-className={`
+                        background:
+                            theme.isDark
+                                ? "linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent)"
+                                : "linear-gradient(90deg,transparent,rgba(255,255,255,0.7),transparent)",
 
-relative
+                        animation: "skeletonShimmer 1.8s infinite"
+                    }}
+                />
+            </div>
 
-overflow-hidden
-
-bg-slate-200
-
-border
-
-border-slate-100
-
-shadow-sm
-
-${height}
-
-${width}
-
-${rounded}
-
-${className}
-
-`}
-
->
-
-{/* SHIMMER */}
-
-<div
-
-className="
-
-absolute
-
-inset-0
-
--translate-x-full
-
-animate-[shimmer_1.8s_infinite]
-
-bg-gradient-to-r
-
-from-transparent
-
-via-white/80
-
-to-transparent
-
-"
-
-/>
-
-</div>
-
-);
-
+            <style>
+                {`
+                @keyframes skeletonShimmer{
+                    0%{
+                        transform:translateX(-100%);
+                    }
+                    100%{
+                        transform:translateX(100%);
+                    }
+                }
+                `}
+            </style>
+        </>
+    );
 };
 
 export default Skeleton;

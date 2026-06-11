@@ -1,351 +1,185 @@
 import {
-
-SearchX,
-Sparkles,
-RefreshCcw
-
+    SearchX,
+    Sparkles,
+    RefreshCcw
 } from "lucide-react";
 
-
-const EmptyState=({
-
-title="No Data Found",
-message="Nothing available right now.",
-buttonText,
-onClick
-
-})=>{
-
-return(
-
-<div
-
-className="
-
-relative
-
-overflow-hidden
-
-bg-white
-
-border
-
-border-slate-200
-
-rounded-[32px]
-
-shadow-sm
-
-min-h-[360px]
-
-flex
-
-flex-col
-
-items-center
-
-justify-center
-
-text-center
-
-px-10
-
-py-14
-
-"
-
->
-
-{/* PREMIUM GLOW */}
-
-<div
-
-className="
-
-absolute
-
--top-20
-
--right-20
-
-h-72
-
-w-72
-
-bg-indigo-100
-
-rounded-full
-
-blur-3xl
-
-opacity-70
-
-"
-
-/>
-
-
-{/* ICON */}
-
-<div
-
-className="
-
-relative
-
-mb-8
-
-"
-
->
-
-<div
-
-className="
-
-absolute
-
-inset-0
-
-bg-indigo-200
-
-blur-2xl
-
-rounded-full
-
-opacity-60
-
-"
-
-/>
-
-
-<div
-
-className="
-
-relative
-
-h-24
-
-w-24
-
-rounded-full
-
-bg-gradient-to-br
-
-from-indigo-100
-
-to-purple-100
-
-flex
-
-items-center
-
-justify-center
-
-border
-
-border-indigo-100
-
-"
-
->
-
-<SearchX
-
-size={38}
-
-className="
-
-text-indigo-600
-
-"
-
-/>
-
-</div>
-
-</div>
-
-
-{/* LABEL */}
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-mb-4
-
-"
-
->
-
-<Sparkles
-
-size={16}
-
-className="
-
-text-indigo-500
-
-"
-
-/>
-
-<p
-
-className="
-
-uppercase
-
-tracking-[3px]
-
-text-xs
-
-font-semibold
-
-text-indigo-600
-
-"
-
->
-
-Enterprise Insights
-
-</p>
-
-</div>
-
-
-{/* TITLE */}
-
-<h2
-
-className="
-
-text-3xl
-
-font-bold
-
-text-slate-800
-
-mb-4
-
-"
-
->
-
-{
-
-title
-
-}
-
-</h2>
-
-
-{/* MESSAGE */}
-
-<p
-
-className="
-
-max-w-lg
-
-leading-8
-
-text-slate-500
-
-mb-8
-
-"
-
->
-
-{
-
-message
-
-}
-
-</p>
-
-
-{/* BUTTON */}
-
-{
-
-buttonText&&(
-
-<button
-
-onClick={onClick}
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-px-7
-
-py-3
-
-rounded-2xl
-
-bg-indigo-600
-
-hover:bg-indigo-700
-
-text-white
-
-font-semibold
-
-transition-all
-
-duration-300
-
-shadow-lg
-
-shadow-indigo-200
-
-hover:scale-[1.02]
-
-"
-
->
-
-<RefreshCcw
-
-size={16}
-
-/>
-
-{
-
-buttonText
-
-}
-
-</button>
-
-)
-
-}
-
-</div>
-
-);
-
+import { useTheme } from "../../../context/ThemeContext";
+
+const EmptyState = ({
+    title = "No Data Found",
+    message = "Nothing available right now.",
+    buttonText,
+    onClick
+}) => {
+
+    const theme = useTheme();
+
+    return (
+        <div
+            style={{
+                position: "relative",
+                overflow: "hidden",
+                background: theme.cardBg,
+                border: `1px solid ${theme.border}`,
+                borderRadius: "32px",
+                minHeight: "360px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                padding: "56px 40px",
+                boxShadow: theme.isDark
+                    ? "0 12px 40px rgba(0,0,0,0.25)"
+                    : "0 8px 24px rgba(15,23,42,0.08)"
+            }}
+        >
+
+            {/* Background Glow */}
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "-80px",
+                    right: "-80px",
+                    width: "280px",
+                    height: "280px",
+                    borderRadius: "999px",
+                    background: theme.isDark
+                        ? "rgba(139,92,246,0.18)"
+                        : "rgba(139,92,246,0.10)",
+                    filter: "blur(80px)"
+                }}
+            />
+
+            {/* Icon */}
+
+            <div
+                style={{
+                    position: "relative",
+                    marginBottom: "32px"
+                }}
+            >
+
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: theme.isDark
+                            ? "rgba(139,92,246,0.25)"
+                            : "rgba(139,92,246,0.12)",
+                        borderRadius: "999px",
+                        filter: "blur(30px)"
+                    }}
+                />
+
+                <div
+                    style={{
+                        position: "relative",
+                        width: "96px",
+                        height: "96px",
+                        borderRadius: "999px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: theme.isDark
+                            ? "linear-gradient(135deg,#1B1635,#241C48)"
+                            : "linear-gradient(135deg,#F5F0FF,#F8FAFC)",
+                        border: `1px solid ${theme.border}`
+                    }}
+                >
+                    <SearchX
+                        size={38}
+                        color={theme.primary}
+                    />
+                </div>
+            </div>
+
+            {/* Label */}
+
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "16px"
+                }}
+            >
+                <Sparkles
+                    size={16}
+                    color={theme.primary}
+                />
+
+                <p
+                    style={{
+                        textTransform: "uppercase",
+                        letterSpacing: "3px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        color: theme.primary,
+                        margin: 0
+                    }}
+                >
+                    AI Vendor Discovery
+                </p>
+            </div>
+
+            {/* Title */}
+
+            <h2
+                style={{
+                    fontSize: "32px",
+                    fontWeight: 700,
+                    color: theme.textPrimary,
+                    marginBottom: "16px",
+                    marginTop: 0
+                }}
+            >
+                {title}
+            </h2>
+
+            {/* Message */}
+
+            <p
+                style={{
+                    maxWidth: "640px",
+                    lineHeight: 1.8,
+                    color: theme.textMuted,
+                    marginBottom: "32px"
+                }}
+            >
+                {message}
+            </p>
+
+            {/* Button */}
+
+            {buttonText && (
+                <button
+                    onClick={onClick}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "12px 24px",
+                        borderRadius: "16px",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "#FFFFFF",
+                        fontWeight: 600,
+                        background:
+                            "linear-gradient(135deg,#7C5AF6,#A78BFA)",
+                        boxShadow:
+                            "0 0 20px rgba(124,90,246,0.35)"
+                    }}
+                >
+                    <RefreshCcw size={16} />
+                    {buttonText}
+                </button>
+            )}
+
+        </div>
+    );
 };
 
 export default EmptyState;

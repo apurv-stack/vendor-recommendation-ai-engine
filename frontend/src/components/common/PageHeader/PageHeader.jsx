@@ -1,77 +1,52 @@
-const PageHeader=({
+import { useTheme } from "../../../context/ThemeContext";
 
-title,
-subtitle,
-action
+const PageHeader = ({
+    title,
+    subtitle,
+    action
+}) => {
 
-})=>{
+    const theme = useTheme();
 
-return(
+    return (
+        <div
+            style={{
+                background: theme.cardBg,
+                border: `1px solid ${theme.border}`,
+                borderRadius: "24px",
+                padding: "24px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "24px",
+                marginBottom: "24px"
+            }}
+        >
+            <div>
+                <h1
+                    style={{
+                        fontSize: "42px",
+                        fontWeight: 700,
+                        color: theme.text,
+                        margin: 0
+                    }}
+                >
+                    {title}
+                </h1>
 
-<div
+                <p
+                    style={{
+                        color: theme.textMuted,
+                        marginTop: "8px"
+                    }}
+                >
+                    {subtitle}
+                </p>
+            </div>
 
-className="
-
-glass
-
-rounded-[32px]
-
-p-8
-
-flex
-
-justify-between
-
-items-center
-
-gap-6
-
-"
-
->
-
-<div>
-
-<h1
-
-className="
-
-text-5xl
-
-font-bold
-
-"
-
->
-
-{title}
-
-</h1>
-
-<p
-
-className="
-
-text-slate-500
-
-mt-2
-
-"
-
->
-
-{subtitle}
-
-</p>
-
-</div>
-
-{action}
-
-</div>
-
-);
-
+            {action}
+        </div>
+    );
 };
 
 export default PageHeader;
