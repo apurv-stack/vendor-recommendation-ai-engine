@@ -1,280 +1,188 @@
-import {
-
-createContext,
-useContext
-
-} from "react";
-
-const ThemeContext=
-
-createContext();
-
-export const ThemeProvider=({
-
-children
-
-})=>{
-
-const theme={
-
-colors:{
-
-background:`
-
-bg-gradient-to-br
-
-from-[#F8FAFF]
-
-via-[#F5F7FC]
-
-to-[#EEF2FF]
-
-`,
-
-sidebar:`
-
-bg-white/75
-
-backdrop-blur-2xl
-
-border-r
-
-border-slate-200
-
-shadow-[0_10px_35px_rgba(15,23,42,0.06)]
-
-`,
-
-navbar:`
-
-bg-white/70
-
-backdrop-blur-2xl
-
-border-b
-
-border-slate-200
-
-shadow-sm
-
-`,
-
-card:`
-
-glass
-
-bg-white/75
-
-border
-
-border-white/60
-
-shadow-md
-
-hover:shadow-xl
-
-transition-all
-
-duration-300
-
-`,
-
-input:`
-
-bg-white/80
-
-border
-
-border-slate-200
-
-text-slate-700
-
-placeholder-slate-400
-
-focus:ring-4
-
-focus:ring-indigo-100
-
-focus:border-indigo-500
-
-outline-none
-
-shadow-sm
-
-transition-all
-
-duration-200
-
-`,
-
-primary:`
-
-bg-gradient-to-r
-
-from-indigo-600
-
-to-violet-600
-
-hover:from-indigo-700
-
-hover:to-violet-700
-
-`,
-
-secondary:`
-
-bg-slate-100
-
-hover:bg-slate-200
-
-text-slate-700
-
-`,
-
-success:
-
-"text-emerald-600",
-
-warning:
-
-"text-orange-500",
-
-danger:
-
-"text-red-500",
-
-purple:
-
-"text-violet-600",
-
-accent:
-
-"text-indigo-600",
-
-textPrimary:
-
-"text-slate-900",
-
-textSecondary:
-
-"text-slate-500"
-
-},
-
-radius:{
-
-card:
-
-"rounded-[30px]",
-
-button:
-
-"rounded-2xl",
-
-input:
-
-"rounded-2xl"
-
-},
-
-spacing:{
-
-section:
-
-"px-8 py-8",
-
-cardPadding:
-
-"p-7"
-
-},
-
-shadow:{
-
-premium:`
-
-shadow-[0_20px_50px_rgba(99,102,241,0.10)]
-
-`,
-
-card:`
-
-shadow-[0_10px_30px_rgba(15,23,42,0.08)]
-
-`
-
-},
-
-animation:{
-
-hover:`
-
-hover:-translate-y-1
-
-transition-all
-
-duration-300
-
-`,
-
-button:`
-
-transition-all
-
-duration-200
-
-active:scale-[0.98]
-
-`
-
-}
-
+import { createContext, useContext, useState } from "react";
+
+const ThemeContext = createContext();
+
+export const ThemeProvider = ({ children }) => {
+    const [isDark, setIsDark] = useState(true);
+    const toggleTheme = () => setIsDark(prev => !prev);
+
+    const t = isDark ? {
+        // ── DARK TOKENS ──
+        isDark: true,
+        pageBg: "#0d0d1a",
+        sidebarBg: "#0d0d1a",
+        sidebarBorder: "rgba(124,90,255,0.15)",
+        chatBg: "#0f0f1e",
+        chatBorder: "rgba(124,90,246,0.15)",
+        panelBg: "#0a0a18",
+        panelBorder: "rgba(124,90,246,0.15)",
+        cardBg: "#13132a",
+        cardBorder: "rgba(124,90,246,0.2)",
+        cardShadow: "0 4px 24px rgba(0,0,0,0.3)",
+        cardHoverShadow: "0 8px 32px rgba(124,90,246,0.2)",
+        inputBg: "#13132a",
+        inputBorder: "#2d2d4e",
+        inputText: "#F8FAFC",
+        searchBg: "#13132a",
+        searchBorder: "#2d2d4e",
+        menuBg: "#13132a",
+        menuBorder: "#2d2d4e",
+        menuHoverBg: "#1e1e3a",
+        divider: "#1e1e3a",
+        sectionLabel: "#94A3B8",
+        sessionHoverBg: "#13132a",
+        sessionActiveBg: "linear-gradient(135deg,rgba(124,90,246,0.25),rgba(167,139,250,0.15))",
+        scrollTrack: "#0d0d1a",
+        scrollThumb: "#1e1e3a",
+        headerBg: "#0f0f1e",
+        headerBorder: "rgba(124,90,246,0.12)",
+        msgAreaBg: "#0f0f1e",
+        msgScrollTrack: "#0f0f1e",
+        msgScrollThumb: "#1e1e3a",
+        userBubbleBg: "linear-gradient(135deg,#7c5af6,#a78bfa)",
+        userBubbleText: "#fff",
+        userBubbleShadow: "0 4px 20px rgba(124,90,246,0.35)",
+        aiBubbleBg: "#13132a",
+        aiBubbleBorder: "rgba(124,90,246,0.15)",
+        aiBubbleText: "#F8FAFC",
+        aiBubbleShadow: "0 2px 12px rgba(0,0,0,0.2)",
+        timeText: "rgba(203, 213, 225, 0.75)",
+        recWrapBg: "#0f0f24",
+        recWrapBorder: "rgba(124,90,246,0.15)",
+        recLabelText: "#6060a0",
+        textPrimary: "#F8FAFC",
+        textSecondary: "#C4B5FD",
+        textMuted: "#CBD5E1",
+        textFaint: "#94A3B8",
+        profileNameText: "#F8FAFC",
+        profileEmailText: "#CBD5E1",
+        profileArrowText: "#CBD5E1",
+        dropdownSignedText: "#CBD5E1",
+        dropdownEmailText: "#F8FAFC",
+        dropdownItemText: "#E2E8F0",
+        featureCardBg: "rgba(124,90,246,0.04)",
+        featureCardBorder: "rgba(124,90,246,0.1)",
+        featureCardHoverBg: "rgba(124,90,246,0.1)",
+        featureTitleText: "#F8FAFC",
+        featureDescText: "#CBD5E1",
+        panelTitleText: "#a78bfa",
+        priceLabelText: "#94A3B8",
+        priceValueText: "#c4b5fd",
+        serviceTagBg: "rgba(124,90,246,0.08)",
+        serviceTagBorder: "rgba(124,90,246,0.18)",
+        serviceTagText: "#CBD5E1",
+        recReasonText: "#CBD5E1",
+        vendorCityText: "#CBD5E1",
+        reviewText: "#CBD5E1",
+        onlineDotBorder: "#0d0d1a",
+        inputAreaBg: "#0f0f1e",
+        inputAreaBorder: "rgba(124,90,246,0.15)",
+        charCountText: "#3a3a5a",
+        errorText: "#f87171",
+        heroBadgeBg: "rgba(124,90,246,0.15)",
+        heroBadgeBorder: "rgba(124,90,246,0.3)",
+        heroBadgeText: "#a78bfa",
+        heroSubText: "#CBD5E1",
+        loadingDotBg: "#7c5af6",
+        toggleBg: "#1a1a2e",
+        toggleBorder: "#2d2d4e",
+        toggleIcon: "🌙",
+        toggleText: "Dark",
+        toggleTextColor: "#a78bfa",
+    } : {
+        // ── LIGHT TOKENS ──
+        isDark: false,
+        pageBg: "#f5f7ff",
+        sidebarBg: "#ffffff",
+        sidebarBorder: "rgba(124,90,246,0.15)",
+        chatBg: "#ffffff",
+        chatBorder: "rgba(124,90,246,0.15)",
+        panelBg: "#f8f6ff",
+        panelBorder: "rgba(124,90,246,0.12)",
+        cardBg: "#ffffff",
+        cardBorder: "rgba(124,90,246,0.18)",
+        cardShadow: "0 4px 24px rgba(124,90,246,0.08)",
+        cardHoverShadow: "0 8px 32px rgba(124,90,246,0.15)",
+        inputBg: "#f5f3ff",
+        inputBorder: "#ddd6fe",
+        inputText: "#4c3d8a",
+        searchBg: "#f5f3ff",
+        searchBorder: "#ddd6fe",
+        menuBg: "#ffffff",
+        menuBorder: "#e8e0ff",
+        menuHoverBg: "#f5f3ff",
+        divider: "#ede9fe",
+        sectionLabel: "#9090b8",
+        sessionHoverBg: "#f5f3ff",
+        sessionActiveBg: "linear-gradient(135deg,rgba(124,90,246,0.12),rgba(167,139,250,0.08))",
+        scrollTrack: "#f5f7ff",
+        scrollThumb: "#ddd6fe",
+        headerBg: "#ffffff",
+        headerBorder: "rgba(124,90,246,0.1)",
+        msgAreaBg: "#f8f6ff",
+        msgScrollTrack: "#f8f6ff",
+        msgScrollThumb: "#ddd6fe",
+        userBubbleBg: "linear-gradient(135deg,#7c5af6,#a78bfa)",
+        userBubbleText: "#fff",
+        userBubbleShadow: "0 4px 20px rgba(124,90,246,0.3)",
+        aiBubbleBg: "#ffffff",
+        aiBubbleBorder: "rgba(124,90,246,0.12)",
+        aiBubbleText: "#1E293B",
+        aiBubbleShadow: "0 2px 12px rgba(124,90,246,0.06)",
+        timeText: "rgba(100, 116, 139, 0.85)",
+        recWrapBg: "#f5f3ff",
+        recWrapBorder: "rgba(124,90,246,0.12)",
+        recLabelText: "#8888b8",
+        textPrimary: "#1e1048",
+        textSecondary: "#7c5af6",
+        textMuted: "#8888b8",
+        textFaint: "#b0b0cc",
+        profileNameText: "#2d1b6b",
+        profileEmailText: "#9090b8",
+        profileArrowText: "#9090b8",
+        dropdownSignedText: "#9090b8",
+        dropdownEmailText: "#2d1b6b",
+        dropdownItemText: "#4c3d8a",
+        featureCardBg: "rgba(124,90,246,0.04)",
+        featureCardBorder: "rgba(124,90,246,0.1)",
+        featureCardHoverBg: "rgba(124,90,246,0.09)",
+        featureTitleText: "#2d1b6b",
+        featureDescText: "#6868a0",
+        panelTitleText: "#7c5af6",
+        priceLabelText: "#9090b8",
+        priceValueText: "#7c5af6",
+        serviceTagBg: "rgba(124,90,246,0.06)",
+        serviceTagBorder: "rgba(124,90,246,0.15)",
+        serviceTagText: "#7c5af6",
+        recReasonText: "#7070a0",
+        vendorCityText: "#8888b8",
+        reviewText: "#9090b8",
+        onlineDotBorder: "#ffffff",
+        inputAreaBg: "#ffffff",
+        inputAreaBorder: "rgba(124,90,246,0.12)",
+        charCountText: "#b0b0cc",
+        errorText: "#ef4444",
+        heroBadgeBg: "rgba(124,90,246,0.08)",
+        heroBadgeBorder: "rgba(124,90,246,0.2)",
+        heroBadgeText: "#7c5af6",
+        heroSubText: "#8888b8",
+        loadingDotBg: "#7c5af6",
+        toggleBg: "#ede9fe",
+        toggleBorder: "#ddd6fe",
+        toggleIcon: "☀️",
+        toggleText: "Light",
+        toggleTextColor: "#7c5af6",
+    };
+
+    return (
+        <ThemeContext.Provider value={{ ...t, toggleTheme, isDark }}>
+            {children}
+        </ThemeContext.Provider>
+    );
 };
 
-return(
-
-<ThemeContext.Provider
-
-value={theme}
-
->
-
-{
-
-children
-
-}
-
-</ThemeContext.Provider>
-
-);
-
-};
-
-export const useTheme=()=>{
-
-const context=
-
-useContext(
-
-ThemeContext
-
-);
-
-if(
-
-!context
-
-){
-
-throw new Error(
-
-"useTheme must be used inside ThemeProvider"
-
-);
-
-}
-
-return context;
-
+export const useTheme = () => {
+    const ctx = useContext(ThemeContext);
+    if (!ctx) throw new Error("useTheme must be used inside ThemeProvider");
+    return ctx;
 };

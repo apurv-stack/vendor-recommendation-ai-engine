@@ -368,6 +368,11 @@ class QueryParser:
         ):
             filters["comparison_request"] = True
 
+            vendor_names = QueryParser._extract_vendor_names(query)
+
+            if vendor_names:
+                filters["vendor_names"] = vendor_names
+
         if any(
             term in query_lower
             for term
@@ -584,3 +589,64 @@ class QueryParser:
     # ----------------------------------
 
         return None
+    
+    @staticmethod
+    def _extract_vendor_names(query: str):
+
+    # Pattern 1: "compare X and Y" or "compare X vs Y"
+        pattern = re.search(
+            r"(?:compare)\s+(.+?)\s+(?:and|vs\.?|versus)\s+(.+)",
+            query,
+            re.IGNORECASE
+        )
+
+    # Pattern 2: "X vs Y" or "X versus Y" (no leading compare)
+        if not pattern:
+            pattern = re.search(
+                r"(.+?)\s+(?:vs\.?|versus)\s+(.+)",
+                query,
+                re.IGNORECASE
+            )
+
+        if not pattern:
+            return []
+
+        vendor1 = QueryParser._clean_vendor_name(pattern.group(1))
+        vendor2 = QueryParser._clean_vendor_name(pattern.group(2))
+
+    # Reject pure category words or too-short names
+        known_categories = {
+            term
+            for terms in QueryParser.CATEGORY_PATTERNS.values()
+            for term in terms
+        }
+
+        result = []
+        for name in [vendor1, vendor2]:
+            if (
+                name
+                and len(name) >= 3
+                and name.lower() not in known_categories
+            ):
+                result.append(name)
+
+        return result if len(result) == 2 else []
+
+
+    @staticmethod
+    def _clean_vendor_name(raw: str) -> str:
+
+        if not raw:
+            return ""
+
+    # Strip trailing "in delhi", "for wedding", "near noida" etc.
+        noise_pattern = re.compile(
+            r"\s+(?:in|at|for|near|from|within|under|above|with|by)\b.*$",
+            re.IGNORECASE
+        )
+        cleaned = noise_pattern.sub("", raw.strip())
+
+    # Remove trailing punctuation
+        cleaned = re.sub(r"[^\w\s]+$", "", cleaned).strip()
+
+        return cleaned
