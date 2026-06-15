@@ -55,18 +55,29 @@ vendor
 const theme = useTheme();
 
 const[
-
-following,
-setFollowing
-
-]=useState(false);
+    following,
+    setFollowing
+]=useState(
+    vendor?.is_following ||
+    vendor?.following ||
+    false
+);
 
 const[
+    saved,
+    setSaved
+]=useState(
+    vendor?.is_saved ||
+    false
+);
 
-saved,
-setSaved
+useEffect(() => {
 
-]=useState(false);
+    setSaved(
+        vendor?.is_saved || false
+    );
+
+}, [vendor]);
 
 const[
 
@@ -461,7 +472,7 @@ verified&&(
 
 <BadgeCheck
 
-size={24}
+size={18}
 
 color="#7C5AF6"
 
@@ -479,7 +490,6 @@ color="#7C5AF6"
 style={{
 display:"flex",
 flexDirection:"column",
-gap:"7px",
 color:theme.textMuted,
 fontSize:"13px"
 }}
@@ -488,7 +498,7 @@ fontSize:"13px"
 
 <InfoRow
 
-icon={<MapPin/>}
+icon={<MapPin size={16} />}
 
 text={
 
@@ -502,7 +512,7 @@ vendor?.city||
 
 <InfoRow
 
-icon={<Phone/>}
+icon={<Phone size={16} />}
 
 text={
 
@@ -516,7 +526,7 @@ vendor?.contact_phone||
 
 <InfoRow
 
-icon={<Mail/>}
+icon={<Mail size={16} />}
 
 text={
 
@@ -536,7 +546,7 @@ available
 
 ?
 
-<CheckCircle/>
+<CheckCircle size={16}/>
 
 :
 
@@ -579,7 +589,7 @@ flex-wrap
 
 >
 
-<button
+{/* <button
 
 onClick={
 
@@ -594,8 +604,9 @@ followLoading
 }
 
 style={{
-padding: "10px 16px",
-borderRadius: "16px",
+padding: "8px 14px",
+borderRadius: "12px",
+fontSize: "13px",
 fontWeight: 600,
 display: "flex",
 alignItems: "center",
@@ -603,14 +614,20 @@ gap: "8px",
 border: "none",
 cursor: "pointer",
 background: following
-? "#EF4444"
-: "linear-gradient(135deg,#7C5AF6,#A78BFA)",
-color: "#fff"
+? "#7C5AF6"
+: theme.panelBg,
+color: following
+? "#fff"
+: theme.textPrimary,
+border: `1px solid ${theme.cardBorder}`
 }}
 
 >
 
-<Heart size={18}/>
+<Heart
+    size={18}
+    fill={following ? "currentColor" : "none"}
+/>
 
 {
 
@@ -634,7 +651,7 @@ following
 
 }
 
-</button>
+</button> */}
 
 
 <button
@@ -652,8 +669,9 @@ saveLoading
 }
 
 style={{
-padding: "10px 16px",
-borderRadius: "16px",
+padding: "8px 14px",
+borderRadius: "12px",
+fontSize: "13px",
 fontWeight: 600,
 display: "flex",
 alignItems: "center",
@@ -669,7 +687,10 @@ border: `1px solid ${theme.cardBorder}`
 }}
 >
 
-<Bookmark size={18}/>
+<Bookmark
+    size={18}
+    fill={saved ? "currentColor" : "none"}
+/>
 
 {
 
@@ -915,10 +936,11 @@ index
 }
 
 style={{
-padding:"10px 16px",
+padding:"8px 12px",
+borderRadius:"12px",
+fontSize:"12px",
 background:theme.panelBg,
 border:`1px solid ${theme.cardBorder}`,
-borderRadius:"16px",
 color:theme.textSecondary
 }}
 

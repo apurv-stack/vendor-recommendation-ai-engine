@@ -578,24 +578,16 @@ def search_vendors(
 
         )
 
-    if min_price:
+    if min_price is not None:
 
         search=search.filter(
-
-            Vendor.price_max
-            >=
-            min_price
-
+            Vendor.price_max >= min_price
         )
 
-    if max_price:
+    if max_price is not None:
 
         search=search.filter(
-
-            Vendor.price_min
-            <=
-            max_price
-
+            Vendor.price_min <= max_price
         )
 
     search=search.group_by(
@@ -632,25 +624,32 @@ def search_vendors(
 
         )
 
-    total=search.count()
+    all_vendors=search.all()
 
-    vendors=(
+    if rating is not None:
 
-        search
+        min_rating = float(rating)
 
-        .offset(
+        all_vendors = [
 
-            (page-1)*limit
+            v for v in all_vendors
 
-        )
+            if (
+                v.avg_rating is not None
+                and float(v.avg_rating) >= min_rating
+            )
 
-        .limit(limit)
+        ]
 
-        .all()
+    total = len(all_vendors)
 
-    )
+    vendors = all_vendors[
 
-    return vendors,total
+        (page-1)*limit : (page-1)*limit + limit
+
+    ]
+
+    return vendors, total
 
 
 # =====================================

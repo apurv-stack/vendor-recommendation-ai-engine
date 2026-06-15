@@ -152,7 +152,16 @@ const VendorCard = ({
                 >
                     <Heart
                         size={16}
-                        color={theme.textMuted}
+                        color={
+                            vendor?.is_saved
+                                ? "#EF4444"
+                                : theme.textMuted
+                            }
+                        fill={
+                            vendor?.is_saved
+                                ? "#EF4444"
+                                : "none"
+                        }
                     />
                 </button>
 

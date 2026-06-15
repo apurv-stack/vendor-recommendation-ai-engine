@@ -87,24 +87,71 @@ const VendorFilters = ({
             return;
         }
 
+        const updatedFilters = {
+            ...filters,
+            [field]: value
+        };
+
+        setFilters(updatedFilters);
+
+        const updatedMin = Number(updatedFilters.minPrice);
+        const updatedMax = Number(updatedFilters.maxPrice);
+        const hasMin = updatedFilters.minPrice !== "";
+        const hasMax = updatedFilters.maxPrice !== "";
+
+        if (hasMin && hasMax) {
+
+            if (updatedMin === 0 && updatedMax === 0) {
+                setError("Please enter a valid price range");
+                return;
+            }
+
+            if (updatedMax <= updatedMin) {
+                setError("Maximum price must exceed minimum price");
+                return;
+            }
+
+            if (updatedMax - updatedMin < 500) {
+                setError("Price range must differ by at least ₹500");
+                return;
+            }
+
+        }
+
         setError("");
 
-        setFilters(previous => ({
-            ...previous,
-            [field]: value
-        }));
     };
 
     const validateFilters = () => {
 
         const min = Number(filters.minPrice);
         const max = Number(filters.maxPrice);
+        const hasMin = filters.minPrice !== "";
+        const hasMax = filters.maxPrice !== "";
 
-        if (min && max && min > max) {
-            setError(
-                "Maximum price must exceed minimum price"
-            );
-            return false;
+        if (hasMin && hasMax) {
+
+            if (min === 0 && max === 0) {
+                setError(
+                    "Please enter a valid price range"
+                );
+                return false;
+            }
+
+            if (max <= min) {
+                setError(
+                    "Maximum price must exceed minimum price"
+                );
+                return false;
+            }
+
+            if (max - min < 500) {
+                setError(
+                    "Price range must differ by at least ₹500"
+                );
+                return false;
+            }
+
         }
 
         if (

@@ -817,6 +817,32 @@ def search_vendors_service(
 
     )
 
+    min_price = filters.get("min_price")
+    max_price = filters.get("max_price")
+
+    if min_price is not None and max_price is not None:
+
+        if min_price == 0 and max_price == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Please enter a valid price range"
+            )
+
+        if max_price <= min_price:
+            raise HTTPException(
+                status_code=400,
+                detail="Maximum price must be greater than minimum price"
+            )
+
+        if (max_price - min_price) < 500:
+            raise HTTPException(
+                status_code=400,
+                detail="Price range must be at least ₹500"
+            )
+
+    if filters.get("rating") is not None:
+        filters["rating"] = float(filters["rating"])
+
     vendors, total = (
 
         search_vendors(

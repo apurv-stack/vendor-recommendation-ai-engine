@@ -56,6 +56,11 @@ setSelectedVendor
 ]=useState(null);
 
 const[
+errorMessage,
+setErrorMessage
+]=useState("");
+
+const[
 loading,
 setLoading
 ]=useState(false);
@@ -198,6 +203,8 @@ currentPage=1
 
 try{
 
+    setErrorMessage("");
+
 setLoading(true);
 
 setSearched(true);
@@ -238,15 +245,15 @@ undefined,
 
 min_price:
 
-filters.minPrice||
-
-undefined,
+filters.minPrice === ""
+? undefined
+: Number(filters.minPrice),
 
 max_price:
 
-filters.maxPrice||
-
-undefined,
+filters.maxPrice === ""
+? undefined
+: Number(filters.maxPrice),
 
 rating:
 
@@ -314,9 +321,14 @@ payload?.total_results||
 
 setTotalPages(
 
-payload?.total_pages||
-
-1
+Math.max(
+1,
+Math.ceil(
+(payload?.total_results || 0)
+/
+limit
+)
+)
 
 );
 
@@ -332,11 +344,13 @@ payload?.page||
 
 catch(error){
 
-console.log(
+setErrorMessage(
 
-"Search failed",
+error?.response?.data?.detail ||
 
-error
+error?.response?.data?.message ||
+
+"Search failed"
 
 );
 
@@ -411,62 +425,54 @@ vendor.profile_views||
 };
 
 
-const saveVendor=
+const saveVendor = async (vendor) => {
 
-async(
+    try {
 
-vendor
+        if (vendor.is_saved) {
 
-)=>{
+            await axiosInstance.delete(
+                `/vendors/${vendor.vendor_id}/save`
+            );
 
-try{
+        } else {
 
-await axiosInstance.post(
+            await axiosInstance.post(
+                `/vendors/${vendor.vendor_id}/save`
+            );
 
-`/vendors/${vendor.vendor_id}/save`
+        }
 
-);
+        setVendors(previous =>
+            previous.map(item =>
+                item.vendor_id === vendor.vendor_id
+                    ? {
+                        ...item,
+                        is_saved: !item.is_saved
+                    }
+                    : item
+            )
+        );
 
-setVendors(
+        if (
+            selectedVendor &&
+            selectedVendor.vendor_id === vendor.vendor_id
+        ) {
 
-previous=>
+            setSelectedVendor(prev => ({
+                ...prev,
+                is_saved: !prev.is_saved
+            }));
 
-previous.map(
+        }
 
-item=>
+    } catch (error) {
 
-item.vendor_id===
+        console.log(error);
 
-vendor.vendor_id
-
-?
-
-{
-
-...item,
-
-saved:true
-
-}
-
-:
-
-item
-
-)
-
-);
-
-}
-
-catch(error){
-
-console.log(error);
-
-}
+    }
 
 };
-
 
 const resetFilters=()=>{
 
@@ -626,6 +632,22 @@ key={card.title}
 
 </div>
 
+{
+errorMessage && (
+
+<div
+className="
+text-red-500
+text-sm
+font-medium
+mt-2
+"
+>
+{errorMessage}
+</div>
+
+)
+}
 
 <VendorFilters
 

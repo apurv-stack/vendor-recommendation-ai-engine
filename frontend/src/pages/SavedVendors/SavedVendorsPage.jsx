@@ -92,9 +92,12 @@ const SavedVendorsPage = () => {
                         {vendors.map(vendor => (
                             <VendorCard
                                 key={vendor.vendor_id}
-                                vendor={vendor}
-                                onView={handleView}  // ✅ opens modal
-                                onSave={handleSave}  // ✅ unsaves and removes
+                                vendor={{
+                                    ...vendor,
+                                    is_saved: true
+                                }}
+                                onView={handleView}
+                                onSave={handleSave}
                             />
                         ))}
                     </div>
@@ -110,7 +113,12 @@ const SavedVendorsPage = () => {
                 size="lg"
             >
                 {selectedVendor && (
-                    <VendorDetails vendor={selectedVendor} />
+                    <VendorDetails
+                        vendor={{
+                            ...selectedVendor,
+                            is_saved: true
+                        }}
+                    />
                 )}
             </Modal>
 

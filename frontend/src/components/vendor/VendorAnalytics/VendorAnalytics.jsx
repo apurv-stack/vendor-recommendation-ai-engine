@@ -170,15 +170,20 @@ const VendorAnalytics = ({
             {/* Chart */}
 
             <div
-    style={{
-        height:
-            safeAnalytics.length === 0
-                ? "80px"
-                : "180px",
-        position: "relative",
-        zIndex: 2
-    }}
->
+                style={{
+                    minHeight:
+                        safeAnalytics.length === 0
+                            ? "80px"
+                            : "180px",
+                    height:
+                        safeAnalytics.length === 0
+                            ? "80px"
+                            : "180px",
+                    width: "100%",
+                    position: "relative",
+                    zIndex: 2
+                }}
+            >
 
                 {safeAnalytics.length === 0 ? (
 
@@ -199,7 +204,7 @@ const VendorAnalytics = ({
 
                     <ResponsiveContainer
                         width="100%"
-                        height="100%"
+                        height={180}
                     >
 
                         <AreaChart
