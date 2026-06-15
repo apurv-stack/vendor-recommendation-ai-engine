@@ -146,11 +146,12 @@ class ServiceResponse(
 
     service_id: UUID
 
-    name: str
+    name: str = Field(validation_alias="service_name")
 
     class Config:
 
         from_attributes=True
+        populate_by_name = True
 
 
 # ==========================================
@@ -222,13 +223,15 @@ class ManagedTeamResponse(
 
     parent_vendor_id: UUID | None
 
-    managed_teams: list[
-        ServiceResponse
-    ]=[]
+    services: list[ServiceResponse] = Field(
+        default=[],
+        validation_alias="service_records"
+    )
 
     class Config:
 
         from_attributes=True
+        populate_by_name = True
 
 
 # ==========================================

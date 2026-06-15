@@ -1,619 +1,338 @@
 import {
-
-Shield,
-Sparkles,
-BrainCircuit,
-TrendingUp
-
+    Shield,
+    Sparkles,
+    BrainCircuit,
+    TrendingUp
 } from "lucide-react";
 
-const AuthLayout=({
-
-subtitle,
-children
-
-})=>{
-
-return(
-
-<div
-
-className="
-
-min-h-screen
-
-relative
-
-overflow-hidden
-
-bg-gradient-to-br
-
-from-[#F8FAFF]
-
-via-[#F5F7FC]
-
-to-[#EEF2FF]
-
-flex
-
-items-center
-
-justify-center
-
-px-6
-
-py-10
-
-"
-
->
-
-{/* BACKGROUND BLOBS */}
-
-<div
-
-className="
-
-absolute
-
-top-[-120px]
-
-right-[-120px]
-
-h-[380px]
-
-w-[380px]
-
-rounded-full
-
-bg-indigo-300/20
-
-blur-3xl
-
-"
-
-/>
-
-<div
-
-className="
-
-absolute
-
-bottom-[-120px]
-
-left-[-120px]
-
-h-[320px]
-
-w-[320px]
-
-rounded-full
-
-bg-sky-300/20
-
-blur-3xl
-
-"
-
-/>
-
-<div
-
-className="
-
-absolute
-
-top-[40%]
-
-left-[45%]
-
-h-[250px]
-
-w-[250px]
-
-rounded-full
-
-bg-violet-300/10
-
-blur-3xl
-
-"
-
-/>
-
-<div
-
-className="
-
-relative
-
-z-10
-
-grid
-
-lg:grid-cols-2
-
-gap-12
-
-items-center
-
-max-w-7xl
-
-w-full
-
-"
-
->
-
-{/* LEFT */}
-
-<div
-
-className="hidden lg:block"
-
->
-
-<p
-
-className="
-
-uppercase
-
-tracking-[4px]
-
-font-semibold
-
-text-indigo-600
-
-mb-5
-
-"
-
->
-
-Enterprise Intelligence
-
-</p>
-
-<h1
-
-className="
-
-text-6xl
-
-font-bold
-
-leading-tight
-
-text-slate-900
-
-mb-6
-
-"
-
->
-
-AI Vendor
-
-<span
-
-className="
-
-text-indigo-600
-
-"
-
->
-
- Discovery
-
-</span>
-
-Platform
-
-</h1>
-
-<p
-
-className="
-
-text-slate-600
-
-text-lg
-
-leading-8
-
-mb-10
-
-max-w-xl
-
-"
-
->
-
-Discover vendors,
-
-analyze capabilities,
-
-benchmark pricing
-
-and drive procurement
-
-decisions through
-
-AI-powered intelligence.
-
-</p>
-
-<div
-
-className="space-y-5"
-
->
-
-<div
-
-className="
-
-glass
-
-rounded-[28px]
-
-p-5
-
-flex
-
-gap-4
-
-items-start
-
-"
-
->
-
-<div
-
-className="
-
-h-12
-
-w-12
-
-rounded-2xl
-
-bg-indigo-100
-
-flex
-
-items-center
-
-justify-center
-
-"
-
->
-
-<BrainCircuit
-
-className="
-
-text-indigo-600
-
-"
-
-/>
-
-</div>
-
-<div>
-
-<h3
-
-className="
-
-font-bold
-
-text-lg
-
-mb-1
-
-"
-
->
-
-AI Recommendations
-
-</h3>
-
-<p
-
-className="
-
-text-slate-500
-
-"
-
->
-
-Smart vendor suggestions
-
-powered by analytics.
-
-</p>
-
-</div>
-
-</div>
-
-<div
-
-className="
-
-glass
-
-rounded-[28px]
-
-p-5
-
-flex
-
-gap-4
-
-items-start
-
-"
-
->
-
-<div
-
-className="
-
-h-12
-
-w-12
-
-rounded-2xl
-
-bg-emerald-100
-
-flex
-
-items-center
-
-justify-center
-
-"
-
->
-
-<TrendingUp
-
-className="
-
-text-emerald-600
-
-"
-
-/>
-
-</div>
-
-<div>
-
-<h3
-
-className="
-
-font-bold
-
-text-lg
-
-mb-1
-
-"
-
->
-
-Vendor Benchmarking
-
-</h3>
-
-<p
-
-className="
-
-text-slate-500
-
-"
-
->
-
-Compare pricing,
-
-performance and
-
-engagement metrics.
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-{/* RIGHT */}
-
-<div
-
-className="
-
-glass
-
-rounded-[40px]
-
-shadow-xl
-
-border
-
-border-white/60
-
-p-10
-
-max-w-md
-
-w-full
-
-mx-auto
-
-"
-
->
-
-<div
-
-className="
-
-flex
-
-justify-center
-
-mb-6
-
-"
-
->
-
-<div
-
-className="
-
-h-16
-
-w-16
-
-rounded-3xl
-
-bg-indigo-100
-
-flex
-
-items-center
-
-justify-center
-
-"
-
->
-
-<Shield
-
-size={28}
-
-className="
-
-text-indigo-600
-
-"
-
-/>
-
-</div>
-
-</div>
-
-<h2
-
-className="
-
-text-4xl
-
-font-bold
-
-text-center
-
-mb-3
-
-"
-
->
-
-Welcome
-
-</h2>
-
-<p
-
-className="
-
-text-slate-500
-
-text-center
-
-mb-8
-
-"
-
->
-
-{
-
-subtitle
-
-}
-
-</p>
-
-{
-
-children
-
-}
-
-<div
-
-className="
-
-flex
-
-justify-center
-
-items-center
-
-gap-2
-
-mt-8
-
-text-slate-400
-
-text-sm
-
-"
-
->
-
-<Sparkles
-
-size={14}
-
-/>
-
-Enterprise AI Platform
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-);
-
+import { useTheme } from "../../../context/ThemeContext";
+
+const AuthLayout = ({
+    subtitle,
+    children
+}) => {
+
+    const theme = useTheme();
+
+    return (
+
+        <div
+            style={{
+                minHeight: "100vh",
+                position: "relative",
+                overflow: "hidden",
+
+                background: theme.pageBg,
+
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+
+                padding: "40px 24px"
+            }}
+        >
+
+            {/* Background Glow */}
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "-120px",
+                    right: "-120px",
+                    width: "380px",
+                    height: "380px",
+                    borderRadius: "999px",
+                    background: "rgba(124,90,246,0.15)",
+                    filter: "blur(80px)"
+                }}
+            />
+
+            <div
+                style={{
+                    position: "absolute",
+                    bottom: "-120px",
+                    left: "-120px",
+                    width: "320px",
+                    height: "320px",
+                    borderRadius: "999px",
+                    background: "rgba(96,165,250,0.12)",
+                    filter: "blur(80px)"
+                }}
+            />
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "40%",
+                    left: "45%",
+                    width: "250px",
+                    height: "250px",
+                    borderRadius: "999px",
+                    background: "rgba(167,139,250,0.10)",
+                    filter: "blur(80px)"
+                }}
+            />
+
+            <div
+                className="
+                    relative
+                    z-10
+                    grid
+                    lg:grid-cols-2
+                    gap-12
+                    items-center
+                    max-w-7xl
+                    w-full
+                "
+            >
+
+                {/* Left Section */}
+
+                <div
+                    className="hidden lg:block"
+                >
+
+                    <p
+                        style={{
+                            textTransform: "uppercase",
+                            letterSpacing: "4px",
+                            fontWeight: 600,
+                            color: "#7C5AF6",
+                            marginBottom: "20px"
+                        }}
+                    >
+                        Enterprise Intelligence
+                    </p>
+
+                    <h1
+                        style={{
+                            fontSize: "60px",
+                            fontWeight: 700,
+                            lineHeight: 1.1,
+                            color: theme.textPrimary,
+                            marginBottom: "24px"
+                        }}
+                    >
+                        AI Vendor
+                        <span
+                            style={{
+                                color: "#7C5AF6"
+                            }}
+                        >
+                            {" "}Discovery
+                        </span>
+                        <br />
+                        Platform
+                    </h1>
+
+                    <p
+                        style={{
+                            color: theme.textMuted,
+                            fontSize: "18px",
+                            lineHeight: 1.8,
+                            maxWidth: "600px",
+                            marginBottom: "40px"
+                        }}
+                    >
+                        Discover vendors,
+                        analyze capabilities,
+                        benchmark pricing
+                        and drive procurement
+                        decisions through
+                        AI-powered intelligence.
+                    </p>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "20px"
+                        }}
+                    >
+
+                        <FeatureCard
+                            icon={<BrainCircuit />}
+                            title="AI Recommendations"
+                            description="Smart vendor suggestions powered by analytics."
+                            theme={theme}
+                            iconColor="#7C5AF6"
+                            iconBg="rgba(124,90,246,0.12)"
+                        />
+
+                        <FeatureCard
+                            icon={<TrendingUp />}
+                            title="Vendor Benchmarking"
+                            description="Compare pricing, performance and engagement metrics."
+                            theme={theme}
+                            iconColor="#22C55E"
+                            iconBg="rgba(34,197,94,0.12)"
+                        />
+
+                    </div>
+
+                </div>
+
+                {/* Right Section */}
+
+                <div
+                    style={{
+                        background: theme.cardBg,
+                        border: `1px solid ${theme.cardBorder}`,
+                        borderRadius: "40px",
+                        padding: "40px",
+                        maxWidth: "520px",
+                        width: "100%",
+                        margin: "0 auto",
+
+                        boxShadow: theme.isDark
+                            ? "0 20px 50px rgba(0,0,0,0.35)"
+                            : "0 20px 50px rgba(15,23,42,0.08)"
+                    }}
+                >
+
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            marginBottom: "24px"
+                        }}
+                    >
+
+                        <div
+                            style={{
+                                width: "64px",
+                                height: "64px",
+                                borderRadius: "24px",
+                                background:
+                                    "rgba(124,90,246,0.12)",
+
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                        >
+                            <Shield
+                                size={28}
+                                color="#7C5AF6"
+                            />
+                        </div>
+
+                    </div>
+
+                    <h2
+                        style={{
+                            fontSize: "40px",
+                            fontWeight: 700,
+                            textAlign: "center",
+                            color: theme.textPrimary,
+                            marginBottom: "12px"
+                        }}
+                    >
+                        Welcome
+                    </h2>
+
+                    <p
+                        style={{
+                            color: theme.textMuted,
+                            textAlign: "center",
+                            marginBottom: "32px"
+                        }}
+                    >
+                        {subtitle}
+                    </p>
+
+                    {children}
+
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            marginTop: "32px",
+                            color: theme.textMuted,
+                            fontSize: "14px"
+                        }}
+                    >
+                        <Sparkles size={14} />
+                        Enterprise AI Platform
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
+};
+
+const FeatureCard = ({
+    icon,
+    title,
+    description,
+    theme,
+    iconColor,
+    iconBg
+}) => {
+
+    return (
+        <div
+            style={{
+                background: theme.cardBg,
+                border: `1px solid ${theme.cardBorder}`,
+                borderRadius: "28px",
+                padding: "20px",
+
+                display: "flex",
+                gap: "16px",
+                alignItems: "flex-start"
+            }}
+        >
+
+            <div
+                style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "16px",
+
+                    background: iconBg,
+
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+
+                    color: iconColor
+                }}
+            >
+                {icon}
+            </div>
+
+            <div>
+
+                <h3
+                    style={{
+                        fontWeight: 700,
+                        fontSize: "18px",
+                        color: theme.textPrimary,
+                        marginBottom: "4px"
+                    }}
+                >
+                    {title}
+                </h3>
+
+                <p
+                    style={{
+                        color: theme.textMuted
+                    }}
+                >
+                    {description}
+                </p>
+
+            </div>
+
+        </div>
+    );
 };
 
 export default AuthLayout;

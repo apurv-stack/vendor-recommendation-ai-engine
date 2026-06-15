@@ -60,10 +60,10 @@ const Pagination = ({
     const pages = visiblePages();
 
     const buttonStyle = {
-        width: "44px",
-        height: "44px",
+        width: "36px",
+        height: "36px",
 
-        borderRadius: "14px",
+        borderRadius: "10px",
 
         border: `1px solid ${theme.border}`,
         background: theme.cardBg,
@@ -76,17 +76,17 @@ const Pagination = ({
     return (
         <div
             style={{
-                marginTop: "24px",
+                marginTop: "16px",
 
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
 
-                padding: "20px",
+                padding: "12px 16px",
 
                 background: theme.cardBg,
                 border: `1px solid ${theme.border}`,
-                borderRadius: "24px"
+                borderRadius: "16px"
             }}
         >
             <div

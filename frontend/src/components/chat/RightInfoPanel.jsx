@@ -49,8 +49,8 @@ const RightInfoPanel = () => {
                 {features.map(({ Icon, title, desc }, i) => (
                     <div key={i} style={{
                         display: "flex", alignItems: "flex-start", gap: 12,
-                        marginBottom: 14,
-                        padding: "10px 10px",
+                        marginBottom: 8,
+                        padding: "8px 10px",
                         borderRadius: 12,
                         background: t.featureCardBg,
                         border: `1px solid ${t.featureCardBorder}`,
@@ -60,12 +60,12 @@ const RightInfoPanel = () => {
                         onMouseLeave={e => e.currentTarget.style.background = t.featureCardBg}
                     >
                         <div style={{
-                            width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                             background: "rgba(124,90,246,0.1)",
                             border: "1px solid rgba(124,90,246,0.2)",
                             display: "flex", alignItems: "center", justifyContent: "center"
                         }}>
-                            <Icon size={24} />
+                            <Icon size={16} />
                         </div>
                         <div>
                             <div style={{

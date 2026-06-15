@@ -16,7 +16,7 @@ disabled=false,
 loading=false,
 variant="primary",
 icon=null,
-fullWidth=true,
+fullWidth=false,
 className=""
 
 })=>{
@@ -119,13 +119,15 @@ fullWidth
 
 }
 
-px-6
+px-3
 
-py-4
+py-1.5
 
-rounded-2xl
+rounded-lg
 
-font-semibold
+font-medium
+
+text-xs
 
 flex
 
@@ -133,13 +135,13 @@ items-center
 
 justify-center
 
-gap-3
+gap-1.5
 
 transition-all
 
 duration-300
 
-hover:scale-[1.02]
+hover:scale-[1.01]
 
 active:scale-[0.98]
 
@@ -169,7 +171,7 @@ loading
 
 <Loader2
 
-size={18}
+size={14}
 
 className="
 

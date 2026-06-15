@@ -1,679 +1,377 @@
 import {
-
-ResponsiveContainer,
-AreaChart,
-Area,
-CartesianGrid,
-XAxis,
-YAxis,
-Tooltip
-
+    ResponsiveContainer,
+    AreaChart,
+    Area,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Tooltip
 } from "recharts";
 
-import {
-
-TrendingUp,
-Activity,
-Eye
-
-} from "lucide-react";
-
-import Card
-from "../../common/Card/Card";
-
-
-const VendorAnalytics=({
-
-analytics=[]
-
-})=>{
-
-const safeAnalytics=
-
-Array.isArray(
-
-analytics
-
-)
-
-?
-
-analytics.map(
-
-item=>({
-
-day:
-
-item.day||
-
-item.date||
-
-"Unknown",
-
-views:
-
-Number(
-
-item.views??
-
-item.total_views??
-
-item.count??
-
-0
-
-)
-
-})
-
-)
-
-:
-
-[];
-
-
-// =========================
-// KPI
-// =========================
-
-const totalViews=
-
-safeAnalytics.reduce(
-
-(
-
-sum,
-item
-
-)=>
-
-sum+
-
-item.views,
-
-0
-
-);
-
-
-const growth=
-
-safeAnalytics.length>1
-
-?
-
-Math.round(
-
-(
-
-(
-
-safeAnalytics[
-
-safeAnalytics.length-1
-
-]?.views||
-
-0
-
-)
-
--
-
-(
-
-safeAnalytics[0]
-
-?.views||
-
-0
-
-)
-
-)
-
-/
-
-Math.max(
-
-safeAnalytics[0]
-
-?.views||
-
-1,
-
-1
-
-)
-
-)
-
-*100
-
-:
-
-0;
-
-
-const engagement=
-
-Math.min(
-
-95,
-
-Math.floor(
-
-totalViews/
-
-25
-
-)
-
-);
-
-
-return(
-
-<Card
-
-className="
-
-relative
-
-overflow-hidden
-
-"
-
+import Card from "../../common/Card/Card";
+import { useTheme } from "../../../context/ThemeContext";
+
+const VendorAnalytics = ({
+    analytics = []
+}) => {
+
+    const theme = useTheme();
+
+    const safeAnalytics =
+        Array.isArray(analytics)
+            ? analytics.map(item => ({
+                day:
+                    item.day ||
+                    item.date ||
+                    "Unknown",
+
+                views: Number(
+                    item.views ??
+                    item.total_views ??
+                    item.count ??
+                    0
+                ),
+
+                growth: Number(
+                    item.growth ?? 0
+                ),
+
+                engagement: Number(
+                    item.engagement ?? 0
+                )
+            }))
+            : [];
+
+    return (
+
+        <Card
+            className="
+                relative
+                overflow-hidden
+            "
+        >
+
+            {/* Background Glow */}
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "-120px",
+                    right: "-120px",
+                    width: "260px",
+                    height: "260px",
+                    borderRadius: "999px",
+                    background:
+                        "rgba(124,90,246,0.12)",
+                    filter: "blur(80px)"
+                }}
+            />
+
+            {/* Header */}
+
+            <div
+                style={{
+                    position: "relative",
+                    zIndex: 2,
+                    marginBottom: "10px"
+                }}
+            >
+
+                <p
+                    style={{
+                        textTransform: "uppercase",
+                        letterSpacing: "3px",
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        color: "#7C5AF6",
+                        marginBottom: "4px"
+                    }}
+                >
+                    Analytics Intelligence
+                </p>
+
+                <h2
+                    style={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: theme.textPrimary,
+                        marginBottom: "4px"
+                    }}
+                >
+                    Analytics Overview
+                </h2>
+
+                <p
+                    style={{
+                        color: theme.textMuted,
+                        fontSize: "12px"
+                    }}
+                >
+                    Vendor performance analytics
+                </p>
+
+            </div>
+
+            {/* Legend */}
+
+            <div
+                style={{
+                    display: "flex",
+                    gap: "10px",
+                    flexWrap: "wrap",
+                    marginBottom: "8px"
+                }}
+            >
+
+                {[
+                    {
+                        label: "Views",
+                        color: "#7C5AF6"
+                    },
+                    {
+                        label: "Growth",
+                        color: "#22C55E"
+                    },
+                    {
+                        label: "Engagement",
+                        color: "#F472B6"
+                    }
+                ].map(item => (
+
+                    <div
+                        key={item.label}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            color: theme.textMuted,
+                            fontSize: "10px"
+                        }}
+                    >
+
+                        <div
+                            style={{
+                                width: "7px",
+                                height: "7px",
+                                borderRadius: "50%",
+                                background:
+                                    item.color
+                            }}
+                        />
+
+                        {item.label}
+
+                    </div>
+
+                ))}
+
+            </div>
+
+            {/* Chart */}
+
+            <div
+    style={{
+        height:
+            safeAnalytics.length === 0
+                ? "80px"
+                : "180px",
+        position: "relative",
+        zIndex: 2
+    }}
 >
 
-{/* GLOW */}
-
-<div
-
-className="
-
-absolute
-
-top-0
-
-right-0
-
-h-60
-
-w-60
-
-bg-indigo-100
-
-blur-3xl
-
-rounded-full
-
-opacity-60
-
-"
-
-/>
-
-
-{/* HEADER */}
-
-<div
-
-className="
-
-relative
-
-flex
-
-flex-col
-
-xl:flex-row
-
-justify-between
-
-gap-6
-
-mb-8
-
-"
-
->
-
-<div>
-
-<p
-
-className="
-
-text-indigo-600
-
-uppercase
-
-tracking-[4px]
-
-font-semibold
-
-text-xs
-
-mb-3
-
-"
-
->
-
-Analytics Intelligence
-
-</p>
-
-
-<h2
-
-className="
-
-text-3xl
-
-font-bold
-
-text-slate-800
-
-mb-2
-
-"
-
->
-
-Profile Traffic Insights
-
-</h2>
-
-
-<p
-
-className="
-
-text-slate-500
-
-"
-
->
-
-Vendor performance analytics
-
-</p>
-
-</div>
-
-
-<div
-
-className="
-
-flex
-
-gap-4
-
-flex-wrap
-
-"
-
->
-
-<MetricCard
-
-title="Views"
-
-value={
-
-totalViews
-
-}
-
-icon={<Eye/>}
-
-bg="bg-blue-50"
-
-text="text-blue-600"
-
-/>
-
-
-<MetricCard
-
-title="Growth"
-
-value={`${growth}%`}
-
-icon={<TrendingUp/>}
-
-bg="bg-green-50"
-
-text="text-green-600"
-
-/>
-
-
-<MetricCard
-
-title="Engagement"
-
-value={`${engagement}%`}
-
-icon={<Activity/>}
-
-bg="bg-purple-50"
-
-text="text-purple-600"
-
-/>
-
-</div>
-
-</div>
-
-
-{/* CHART */}
-
-<div
-
-className="
-
-h-[340px]
-
-"
-
->
-
-{
-
-safeAnalytics.length===0
-
-?
-
-(
-
-<div
-
-className="
-
-h-full
-
-flex
-
-items-center
-
-justify-center
-
-text-slate-400
-
-"
-
->
-
-No analytics available
-
-</div>
-
-)
-
-:
-
-(
-
-<ResponsiveContainer
-
-width="100%"
-
-height="100%"
-
->
-
-<AreaChart
-
-data={
-
-safeAnalytics
-
-}
-
->
-
-<defs>
-
-<linearGradient
-
-id="traffic"
-
-x1="0"
-
-y1="0"
-
-x2="0"
-
-y2="1"
-
->
-
-<stop
-
-offset="0%"
-
-stopColor="#6366F1"
-
-stopOpacity={0.28}
-
-/>
-
-<stop
-
-offset="100%"
-
-stopColor="#6366F1"
-
-stopOpacity={0}
-
-/>
-
-</linearGradient>
-
-</defs>
-
-
-<CartesianGrid
-
-stroke="#E2E8F0"
-
-strokeDasharray="4 4"
-
-vertical={false}
-
-/>
-
-
-<XAxis
-
-dataKey="day"
-
-tick={{
-
-fill:"#64748B"
-
-}}
-
-axisLine={false}
-
-tickLine={false}
-
-/>
-
-
-<YAxis
-
-tick={{
-
-fill:"#64748B"
-
-}}
-
-axisLine={false}
-
-tickLine={false}
-
-/>
-
-
-<Tooltip
-
-contentStyle={{
-
-borderRadius:"18px",
-
-border:"none",
-
-boxShadow:
-
-"0 10px 30px rgba(0,0,0,0.08)"
-
-}}
-
-labelStyle={{
-
-color:"#0F172A"
-
-}}
-
-itemStyle={{
-
-color:"#4F46E5"
-
-}}
-
-/>
-
-
-<Area
-
-type="monotone"
-
-dataKey="views"
-
-stroke="#6366F1"
-
-strokeWidth={3}
-
-fill="url(#traffic)"
-
-dot={{
-
-r:5,
-
-fill:"#6366F1"
-
-}}
-
-activeDot={{
-
-r:7
-
-}}
-
-/>
-
-</AreaChart>
-
-</ResponsiveContainer>
-
-)
-
-}
-
-</div>
-
-</Card>
-
-);
+                {safeAnalytics.length === 0 ? (
+
+                    <div
+                        style={{
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: theme.textMuted,
+                            fontSize: "10px"
+                        }}
+                    >
+                        No analytics data available
+                    </div>
+
+                ) : (
+
+                    <ResponsiveContainer
+                        width="100%"
+                        height="100%"
+                    >
+
+                        <AreaChart
+                            data={safeAnalytics}
+                            margin={{
+                                top: 10,
+                                right: 10,
+                                left: -20,
+                                bottom: 0
+                            }}
+                        >
+
+                            <defs>
+
+                                <linearGradient
+                                    id="viewsGradient"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stopColor="#7C5AF6"
+                                        stopOpacity={0.35}
+                                    />
+
+                                    <stop
+                                        offset="100%"
+                                        stopColor="#7C5AF6"
+                                        stopOpacity={0}
+                                    />
+                                </linearGradient>
+
+                                <linearGradient
+                                    id="growthGradient"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stopColor="#22C55E"
+                                        stopOpacity={0.35}
+                                    />
+
+                                    <stop
+                                        offset="100%"
+                                        stopColor="#22C55E"
+                                        stopOpacity={0}
+                                    />
+                                </linearGradient>
+
+                                <linearGradient
+                                    id="engagementGradient"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stopColor="#F472B6"
+                                        stopOpacity={0.35}
+                                    />
+
+                                    <stop
+                                        offset="100%"
+                                        stopColor="#F472B6"
+                                        stopOpacity={0}
+                                    />
+                                </linearGradient>
+
+                            </defs>
+
+                            <CartesianGrid
+                                stroke={
+                                    theme.cardBorder
+                                }
+                                strokeDasharray="4 4"
+                                vertical={false}
+                            />
+
+                            <XAxis
+                                dataKey="day"
+                                tick={{
+                                    fill:
+                                        theme.textMuted,
+                                    fontSize: 12
+                                }}
+                                tickLine={false}
+                                axisLine={false}
+                            />
+
+                            <YAxis
+                                tick={{
+                                    fill:
+                                        theme.textMuted,
+                                    fontSize: 12
+                                }}
+                                tickLine={false}
+                                axisLine={false}
+                            />
+
+                            <Tooltip
+                                contentStyle={{
+                                    background:
+                                        theme.cardBg,
+                                    border:
+                                        `1px solid ${theme.cardBorder}`,
+                                    borderRadius:
+                                        "16px",
+                                    color:
+                                        theme.textPrimary
+                                }}
+                            />
+
+                            <Area
+                                type="monotone"
+                                dataKey="views"
+                                stroke="#7C5AF6"
+                                strokeWidth={2}
+                                fill="url(#viewsGradient)"
+                                dot={false}
+                                activeDot={{
+                                    r: 6,
+                                    fill:
+                                        "#7C5AF6"
+                                }}
+                            />
+
+                            <Area
+                                type="monotone"
+                                dataKey="growth"
+                                stroke="#22C55E"
+                                strokeWidth={2}
+                                fill="url(#growthGradient)"
+                                dot={false}
+                                activeDot={{
+                                    r: 6,
+                                    fill:
+                                        "#22C55E"
+                                }}
+                            />
+
+                            <Area
+                                type="monotone"
+                                dataKey="engagement"
+                                stroke="#F472B6"
+                                strokeWidth={2}
+                                fill="url(#engagementGradient)"
+                                dot={false}
+                                activeDot={{
+                                    r: 6,
+                                    fill:
+                                        "#F472B6"
+                                }}
+                            />
+
+                        </AreaChart>
+
+                    </ResponsiveContainer>
+
+                )}
+
+            </div>
+
+        </Card>
+
+    );
 
 };
-
-
-function MetricCard({
-
-title,
-value,
-icon,
-bg,
-text
-
-}){
-
-return(
-
-<div
-
-className={`
-
-${bg}
-
-rounded-2xl
-
-px-5
-
-py-4
-
-min-w-[150px]
-
-`}
-
->
-
-<div
-
-className={`
-
-flex
-
-items-center
-
-gap-2
-
-mb-2
-
-${text}
-
-`}
-
->
-
-{icon}
-
-{title}
-
-</div>
-
-
-<h3
-
-className="
-
-text-2xl
-
-font-bold
-
-text-slate-800
-
-"
-
->
-
-{value}
-
-</h3>
-
-</div>
-
-);
-
-}
-
 
 export default VendorAnalytics;

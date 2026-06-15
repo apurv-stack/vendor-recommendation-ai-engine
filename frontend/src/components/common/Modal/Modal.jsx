@@ -77,7 +77,7 @@ sm:"max-w-md",
 
 md:"max-w-2xl",
 
-lg:"max-w-5xl",
+lg:"max-w-3xl",
 
 xl:"max-w-7xl"
 
@@ -157,7 +157,7 @@ overflow-hidden
 
 animate-[modalEnter_0.25s_ease]
 
-max-h-[90vh]
+max-h-[88vh]
 
 flex
 
@@ -210,9 +210,9 @@ justify-between
 
 items-center
 
-px-8
+px-6
 
-py-6
+py-4
 
 border-b
 
@@ -244,7 +244,7 @@ text-xs
 
 font-semibold
 
-mb-2
+mb-1
 
 "
 
@@ -259,7 +259,7 @@ Enterprise View
 
 className="
 
-text-3xl
+text-xl
 
 font-bold
 
@@ -286,11 +286,11 @@ onClick={onClose}
 
 className="
 
-h-12
+h-9
 
-w-12
+w-9
 
-rounded-2xl
+rounded-xl
 
 bg-white
 
@@ -343,7 +343,11 @@ relative
 
 overflow-y-auto
 
-p-8
+px-5
+
+pt-4
+
+pb-5
 
 bg-gradient-to-br
 

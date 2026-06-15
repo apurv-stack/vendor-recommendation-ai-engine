@@ -1,844 +1,410 @@
 import {
-
-Star,
-MapPin,
-Eye,
-Users,
-Heart,
-BadgeCheck,
-ArrowUpRight
-
+    Star,
+    MapPin,
+    Eye,
+    Users,
+    Heart,
+    BadgeCheck,
+    ArrowUpRight
 } from "lucide-react";
 
-import Card
-from "../../common/Card/Card";
-
-import Button
-from "../../common/Button/Button";
-
-
-const VendorCard=({
-
-vendor,
-onView,
-onSave
-
-})=>{
-
-const verified=
-
-vendor?.is_verified??
-
-false;
-
-const available=
-
-vendor?.is_available??
-
-true;
-
-const services=
-
-vendor?.services||
-
-[];
-
-const rating=
-
-Number(
-
-vendor?.avg_rating||
-
-0
-
-).toFixed(1);
-
-const reviews=
-
-vendor?.review_count||
-
-0;
-
-
-return(
-
-<Card
-
-className="
-
-relative
-
-overflow-hidden
-
-group
-
-hover:-translate-y-2
-
-transition-all
-
-duration-300
-
-"
-
->
-
-{/* TOP BAR */}
-
-<div
-
-className="
-
-absolute
-
-top-0
-
-left-0
-
-right-0
-
-h-1
-
-bg-gradient-to-r
-
-from-indigo-500
-
-via-purple-500
-
-to-cyan-500
-
-"
-
-/>
-
-
-{/* GLOW */}
-
-<div
-
-className="
-
-absolute
-
--right-16
-
--top-16
-
-h-40
-
-w-40
-
-bg-indigo-200/30
-
-blur-3xl
-
-rounded-full
-
-"
-
-/>
-
-
-{/* HEADER */}
-
-<div
-
-className="
-
-relative
-
-flex
-
-justify-between
-
-items-start
-
-mb-6
-
-"
-
->
-
-<div>
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-mb-2
-
-"
-
->
-
-<h2
-
-className="
-
-text-2xl
-
-font-bold
-
-text-slate-800
-
-"
-
->
-
-{
-
-vendor?.name||
-
-"Vendor"
-
-}
-
-</h2>
-
-
-{
-
-verified&&(
-
-<BadgeCheck
-
-size={18}
-
-className="
-
-text-indigo-500
-
-"
-
-/>
-
-)
-
-}
-
-</div>
-
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-text-slate-500
-
-"
-
->
-
-<MapPin size={16}/>
-
-{
-
-vendor?.city||
-
-"Location unavailable"
-
-}
-
-</div>
-
-</div>
-
-
-<button
-
-onClick={()=>
-
-onSave?.(
-
-vendor
-
-)
-
-}
-
-className="
-
-h-11
-
-w-11
-
-rounded-2xl
-
-bg-slate-100
-
-hover:bg-rose-100
-
-flex
-
-items-center
-
-justify-center
-
-transition-all
-
-"
-
->
-
-<Heart
-
-size={18}
-
-className="
-
-text-slate-500
-
-hover:text-rose-500
-
-"
-
-/>
-
-</button>
-
-</div>
-
-
-{/* STATUS */}
-
-<div
-
-className="
-
-flex
-
-gap-2
-
-flex-wrap
-
-mb-5
-
-"
-
->
-
-{
-
-verified&&(
-
-<span
-
-className="
-
-bg-indigo-50
-
-text-indigo-600
-
-px-4
-
-py-2
-
-rounded-full
-
-font-semibold
-
-text-sm
-
-"
-
->
-
-Verified
-
-</span>
-
-)
-
-}
-
-
-<span
-
-className={`
-
-px-4
-
-py-2
-
-rounded-full
-
-font-semibold
-
-text-sm
-
-${
-
-available
-
-?
-
-"bg-emerald-100 text-emerald-700"
-
-:
-
-"bg-red-100 text-red-700"
-
-}
-
-`}
-
->
-
-{
-
-available
-
-?
-
-"Available"
-
-:
-
-"Unavailable"
-
-}
-
-</span>
-
-</div>
-
-
-{/* DESCRIPTION */}
-
-<p
-
-className="
-
-text-slate-500
-
-leading-7
-
-line-clamp-3
-
-mb-6
-
-"
-
->
-
-{
-
-vendor?.description||
-
-"No description available"
-
-}
-
-</p>
-
-
-{/* PRICE */}
-
-<div
-
-className="
-
-bg-gradient-to-r
-
-from-indigo-50
-
-to-purple-50
-
-rounded-3xl
-
-p-5
-
-mb-6
-
-border
-
-border-indigo-100
-
-"
-
->
-
-<p
-
-className="
-
-text-slate-500
-
-text-sm
-
-mb-2
-
-"
-
->
-
-Pricing Range
-
-</p>
-
-
-<h3
-
-className="
-
-text-3xl
-
-font-bold
-
-text-slate-800
-
-"
-
->
-
-₹
-
-{
-
-vendor?.price_min??
-
-0
-
-}
-
--
-
-₹
-
-{
-
-vendor?.price_max??
-
-0
-
-}
-
-</h3>
-
-</div>
-
-
-{/* SERVICES */}
-
-{
-
-services.length>0&&(
-
-<div
-
-className="
-
-flex
-
-flex-wrap
-
-gap-2
-
-mb-6
-
-"
-
->
-
-{
-
-services
-
-.slice(
-
-0,
-
-3
-
-)
-
-.map(
-
-(
-
-service,
-index
-
-)=>(
-
-<span
-
-key={
-
-service.service_id||
-
-index
-
-}
-
-className="
-
-px-4
-
-py-2
-
-bg-slate-100
-
-rounded-2xl
-
-text-sm
-
-font-medium
-
-text-slate-600
-
-"
-
->
-
-{
-
-service.service_name||
-
-service
-
-}
-
-</span>
-
-)
-
-)
-
-}
-
-</div>
-
-)
-
-}
-
-
-{/* KPI */}
-
-<div
-
-className="
-
-grid
-
-grid-cols-3
-
-gap-3
-
-mb-6
-
-"
-
->
-
-<Metric
-
-icon={
-
-<Users size={16}/>
-
-}
-
-value={reviews}
-
-label="Reviews"
-
-iconColor="text-indigo-500"
-
-/>
-
-
-<Metric
-
-icon={
-
-<Eye size={16}/>
-
-}
-
-value={
-
-services.length
-
-}
-
-label="Services"
-
-iconColor="text-cyan-500"
-
-/>
-
-
-<Metric
-
-icon={
-
-<Star
-
-size={16}
-
-fill="#FACC15"
-
-color="#FACC15"
-
-/>
-
-}
-
-value={rating}
-
-label="Rating"
-
-iconColor=""
-
-/>
-
-</div>
-
-
-<Button
-
-onClick={()=>
-
-onView?.(
-
-vendor
-
-)
-
-}
-
-icon={
-
-<ArrowUpRight/>
-
-}
-
->
-
-View Details
-
-</Button>
-
-</Card>
-
-);
-
+import Card from "../../common/Card/Card";
+import Button from "../../common/Button/Button";
+import { useTheme } from "../../../context/ThemeContext";
+
+const VendorCard = ({
+    vendor,
+    onView,
+    onSave
+}) => {
+
+    const theme = useTheme();
+
+    const verified =
+        vendor?.is_verified ?? false;
+
+    const available =
+        vendor?.is_available ?? true;
+
+     const services =
+        (vendor?.managed_teams || [])
+            .flatMap(team => team?.services || []);
+       
+
+    const rating = Number(
+        vendor?.avg_rating || 0
+    ).toFixed(1);
+
+    const reviews =
+        vendor?.review_count || 0;
+
+    return (
+        <Card
+            className="relative overflow-hidden group transition-all duration-300"
+        >
+
+            {/* Top Accent Bar */}
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "4px",
+                    background:
+                        "linear-gradient(90deg,#7C5AF6,#A78BFA,#60A5FA)"
+                }}
+            />
+
+            {/* Glow */}
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "-60px",
+                    right: "-60px",
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "999px",
+                    background: "rgba(124,90,246,0.12)",
+                    filter: "blur(60px)"
+                }}
+            />
+
+            {/* Header */}
+
+            <div
+                style={{
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "12px"
+                }}
+            >
+
+                <div>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            marginBottom: "8px"
+                        }}
+                    >
+
+                        <h2
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: 700,
+                                whiteSpace: "nowrap",
+                                color: theme.textPrimary,
+                                margin: 0,
+                                lineHeight: 1.3
+                            }}
+                        >
+                            {vendor?.name || "Vendor"}
+                        </h2>
+
+                        {verified && (
+                            <BadgeCheck
+                                size={18}
+                                color="#7C5AF6"
+                            />
+                        )}
+
+                    </div>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            color: theme.textMuted,
+                            fontSize: "13px",
+                            fontWeight: 500
+                        }}
+                    >
+                        <MapPin size={13} />
+
+                        {vendor?.city ||
+                            "Location unavailable"}
+                    </div>
+
+                </div>
+
+                <button
+                    onClick={() => onSave?.(vendor)}
+                    style={{
+                        fontSize: "13px",
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "10px",
+                        background: theme.panelBg,
+                        border: `1px solid ${theme.cardBorder}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer"
+                    }}
+                >
+                    <Heart
+                        size={16}
+                        color={theme.textMuted}
+                    />
+                </button>
+
+            </div>
+
+            {/* Status */}
+
+            <div
+                style={{
+                    display: "flex",
+                    gap: "10px",
+                    flexWrap: "wrap",
+                    marginBottom: "12px"
+                }}
+            >
+
+                {verified && (
+                    <span
+                        style={{
+                            background:
+                                "rgba(124,90,246,0.12)",
+                            color: "#7C5AF6",
+                            padding: "4px 10px",
+                            borderRadius: "10px",
+                            fontWeight: 600,
+                            fontSize: "11px"
+                        }}
+                    >
+                        Verified
+                    </span>
+                )}
+
+                <span
+                    style={{
+                        padding: "4px 10px",
+                        borderRadius: "999px",
+                        fontWeight: 600,
+                        fontSize: "11px",
+                        background: available
+                            ? "rgba(34,197,94,0.12)"
+                            : "rgba(239,68,68,0.12)",
+                        color: available
+                            ? "#22C55E"
+                            : "#EF4444"
+                    }}
+                >
+                    {available
+                        ? "Available"
+                        : "Unavailable"}
+                </span>
+
+            </div>
+
+            {/* Description */}
+
+            <p
+                style={{
+                    color: theme.textMuted,
+                    lineHeight: 1.7,
+                    marginBottom: "12px",
+                    minHeight: "40px",
+                    fontSize: "12px"
+                }}
+            >
+                {vendor?.description ||
+                    "No description available"}
+            </p>
+
+            {/* Pricing */}
+
+            <div
+                style={{
+                    background: theme.panelBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: "18px",
+                    padding: "10px 14px",
+                    marginBottom: "14px",
+                    whiteSpace: "nowrap"
+                }}
+            >
+
+                <p
+                    style={{
+                        color: theme.textMuted,
+                        fontSize: "13px",
+                        marginBottom: "4px"
+                    }}
+                >
+                    Pricing Range
+                </p>
+
+                <h3
+                    style={{
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        color: theme.textPrimary,
+                        margin: 0
+                    }}
+                >
+                    ₹{vendor?.price_min ?? 0}
+                    {" - "}
+                    ₹{vendor?.price_max ?? 0}
+                </h3>
+
+            </div>
+
+            {/* Services */}
+
+            {services.length > 0 && (
+                <div
+                    style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "6px",
+                        marginBottom: "12px"
+                    }}
+                >
+
+                    {services
+                        .slice(0, 3)
+                        .map((service, index) => (
+
+                            <span
+                                key={
+                                    service.service_id ||
+                                    index
+                                }
+                                style={{
+                                    padding: "5px 10px",
+                                    background:
+                                        theme.panelBg,
+                                    border:
+                                        `1px solid ${theme.cardBorder}`,
+                                    borderRadius: "14px",
+                                    fontSize: "10px",
+                                    fontWeight: 500,
+                                    color:
+                                        theme.textSecondary
+                                }}
+                            >
+                                {service.name || service.service_name || service}
+                            </span>
+
+                        ))}
+
+                </div>
+            )}
+
+            {/* Metrics */}
+
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                        "repeat(3,1fr)",
+                    gap: "6px",
+                    marginBottom: "14px"
+                }}
+            >
+
+                <Metric
+                    icon={<Users size={16} />}
+                    value={reviews}
+                    label="Reviews"
+                    theme={theme}
+                    color="#7C5AF6"
+                />
+
+                <Metric
+                    icon={<Eye size={16} />}
+                    value={services.length}
+                    label="Services"
+                    theme={theme}
+                    color="#60A5FA"
+                />
+
+                <Metric
+                    icon={
+                        <Star
+                            size={14}
+                            fill="#FACC15"
+                            color="#FACC15"
+                        />
+                    }
+                    value={rating}
+                    label="Rating"
+                    theme={theme}
+                    color="#FACC15"
+                />
+
+            </div>
+
+            <Button
+                onClick={() => onView?.(vendor)}
+                icon={<ArrowUpRight />}
+            >
+                View Details
+            </Button>
+
+        </Card>
+    );
 };
 
+const Metric = ({
+    icon,
+    value,
+    label,
+    theme,
+    color
+}) => (
+    <div
+        style={{
+            background: theme.panelBg,
+            border: `1px solid ${theme.cardBorder}`,
+            borderRadius: "12px",
+            padding: "10px",
+            textAlign: "center"
+        }}
+    >
 
-const Metric=({
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "4px",
+                color
+            }}
+        >
+            {icon}
+        </div>
 
-icon,
-value,
-label,
-iconColor
+        <p
+            style={{
+                fontWeight: 700,
+                fontSize: "14px",
+                color: theme.textPrimary,
+                marginBottom: "4px"
+            }}
+        >
+            {value}
+        </p>
 
-})=>(
+        <p
+            style={{
+                fontSize: "11px",
+                color: theme.textMuted
+            }}
+        >
+            {label}
+        </p>
 
-<div
-
-className="
-
-bg-slate-50
-
-rounded-2xl
-
-p-3
-
-text-center
-
-"
-
->
-
-<div
-
-className={`
-
-mx-auto
-
-mb-2
-
-flex
-
-justify-center
-
-${
-
-iconColor
-
-}
-
-`}
-
->
-
-{
-
-icon
-
-}
-
-</div>
-
-
-<p
-
-className="
-
-font-bold
-
-text-slate-800
-
-"
-
->
-
-{
-
-value
-
-}
-
-</p>
-
-
-<p
-
-className="
-
-text-xs
-
-text-slate-500
-
-"
-
->
-
-{
-
-label
-
-}
-
-</p>
-
-</div>
-
+    </div>
 );
-
 
 export default VendorCard;

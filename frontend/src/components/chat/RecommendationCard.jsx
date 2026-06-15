@@ -1,13 +1,15 @@
-import React, { memo } from "react";
-import { MapPin, Tag, Star, Target, ChevronRight } from "lucide-react";
+import React, { memo, useState } from "react";
+import { MapPin, Tag, Star, Target, ChevronRight, ArrowUpRight, Bookmark } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+import axiosInstance from "../../api/axiosInstance";
+import Modal from "../common/Modal/Modal";
+import VendorDetails from "../vendor/VendorDetails/VendorDetails";
 
 // ── Category SVG illustrations ──
 const CategoryIllustration = ({ category, isDark }) => {
     const color = isDark ? "#a78bfa" : "#7c5af6";
     const colorFaint = isDark ? "rgba(167,139,250,0.15)" : "rgba(124,90,246,0.1)";
     const colorMid = isDark ? "rgba(167,139,250,0.4)" : "rgba(124,90,246,0.35)";
-
     const cat = (category || "").toLowerCase();
 
     if (cat === "catering" || cat === "food") return (
@@ -124,7 +126,6 @@ const CategoryIllustration = ({ category, isDark }) => {
         </svg>
     );
 
-    // Default fallback — generic sparkle/star
     return (
         <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
             <circle cx="36" cy="36" r="16" fill={colorFaint} stroke={color} strokeWidth="1.5" />
@@ -140,10 +141,16 @@ const CategoryIllustration = ({ category, isDark }) => {
 function RecommendationCard({ vendor }) {
     const t = useTheme();
 
-    const name = vendor?.vendor_name || "Unknown Vendor";
+    // ✅ local modal state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const name = vendor?.vendor_name || vendor?.name || "Unknown Vendor";
     const city = vendor?.city || "Location unavailable";
     const category = vendor?.category || "General";
-    const rating = typeof vendor?.rating === "number" ? vendor.rating.toFixed(1) : "N/A";
+    const rating = typeof vendor?.rating === "number" ? vendor.rating.toFixed(1)
+        : typeof vendor?.avg_rating === "number" ? vendor.avg_rating.toFixed(1) : "N/A";
     const reviewCount = vendor?.review_count ?? 0;
     const description = vendor?.vendor_description?.trim() || "";
     const recommendationReason = vendor?.recommendation_reason || "Recommended based on your requirements";
@@ -169,220 +176,237 @@ function RecommendationCard({ vendor }) {
     const avatarColors = ["#7c5af6", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444"];
     const avatarColor = avatarColors[name.charCodeAt(0) % avatarColors.length];
 
+    const handleSave = async () => {
+        if (saved || saving) return;
+        try {
+            setSaving(true);
+            await axiosInstance.post(`/vendors/${vendor.vendor_id}/save`);
+            setSaved(true);
+        } catch (error) {
+            console.error("Save failed:", error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
-        <div
-            style={{
-                position: "relative", overflow: "hidden",
-                borderRadius: 14,
-                background: t.cardBg,
-                border: `1px solid ${t.cardBorder}`,
-                boxShadow: t.cardShadow,
-                transition: "transform 0.2s, box-shadow 0.2s, background 0.3s",
-                cursor: "default"
-            }}
-            onMouseEnter={e => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = t.cardHoverShadow;
-            }}
-            onMouseLeave={e => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = t.cardShadow;
-            }}
-        >
-            {/* TOP ACCENT BAR */}
-            <div style={{
-                position: "absolute", top: 0, left: 0, right: 0, height: 3,
-                background: "linear-gradient(90deg,#7c5af6,#a78bfa,#c084fc)"
-            }} />
-
-            {/* CATEGORY ILLUSTRATION — absolute top right, with reserved space */}
-            <div style={{
-                position: "absolute", top: 6, right: 6,
-                width: 80, height: 80,
-                pointerEvents: "none",
-                zIndex: 0,
-                opacity: t.isDark ? 0.7 : 0.5
-            }}>
-            <div style={{
-                position: "absolute", top: "50%", left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: 90, height: 90,
-                borderRadius: "50%",
-                background: t.isDark
-                    ? "radial-gradient(circle, rgba(124,90,246,0.3) 0%, transparent 70%)"
-                    : "radial-gradient(circle, rgba(124,90,246,0.15) 0%, transparent 70%)",
-                filter: "blur(8px)"
-            }} />
-            <div style={{ position: "relative" }}>
-                <CategoryIllustration category={category} isDark={t.isDark} />
-            </div>
-        </div>
-
-            <div style={{ padding: "14px 16px 12px", paddingTop: 16 }}>
-
-                {/* ── TOP ROW: Avatar + Name + Rating ── */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, paddingRight: 88 }}>
-
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-                        {/* Avatar */}
-                        <div style={{
-                            width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                            background: avatarColor + (t.isDark ? "22" : "18"),
-                            border: `1.5px solid ${avatarColor}${t.isDark ? "44" : "33"}`,
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 17, fontWeight: 800, color: avatarColor
-                        }}>
-                            {name.charAt(0).toUpperCase()}
-                        </div>
-
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                            {/* Name + featured badge */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
-                                <span style={{
-                                    fontSize: 14, fontWeight: 700,
-                                    color: t.isDark ? "#F8FAFC" : t.textPrimary,
-                                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
-                                }}>{name}</span>
-                                {featuredBadge && (
-                                    <span style={{
-                                        padding: "2px 8px", borderRadius: 20,
-                                        fontSize: 10, fontWeight: 700,
-                                        background: "rgba(245,158,11,0.12)",
-                                        color: "#f59e0b",
-                                        border: "1px solid rgba(245,158,11,0.3)",
-                                        whiteSpace: "nowrap"
-                                    }}>⭐ {featuredBadge}</span>
-                                )}
-                            </div>
-                            {/* City + Category */}
-                            <div style={{ display: "flex", gap: 10, marginTop: 4, flexWrap: "wrap" }}>
-                                <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: t.vendorCityText }}>
-                                    <MapPin size={10} color="#7c5af6" />{city}
-                                </span>
-                                <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: t.vendorCityText }}>
-                                    <Tag size={10} color="#a78bfa" />{category}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Rating box */}
-                    <div style={{
-                        display: "flex", flexDirection: "column", alignItems: "center",
-                        background: "rgba(245,158,11,0.1)",
-                        border: "1px solid rgba(245,158,11,0.25)",
-                        borderRadius: 10, padding: "6px 11px", flexShrink: 0,
-                        position: "relative", zIndex: 2  
-                    }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                            <Star size={11} color="#f59e0b" fill="#f59e0b" />
-                            <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{rating}</span>
-                        </div>
-                        <span style={{ fontSize: 10, color: t.reviewText, marginTop: 2 }}>{reviewCount} reviews</span>
-                    </div>
-                </div>
-
-                {/* ── PRICE + MATCH GRID ── */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12 }}>
-                    {/* Price */}
-                    <div style={{
-                        borderRadius: 10,
-                        background: t.isDark ? "rgba(124,90,246,0.08)" : "rgba(124,90,246,0.05)",
-                        border: `1px solid ${t.isDark ? "rgba(124,90,246,0.2)" : "rgba(124,90,246,0.12)"}`,
-                        padding: "9px 11px"
-                    }}>
-                        <div style={{
-                            fontSize: 9, textTransform: "uppercase",
-                            letterSpacing: "0.07em", color: t.priceLabelText,
-                            fontWeight: 600, marginBottom: 4
-                        }}>Price Range</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: t.priceValueText }}>{pricing}</div>
-                    </div>
-
-                    {/* Match score */}
-                    <div style={{
-                        borderRadius: 10,
-                        background: matchBg,
-                        border: `1px solid ${matchBorder}`,
-                        padding: "9px 11px"
-                    }}>
-                        <div style={{
-                            fontSize: 9, textTransform: "uppercase",
-                            letterSpacing: "0.07em", color: t.priceLabelText,
-                            fontWeight: 600, marginBottom: 4
-                        }}>Match Score</div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                            <Target size={11} color={matchTextColor} />
-                            <span style={{ fontSize: 13, fontWeight: 700, color: matchTextColor }}>{matchScore}%</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ── DESCRIPTION ── */}
-                {description && (
-                    <p style={{
-                        marginTop: 10, fontSize: 11.5,
-                        color: t.isDark ? "#CBD5E1" : "#6060a0",
-                        lineHeight: 1.6,
-                        display: "-webkit-box", WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical", overflow: "hidden",
-                        margin: "10px 0 0"
-                    }}>{description}</p>
-                )}
-
-                {/* ── SERVICES ── */}
-                {services.length > 0 && (
-                    <div style={{ marginTop: 10 }}>
-                        <div style={{
-                            fontSize: 10, fontWeight: 600,
-                            color: t.priceLabelText,
-                            marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.06em"
-                        }}>Services</div>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                            {services.slice(0, 6).map((s, i) => (
-                                <span key={i} style={{
-                                    padding: "3px 9px", borderRadius: 20,
-                                    background: t.serviceTagBg,
-                                    border: `1px solid ${t.serviceTagBorder}`,
-                                    color: t.serviceTagText,
-                                    fontSize: 10, fontWeight: 500
-                                }}>{s}</span>
-                            ))}
-                            {services.length > 6 && (
-                                <span style={{
-                                    padding: "3px 9px", borderRadius: 20,
-                                    background: "rgba(124,90,246,0.1)",
-                                    border: "1px solid rgba(124,90,246,0.2)",
-                                    color: "#a78bfa",
-                                    fontSize: 10, fontWeight: 500
-                                }}>+{services.length - 6} more</span>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                {/* ── RECOMMENDATION REASON ── */}
+        <>
+            <div
+                style={{
+                    position: "relative", overflow: "hidden",
+                    borderRadius: 14,
+                    background: t.cardBg,
+                    border: `1px solid ${t.cardBorder}`,
+                    boxShadow: t.cardShadow,
+                    transition: "transform 0.2s, box-shadow 0.2s",
+                    cursor: "default",
+                    maxWidth: "480px", // ✅ limit horizontal width
+                    width: "100%"
+                }}
+                onMouseEnter={e => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = t.cardHoverShadow;
+                }}
+                onMouseLeave={e => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = t.cardShadow;
+                }}
+            >
+                {/* TOP ACCENT BAR */}
                 <div style={{
-                    marginTop: 10, paddingTop: 10,
-                    borderTop: `1px solid ${t.isDark ? "rgba(124,90,246,0.1)" : "rgba(124,90,246,0.08)"}`,
-                    display: "flex", alignItems: "flex-start", gap: 8
+                    position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                    background: "linear-gradient(90deg,#7c5af6,#a78bfa,#c084fc)"
+                }} />
+
+                {/* CATEGORY ILLUSTRATION */}
+                <div style={{
+                    position: "absolute", top: 6, right: 6,
+                    width: 72, height: 72,
+                    pointerEvents: "none", zIndex: 0,
+                    opacity: t.isDark ? 0.7 : 0.5
                 }}>
                     <div style={{
-                        width: 18, height: 18, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-                        background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
-                        display: "flex", alignItems: "center", justifyContent: "center"
-                    }}>
-                        <ChevronRight size={10} color="#fff" />
+                        position: "absolute", top: "50%", left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 80, height: 80, borderRadius: "50%",
+                        background: t.isDark
+                            ? "radial-gradient(circle, rgba(124,90,246,0.3) 0%, transparent 70%)"
+                            : "radial-gradient(circle, rgba(124,90,246,0.15) 0%, transparent 70%)",
+                        filter: "blur(8px)"
+                    }} />
+                    <div style={{ position: "relative" }}>
+                        <CategoryIllustration category={category} isDark={t.isDark} />
                     </div>
-                    <p style={{
-                        fontSize: 11, color: t.recReasonText,
-                        lineHeight: 1.55, fontStyle: "italic", margin: 0
+                </div>
+
+                <div style={{ padding: "14px 14px 12px", paddingTop: 16 }}>
+
+                    {/* TOP ROW */}
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, paddingRight: 80 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+                            <div style={{
+                                width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                                background: avatarColor + (t.isDark ? "22" : "18"),
+                                border: `1.5px solid ${avatarColor}${t.isDark ? "44" : "33"}`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: 16, fontWeight: 800, color: avatarColor
+                            }}>
+                                {name.charAt(0).toUpperCase()}
+                            </div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                                    <span style={{
+                                        fontSize: 13, fontWeight: 700,
+                                        color: t.isDark ? "#F8FAFC" : t.textPrimary,
+                                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                                    }}>{name}</span>
+                                    {featuredBadge && (
+                                        <span style={{
+                                            padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700,
+                                            background: "rgba(245,158,11,0.12)", color: "#f59e0b",
+                                            border: "1px solid rgba(245,158,11,0.3)", whiteSpace: "nowrap"
+                                        }}>⭐ {featuredBadge}</span>
+                                    )}
+                                </div>
+                                <div style={{ display: "flex", gap: 8, marginTop: 3, flexWrap: "wrap" }}>
+                                    <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: t.vendorCityText }}>
+                                        <MapPin size={9} color="#7c5af6" />{city}
+                                    </span>
+                                    <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: t.vendorCityText }}>
+                                        <Tag size={9} color="#a78bfa" />{category}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Rating */}
+                        <div style={{
+                            display: "flex", flexDirection: "column", alignItems: "center",
+                            background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)",
+                            borderRadius: 10, padding: "5px 10px", flexShrink: 0, position: "relative", zIndex: 2
+                        }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                                <Star size={10} color="#f59e0b" fill="#f59e0b" />
+                                <span style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b" }}>{rating}</span>
+                            </div>
+                            <span style={{ fontSize: 9, color: t.reviewText, marginTop: 1 }}>{reviewCount} reviews</span>
+                        </div>
+                    </div>
+
+                    {/* PRICE + MATCH */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7, marginTop: 10 }}>
+                        <div style={{
+                            borderRadius: 10,
+                            background: t.isDark ? "rgba(124,90,246,0.08)" : "rgba(124,90,246,0.05)",
+                            border: `1px solid ${t.isDark ? "rgba(124,90,246,0.2)" : "rgba(124,90,246,0.12)"}`,
+                            padding: "8px 10px"
+                        }}>
+                            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.07em", color: t.priceLabelText, fontWeight: 600, marginBottom: 3 }}>Price Range</div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: t.priceValueText }}>{pricing}</div>
+                        </div>
+                        <div style={{ borderRadius: 10, background: matchBg, border: `1px solid ${matchBorder}`, padding: "8px 10px" }}>
+                            <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.07em", color: t.priceLabelText, fontWeight: 600, marginBottom: 3 }}>Match Score</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                <Target size={10} color={matchTextColor} />
+                                <span style={{ fontSize: 12, fontWeight: 700, color: matchTextColor }}>{matchScore}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* DESCRIPTION */}
+                    {description && (
+                        <p style={{
+                            marginTop: 8, fontSize: 11,
+                            color: t.isDark ? "#CBD5E1" : "#6060a0",
+                            lineHeight: 1.5,
+                            display: "-webkit-box", WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical", overflow: "hidden"
+                        }}>{description}</p>
+                    )}
+
+                    {/* SERVICES */}
+                    {services.length > 0 && (
+                        <div style={{ marginTop: 8 }}>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: t.priceLabelText, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Services</div>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                                {services.slice(0, 5).map((s, i) => (
+                                    <span key={i} style={{
+                                        padding: "2px 8px", borderRadius: 20,
+                                        background: t.serviceTagBg, border: `1px solid ${t.serviceTagBorder}`,
+                                        color: t.serviceTagText, fontSize: 9, fontWeight: 500
+                                    }}>{s}</span>
+                                ))}
+                                {services.length > 5 && (
+                                    <span style={{
+                                        padding: "2px 8px", borderRadius: 20,
+                                        background: "rgba(124,90,246,0.1)", border: "1px solid rgba(124,90,246,0.2)",
+                                        color: "#a78bfa", fontSize: 9, fontWeight: 500
+                                    }}>+{services.length - 5} more</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* RECOMMENDATION REASON */}
+                    <div style={{
+                        marginTop: 8, paddingTop: 8,
+                        borderTop: `1px solid ${t.isDark ? "rgba(124,90,246,0.1)" : "rgba(124,90,246,0.08)"}`,
+                        display: "flex", alignItems: "flex-start", gap: 6
                     }}>
-                        {recommendationReason}
-                    </p>
+                        <div style={{
+                            width: 16, height: 16, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                            background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
+                            display: "flex", alignItems: "center", justifyContent: "center"
+                        }}>
+                            <ChevronRight size={9} color="#fff" />
+                        </div>
+                        <p style={{ fontSize: 10, color: t.recReasonText, lineHeight: 1.5, fontStyle: "italic", margin: 0 }}>
+                            {recommendationReason}
+                        </p>
+                    </div>
+
+                    {/* ✅ BUTTONS */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7, marginTop: 10 }}>
+                        <button
+                            onClick={() => setModalOpen(true)}
+                            style={{
+                                padding: "8px", borderRadius: 10, fontWeight: 600, fontSize: 12,
+                                cursor: "pointer", display: "flex", alignItems: "center",
+                                justifyContent: "center", gap: 5,
+                                background: t.isDark ? "rgba(255,255,255,0.08)" : "rgba(124,90,246,0.08)",
+                                border: `1px solid ${t.isDark ? "rgba(255,255,255,0.12)" : "rgba(124,90,246,0.2)"}`,
+                                color: t.isDark ? "#fff" : "#7c5af6"
+                            }}
+                        >
+                            <ArrowUpRight size={13} /> Details
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={saved || saving}
+                            style={{
+                                padding: "8px", borderRadius: 10, fontWeight: 600, fontSize: 12,
+                                cursor: saved ? "default" : "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                                background: saved ? "rgba(124,90,246,0.3)" : "linear-gradient(135deg,#7c5af6,#a78bfa)",
+                                border: "none", color: "#fff"
+                            }}
+                        >
+                            <Bookmark size={13} /> {saving ? "Saving..." : saved ? "Saved" : "Save"}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {/* ✅ MODAL — opens inline, no navigation */}
+            <Modal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                title="Vendor Details"
+                size="lg"
+            >
+                <VendorDetails vendor={vendor} />
+            </Modal>
+        </>
     );
 }
 

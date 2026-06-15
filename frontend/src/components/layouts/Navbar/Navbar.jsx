@@ -1,1233 +1,410 @@
-import {
-Menu,
-Bell,
-Search,
-ChevronDown,
-Users,
-Eye
-} from "lucide-react";
-
-import {
-useState,
-useEffect,
-useRef
-} from "react";
-
-import {
-useNavigate
-} from "react-router-dom";
-
-import axiosInstance
-from "../../../api/axiosInstance";
-
-import useAuth
-from "../../../hooks/useAuth";
-
-const Navbar=({
-
-toggleSidebar
-
-})=>{
-
-const{
-
-user,
-logout
-
-}=useAuth();
-
-const navigate=
-
-useNavigate();
-
-const[
-
-profileOpen,
-setProfileOpen
-
-]=useState(false);
-
-const[
-
-notificationOpen,
-setNotificationOpen
-
-]=useState(false);
-
-const[
-
-followers,
-setFollowers
-
-]=useState(0);
-
-const[
-
-views,
-setViews
-
-]=useState(0);
-
-const[
-
-notifications,
-setNotifications
-
-]=useState([]);
-
-const[
-
-loadingNotifications,
-setLoadingNotifications
-
-]=useState(false);
-
-const profileRef=
-
-useRef(null);
-
-const notificationRef=
-
-useRef(null);
-
-
-useEffect(()=>{
-
-fetchNavbarData();
-
-fetchNotifications();
-
-},[]);
-
-
-const fetchNavbarData=
-
-async()=>{
-
-try{
-
-const response=
-
-await axiosInstance.get(
-
-"/vendors/profile/views"
-
-);
-
-setViews(
-
-response.data?.views||0
-
-);
-
-setFollowers(
-
-response.data?.followers||0
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-};
-
-
-const fetchNotifications=
-
-async()=>{
-
-try{
-
-setLoadingNotifications(
-
-true
-
-);
-
-const response=
-
-await axiosInstance.get(
-
-"/vendors/notifications"
-
-);
-
-setNotifications(
-
-response.data?.notifications||
-
-[]
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-finally{
-
-setLoadingNotifications(
-
-false
-
-);
-
-}
-
-};
-
-
-const markRead=
-
-async(
-
-notificationId
-
-)=>{
-
-try{
-
-await axiosInstance.put(
-
-`/vendors/notifications/${notificationId}`
-
-);
-
-setNotifications(
-
-previous=>
-
-previous.map(
-
-item=>
-
-item.notification_id===notificationId
-
-?
-
-{
-
-...item,
-
-is_read:true
-
-}
-
-:
-
-item
-
-)
-
-);
-
-}
-
-catch(error){
-
-console.log(error);
-
-}
-
-};
-
-
-useEffect(()=>{
-
-const close=(event)=>{
-
-if(
-
-profileRef.current&&
-
-!profileRef.current.contains(
-
-event.target
-
-)
-
-){
-
-setProfileOpen(false);
-
-}
-
-if(
-
-notificationRef.current&&
-
-!notificationRef.current.contains(
-
-event.target
-
-)
-
-){
-
-setNotificationOpen(false);
-
-}
-
-};
-
-document.addEventListener(
-
-"mousedown",
-
-close
-
-);
-
-return()=>{
-
-document.removeEventListener(
-
-"mousedown",
-
-close
-
-);
-
-};
-
-},[]);
-
-
-const unreadCount=
-
-notifications.filter(
-
-item=>
-
-!item.is_read
-
-).length;
-
-
-const acronym=(
-
-user?.full_name||
-
-user?.username||
-
-"Vendor"
-
-)
-
-.split(" ")
-
-.map(
-
-word=>word[0]
-
-)
-
-.join("")
-
-.slice(0,2)
-
-.toUpperCase();
-
-
-return(
-
-<header
-
-className="
-
-sticky
-top-0
-z-30
-
-bg-white/80
-backdrop-blur-xl
-
-border-b
-border-slate-200
-
-px-8
-py-5
-
-flex
-items-center
-justify-between
-
-"
-
->
-
-<div
-
-className="
-
-flex
-items-center
-gap-5
-
-"
-
->
-
-<button
-
-onClick={toggleSidebar}
-
-className="
-
-h-14
-w-14
-
-rounded-2xl
-
-bg-white
-
-border
-border-slate-200
-
-shadow-sm
-
-flex
-items-center
-justify-center
-
-hover:bg-slate-50
-
-"
-
->
-
-<Menu size={22}/>
-
-</button>
-
-
-<div>
-
-<p
-
-className="
-
-uppercase
-
-tracking-[4px]
-
-text-xs
-
-text-indigo-500
-
-font-semibold
-
-mb-1
-
-"
-
->
-
-Enterprise Suite
-
-</p>
-
-<h1
-
-className="
-
-text-[18px]
-
-font-bold
-
-leading-tight
-
-"
-
->
-
-AI Vendor
-
-<br/>
-
-Discovery
-
-</h1>
-
-</div>
-
-</div>
-
-
-<div
-
-className="
-
-hidden
-lg:flex
-
-flex-1
-
-justify-center
-
-px-10
-
-"
-
->
-
-<div
-
-className="
-
-relative
-
-w-full
-
-max-w-2xl
-
-"
-
->
-
-<Search
-
-size={18}
-
-className="
-
-absolute
-
-left-5
-top-4
-
-text-slate-400
-
-"
-
-/>
-
-<input
-
-placeholder=
-
-"Search vendors categories services"
-
-className="
-
-w-full
-
-pl-14
-pr-5
-py-4
-
-rounded-2xl
-
-border
-
-border-slate-200
-
-outline-none
-
-focus:ring-2
-
-focus:ring-indigo-200
-
-"
-
-/>
-
-</div>
-
-</div>
-
-
-<div
-
-className="
-
-flex
-items-center
-gap-4
-
-"
-
->
-
-<div
-
-className="
-
-hidden
-xl:flex
-
-items-center
-gap-3
-
-bg-indigo-50
-
-px-5
-py-3
-
-rounded-2xl
-
-"
-
->
-
-<Users size={18}/>
-
-<div>
-
-<p
-
-className="font-bold"
-
->
-
-{followers}
-
-</p>
-
-<p
-
-className="text-xs"
-
->
-
-Followers
-
-</p>
-
-</div>
-
-</div>
-
-
-<div
-
-className="
-
-hidden
-xl:flex
-
-items-center
-gap-3
-
-bg-green-50
-
-px-5
-py-3
-
-rounded-2xl
-
-"
-
->
-
-<Eye size={18}/>
-
-<div>
-
-<p
-
-className="font-bold"
-
->
-
-{views}
-
-</p>
-
-<p
-
-className="text-xs"
-
->
-
-Views
-
-</p>
-
-</div>
-
-</div>
-
-
-<div
-
-ref={notificationRef}
-
-className="relative"
-
->
-
-<button
-
-onClick={()=>{
-
-setNotificationOpen(
-
-previous=>!previous
-
-);
-
-setProfileOpen(false);
-
-}}
-
-className="
-
-relative
-
-h-14
-w-14
-
-border
-
-border-slate-200
-
-rounded-2xl
-
-bg-white
-
-shadow-sm
-
-flex
-items-center
-justify-center
-
-"
-
->
-
-<Bell size={20}/>
-
-{
-
-unreadCount>0&&(
-
-<div
-
-className="
-
-absolute
-
-top-2
-right-2
-
-h-5
-w-5
-
-rounded-full
-
-bg-red-500
-
-text-white
-
-text-[10px]
-
-font-bold
-
-flex
-
-items-center
-
-justify-center
-
-"
-
->
-
-{
-
-unreadCount
-
-}
-
-</div>
-
-)
-
-}
-
-</button>
-
-
-{
-
-notificationOpen&&(
-
-<div
-
-className="
-
-absolute
-
-right-0
-top-16
-
-w-80
-
-bg-white
-
-rounded-3xl
-
-shadow-xl
-
-border
-
-p-5
-
-z-50
-
-"
-
->
-
-<h3
-
-className="font-bold mb-4"
-
->
-
-Notifications
-
-</h3>
-
-{
-
-loadingNotifications
-
-?
-
-<p>
-
-Loading...
-
-</p>
-
-:
-
-notifications.length
-
-?
-
-notifications.map(
-
-item=>(
-
-<div
-
-key={
-
-item.notification_id
-
-}
-
-onClick={()=>
-
-markRead(
-
-item.notification_id
-
-)
-
-}
-
-className="
-
-p-3
-
-border-b
-
-cursor-pointer
-
-hover:bg-slate-50
-
-rounded-lg
-
-"
-
->
-
-<p>
-
-{item.title}
-
-</p>
-
-<p
-
-className="
-
-text-sm
-
-text-slate-500
-
-"
-
->
-
-{item.message}
-
-</p>
-
-</div>
-
-)
-
-)
-
-:
-
-<p>
-
-No notifications
-
-</p>
-
-}
-
-</div>
-
-)
-
-}
-
-</div>
-
-
-<div
-
-ref={profileRef}
-
-className="relative"
-
->
-
-<button
-
-onClick={()=>{
-
-setProfileOpen(
-
-previous=>!previous
-
-);
-
-setNotificationOpen(false);
-
-}}
-
-className="
-
-bg-white
-
-border
-
-border-slate-200
-
-rounded-2xl
-
-px-4
-py-2
-
-flex
-
-items-center
-
-gap-3
-
-shadow-sm
-
-"
-
->
-
-<div
-
-className="
-
-h-12
-w-12
-
-rounded-full
-
-bg-indigo-600
-
-text-white
-
-font-bold
-
-flex
-
-items-center
-
-justify-center
-
-"
-
->
-
-{acronym}
-
-</div>
-
-
-<div
-
-className="
-
-hidden
-md:block
-
-text-left
-
-"
-
->
-
-<p
-
-className="font-semibold"
-
->
-
-{
-
-user?.full_name||
-
-"Vendor"
-
-}
-
-</p>
-
-<p
-
-className="
-
-text-sm
-
-text-slate-500
-
-"
-
->
-
-@
-
-{
-
-user?.username||
-
-"user"
-
-}
-
-</p>
-
-</div>
-
-
-<ChevronDown
-
-size={18}
-
-className={`
-
-transition-transform
-
-${
-
-profileOpen
-
-?
-
-"rotate-180"
-
-:
-
-""
-
-}
-
-`}
-
-/>
-
-</button>
-
-
-{
-
-profileOpen&&(
-
-<div
-
-className="
-
-absolute
-
-right-0
-top-16
-
-w-56
-
-bg-white
-
-rounded-3xl
-
-shadow-xl
-
-border
-
-border-slate-200
-
-p-2
-
-flex
-
-flex-col
-
-gap-1
-
-z-50
-
-"
-
->
-
-<button
-
-onClick={()=>{
-
-navigate(
-
-"/profile"
-
-);
-
-setProfileOpen(false);
-
-}}
-
-className="
-
-text-left
-
-px-4
-py-3
-
-rounded-xl
-
-hover:bg-slate-100
-
-"
-
->
-
-Profile
-
-</button>
-
-
-<button
-
-onClick={()=>{
-
-navigate(
-
-"/settings"
-
-);
-
-setProfileOpen(false);
-
-}}
-
-className="
-
-text-left
-
-px-4
-py-3
-
-rounded-xl
-
-hover:bg-slate-100
-
-"
-
->
-
-Settings
-
-</button>
-
-
-<button
-
-onClick={()=>{
-
-logout();
-
-navigate(
-
-"/login"
-
-);
-
-}}
-
-className="
-
-text-left
-
-px-4
-py-3
-
-rounded-xl
-
-text-red-500
-
-hover:bg-red-50
-
-"
-
->
-
-Logout
-
-</button>
-
-</div>
-
-)
-
-}
-
-</div>
-
-</div>
-
-</header>
-
-);
-
+import { Menu, Bell, Search, ChevronDown, Users, Eye } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../../api/axiosInstance";
+import useAuth from "../../../hooks/useAuth";
+import { useTheme } from "../../../context/ThemeContext";
+
+const Navbar = ({ toggleSidebar }) => {
+  const theme = useTheme();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [followers, setFollowers] = useState(0);
+  const [views, setViews] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
+  const profileRef = useRef(null);
+  const notificationRef = useRef(null);
+
+  useEffect(() => {
+    fetchNavbarData();
+    fetchNotifications();
+  }, []);
+
+  const fetchNavbarData = async () => {
+    try {
+      const response = await axiosInstance.get("/vendors/profile/views");
+      setViews(response.data?.views || 0);
+      setFollowers(response.data?.followers || 0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      setLoadingNotifications(true);
+      const response = await axiosInstance.get("/vendors/notifications");
+      setNotifications(response.data?.notifications || []);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  const markRead = async (notificationId) => {
+    try {
+      await axiosInstance.put(`/vendors/notifications/${notificationId}`);
+      setNotifications(previous =>
+        previous.map(item =>
+          item.notification_id === notificationId
+            ? { ...item, is_read: true }
+            : item
+        )
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const close = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setNotificationOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+    };
+  }, []);
+
+  const unreadCount = notifications.filter(item => !item.is_read).length;
+
+  const acronym = (user?.full_name || user?.username || "Vendor")
+    .split(" ")
+    .map(word => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <header
+      className="sticky top-0 z-30 px-4 py-2 flex items-center justify-between"
+      style={{
+        background: theme.cardBg,
+        borderBottom: `1px solid ${theme.cardBorder}`,
+        backdropFilter: "blur(20px)"
+      }}
+    >
+      {/* Left — Menu + Title */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={toggleSidebar}
+          style={{
+            height: "37px",
+            width: "37px",
+            borderRadius: "9px",
+            background: theme.panelBg,
+            border: `1px solid ${theme.cardBorder}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer"
+          }}
+        >
+          <Menu size={18} color={theme.textPrimary} />
+        </button>
+
+        <div>
+          <p
+            style={{
+              textTransform: "uppercase",
+              letterSpacing: "2px",
+              fontSize: "9px",
+              fontWeight: 600,
+              marginBottom: "2px",
+              color: "#7C5AF6"
+            }}
+          >
+            Enterprise Suite
+          </p>
+          <h1
+            style={{
+              fontSize: "13px",
+              fontWeight: 700,
+              lineHeight: 1.2,
+              color: theme.textPrimary
+            }}
+          >
+            AI Vendor<br />Discovery
+          </h1>
+        </div>
+      </div>
+
+      {/* Center — Search */}
+      <div className="hidden lg:flex flex-1 justify-center px-10">
+        <div style={{ position: "relative", width: "100%", maxWidth: "520px" }}>
+          <Search
+            size={14}
+            style={{
+              position: "absolute",
+              left: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: theme.textMuted
+            }}
+          />
+          <input
+            placeholder="Search vendors, categories, services..."
+            style={{
+              width: "100%",
+              padding: "8px 13px 8px 36px",
+              borderRadius: "10px",
+              background: theme.panelBg,
+              border: `1px solid ${theme.cardBorder}`,
+              color: theme.textPrimary,
+              fontSize: "12px",
+              outline: "none"
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Right — Stats + Notifications + Profile */}
+      <div className="flex items-center gap-4">
+
+        {/* Followers */}
+        <div
+          className="hidden xl:flex items-center gap-2 px-3 py-2 rounded-xl"
+          style={{ background: "rgba(124,90,246,0.12)" }}
+        >
+          <Users size={14} color={theme.textPrimary} />
+          <div>
+            <p style={{ fontWeight: 700, color: theme.textPrimary }}>{followers}</p>
+            <p style={{ fontSize: "10px", color: theme.textMuted }}>Followers</p>
+          </div>
+        </div>
+
+        {/* Views */}
+        <div
+          className="hidden xl:flex items-center gap-2 px-3 py-2 rounded-xl"
+          style={{ background: "rgba(34,197,94,0.12)" }}
+        >
+          <Eye size={14} color={theme.textPrimary} />
+          <div>
+            <p style={{ fontWeight: 700, color: theme.textPrimary }}>{views}</p>
+            <p style={{ fontSize: "10px", color: theme.textMuted }}>Views</p>
+          </div>
+        </div>
+
+        {/* Notifications */}
+        <div ref={notificationRef} className="relative">
+          <button
+            onClick={() => {
+              setNotificationOpen(previous => !previous);
+              setProfileOpen(false);
+            }}
+            style={{
+              position: "relative",
+              height: "42px",
+              width: "42px",
+              borderRadius: "12px",
+              background: theme.panelBg,
+              border: `1px solid ${theme.cardBorder}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer"
+            }}
+          >
+            <Bell size={14} color={theme.textPrimary} />
+            {unreadCount > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "8px",
+                  right: "8px",
+                  height: "16px",
+                  width: "16px",
+                  borderRadius: "50%",
+                  background: "#EF4444",
+                  color: "#fff",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {unreadCount}
+              </div>
+            )}
+          </button>
+
+          {notificationOpen && (
+            <div
+              className="absolute right-0 top-16 w-80 rounded-3xl shadow-xl p-5 z-50"
+              style={{
+                background: theme.cardBg,
+                border: `1px solid ${theme.cardBorder}`
+              }}
+            >
+              <h3
+                style={{ fontWeight: 700, fontSize: "14px", marginBottom: "12px", color: theme.textPrimary }}
+              >
+                Notifications
+              </h3>
+              {loadingNotifications ? (
+                <p style={{ color: theme.textMuted }}>Loading...</p>
+              ) : notifications.length ? (
+                notifications.map(item => (
+                  <div
+                    key={item.notification_id}
+                    onClick={() => markRead(item.notification_id)}
+                    style={{
+                      padding: "12px",
+                      borderBottom: `1px solid ${theme.cardBorder}`,
+                      cursor: "pointer",
+                      borderRadius: "8px"
+                    }}
+                  >
+                    <p style={{ color: theme.textPrimary }}>{item.title}</p>
+                    <p style={{ fontSize: "12px", color: theme.textMuted }}>{item.message}</p>
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: theme.textMuted }}>No notifications</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Profile */}
+        <div ref={profileRef} className="relative">
+          <button
+            onClick={() => {
+              setProfileOpen(previous => !previous);
+              setNotificationOpen(false);
+            }}
+            style={{
+              background: theme.panelBg,
+              border: `1px solid ${theme.cardBorder}`,
+              borderRadius: "12px",
+              padding: "6px 12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: "pointer"
+            }}
+          >
+            <div
+              style={{
+                height: "38px",
+                width: "38px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #7C5AF6, #A78BFA)",
+                color: "#fff",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {acronym}
+            </div>
+
+            <div className="hidden md:block text-left">
+              <p style={{ fontWeight: 600, fontSize: "13px", color: theme.textPrimary }}>
+                {user?.full_name || "Vendor"}
+              </p>
+              <p style={{ fontSize: "10px", color: theme.textMuted }}>
+                @{user?.username || "user"}
+              </p>
+            </div>
+
+            <ChevronDown
+              size={18}
+              color={theme.textMuted}
+              style={{
+                transition: "transform 0.2s",
+                transform: profileOpen ? "rotate(180deg)" : "rotate(0deg)"
+              }}
+            />
+          </button>
+
+          {profileOpen && (
+            <div
+              className="absolute right-0 top-14 w-44 rounded-2xl shadow-xl p-1 flex flex-col gap-0.5 z-50"
+              style={{
+                background: theme.cardBg,
+                border: `1px solid ${theme.cardBorder}`
+              }}
+            >
+              <button
+                onClick={() => { navigate("/profile"); setProfileOpen(false); }}
+                style={{
+                  textAlign: "left",
+                  padding: "8px 12px",
+                  borderRadius: "10px",
+                  color: theme.textPrimary,
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  width: "100%",
+                  fontSize: "13px",
+                  fontWeight: 500
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = theme.panelBg}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                Profile
+              </button>
+
+              <button
+                onClick={() => { navigate("/settings"); setProfileOpen(false); }}
+                style={{
+                  textAlign: "left",
+                  padding: "8px 12px",
+                  borderRadius: "10px",
+                  color: theme.textPrimary,
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  width: "100%",
+                  fontSize: "13px",
+                  fontWeight: 500
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = theme.panelBg}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                Settings
+              </button>
+
+              <button
+                onClick={() => { logout(); navigate("/login"); }}
+                style={{
+                  textAlign: "left",
+                  padding: "8px 12px",
+                  borderRadius: "10px",
+                  color: "#EF4444",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  width: "100%",
+                  fontSize: "13px",
+                  fontWeight: 500
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </header>
+  );
 };
 
 export default Navbar;

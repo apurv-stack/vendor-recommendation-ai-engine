@@ -1,733 +1,375 @@
 import {
-
-IndianRupee,
-TrendingUp,
-TrendingDown,
-Wallet,
-BarChart3,
-BadgeDollarSign
-
+    IndianRupee,
+    TrendingUp,
+    TrendingDown,
+    Wallet,
+    BarChart3,
+    BadgeDollarSign
 } from "lucide-react";
 
-import Card
-from "../../common/Card/Card";
-
-
-const VendorPricing=({
-
-minPrice,
-maxPrice,
-averageMarketPrice=45000
-
-})=>{
-
-
-// =========================
-// SAFE VALUES
-// =========================
-
-const vendorMin=
-
-Math.max(
-
-0,
-
-Number(
-
-minPrice
-
-)||0
-
-);
-
-
-const vendorMax=
-
-Math.max(
-
-vendorMin,
-
-Number(
-
-maxPrice
-
-)||0
-
-);
-
-
-const hasPricing=
-
-vendorMin>0||
-
-vendorMax>0;
-
-
-const averageVendorPrice=
-
-hasPricing
-
-?
-
-Math.floor(
-
-(
-
-vendorMin+
-
-vendorMax
-
-)/2
-
-)
-
-:
-
-0;
-
-
-const difference=
-
-averageVendorPrice-
-
-averageMarketPrice;
-
-
-const aboveMarket=
-
-difference>=0;
-
-
-const trend=
-
-aboveMarket
-
-?
-
-"up"
-
-:
-
-"down";
-
-
-return(
-
-<Card
-
-className="
-
-relative
-
-overflow-hidden
-
-"
-
->
-
-{/* GLOW */}
-
-<div
-
-className="
-
-absolute
-
--right-20
-
--top-20
-
-h-60
-
-w-60
-
-bg-indigo-100
-
-blur-3xl
-
-rounded-full
-
-opacity-70
-
-"
-
-/>
-
-
-{/* HEADER */}
-
-<div
-
-className="
-
-relative
-
-flex
-
-flex-col
-
-lg:flex-row
-
-justify-between
-
-gap-6
-
-mb-8
-
-"
-
->
-
-<div>
-
-<p
-
-className="
-
-text-indigo-600
-
-uppercase
-
-tracking-[3px]
-
-text-xs
-
-font-semibold
-
-mb-2
-
-"
-
->
-
-Pricing Intelligence
-
-</p>
-
-
-<h2
-
-className="
-
-text-3xl
-
-font-bold
-
-text-slate-800
-
-mb-2
-
-"
-
->
-
-Vendor Pricing Analytics
-
-</h2>
-
-
-<p
-
-className="
-
-text-slate-500
-
-"
-
->
-
-AI powered pricing benchmarks
-
-and marketplace positioning
-
-</p>
-
-</div>
-
-
-<div
-
-className="
-
-h-16
-
-w-16
-
-rounded-2xl
-
-bg-indigo-100
-
-flex
-
-items-center
-
-justify-center
-
-"
-
->
-
-<Wallet
-
-size={28}
-
-className="
-
-text-indigo-600
-
-"
-
-/>
-
-</div>
-
-</div>
-
-
-{/* KPI */}
-
-<div
-
-className="
-
-grid
-
-lg:grid-cols-3
-
-gap-6
-
-mb-7
-
-"
-
->
-
-<PriceCard
-
-title="Vendor Range"
-
-value={
-
-hasPricing
-
-?
-
-`₹${vendorMin} - ₹${vendorMax}`
-
-:
-
-"Unavailable"
-
-}
-
-description="Vendor service pricing"
-
-icon={
-
-<IndianRupee/>
-
-}
-
-/>
-
-
-<PriceCard
-
-title="Average Vendor Price"
-
-value={
-
-hasPricing
-
-?
-
-`₹${averageVendorPrice}`
-
-:
-
-"Unavailable"
-
-}
-
-description="AI calculated average"
-
-highlight
-
-icon={
-
-<Wallet/>
-
-}
-
-/>
-
-
-<PriceCard
-
-title="Market Benchmark"
-
-value={`₹${averageMarketPrice}`}
-
-description={
-
-hasPricing
-
-?
-
-(
-
-aboveMarket
-
-?
-
-`₹${Math.abs(difference)} above benchmark`
-
-:
-
-`₹${Math.abs(difference)} below benchmark`
-
-)
-
-:
-
-"No pricing available"
-
-}
-
-trend={trend}
-
-icon={
-
-trend==="up"
-
-?
-
-<TrendingUp/>
-
-:
-
-<TrendingDown/>
-
-}
-
-/>
-
-</div>
-
-
-{/* INSIGHT */}
-
-<div
-
-className="
-
-bg-gradient-to-r
-
-from-indigo-50
-
-to-purple-50
-
-border
-
-border-indigo-100
-
-rounded-[28px]
-
-p-6
-
-flex
-
-flex-col
-
-lg:flex-row
-
-justify-between
-
-gap-5
-
-"
-
->
-
-<div>
-
-<div
-
-className="
-
-flex
-
-gap-2
-
-items-center
-
-mb-3
-
-"
-
->
-
-<BarChart3
-
-size={18}
-
-className="
-
-text-indigo-600
-
-"
-
-/>
-
-
-<h4
-
-className="
-
-font-bold
-
-text-slate-800
-
-"
-
->
-
-Pricing Insight
-
-</h4>
-
-</div>
-
-
-<p
-
-className="
-
-text-slate-600
-
-leading-7
-
-"
-
->
-
-{
-
-!hasPricing
-
-?
-
-"Pricing information not available yet."
-
-:
-
-aboveMarket
-
-?
-
-"Vendor pricing indicates premium positioning."
-
-:
-
-"Vendor pricing remains competitive."
-
-}
-
-</p>
-
-</div>
-
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-font-semibold
-
-text-indigo-600
-
-"
-
->
-
-<BadgeDollarSign/>
-
-AI Pricing Engine
-
-</div>
-
-</div>
-
-</Card>
-
-);
-
+import Card from "../../common/Card/Card";
+import { useTheme } from "../../../context/ThemeContext";
+
+const VendorPricing = ({
+    minPrice,
+    maxPrice,
+    averageMarketPrice = 45000
+}) => {
+
+    const theme = useTheme();
+
+    const vendorMin = Math.max(
+        0,
+        Number(minPrice) || 0
+    );
+
+    const vendorMax = Math.max(
+        vendorMin,
+        Number(maxPrice) || 0
+    );
+
+    const hasPricing =
+        vendorMin > 0 ||
+        vendorMax > 0;
+
+    const averageVendorPrice =
+        hasPricing
+            ? Math.floor(
+                (
+                    vendorMin +
+                    vendorMax
+                ) / 2
+            )
+            : 0;
+
+    const difference =
+        averageVendorPrice -
+        averageMarketPrice;
+
+    const aboveMarket =
+        difference >= 0;
+
+    const trend =
+        aboveMarket
+            ? "up"
+            : "down";
+
+    return (
+
+        <Card
+            className="
+                relative
+                overflow-hidden
+            "
+        >
+
+            {/* Glow */}
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "-80px",
+                    right: "-80px",
+                    width: "240px",
+                    height: "240px",
+                    borderRadius: "999px",
+                    background:
+                        "rgba(124,90,246,0.12)",
+                    filter: "blur(70px)"
+                }}
+            />
+
+            {/* Header */}
+
+            <div
+                style={{
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                    marginBottom: "16px"
+                }}
+            >
+
+                <div>
+
+                    <p
+                        style={{
+                            textTransform: "uppercase",
+                            letterSpacing: "3px",
+                            fontSize: "10px",
+                            fontWeight: 600,
+                            color: "#7C5AF6",
+                            marginBottom: "8px"
+                        }}
+                    >
+                        Pricing Intelligence
+                    </p>
+
+                    <h2
+                        style={{
+                            fontSize: "18px",
+                            fontWeight: 700,
+                            color: theme.textPrimary,
+                            marginBottom: "6px"
+                        }}
+                    >
+                        Vendor Pricing Analytics
+                    </h2>
+
+                    <p
+                        style={{
+                            color: theme.textMuted
+                        }}
+                    >
+                        AI powered pricing benchmarks
+                        and marketplace positioning
+                    </p>
+
+                </div>
+
+                <div
+                    style={{
+                        width: "44px",
+                        height: "44px",
+                        borderRadius: "14px",
+                        background:
+                            "rgba(124,90,246,0.12)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                    }}
+                >
+                    <Wallet
+                        size={20}
+                        color="#7C5AF6"
+                    />
+                </div>
+
+            </div>
+
+            {/* KPI Cards */}
+
+            <div
+                className="
+                    grid
+                    lg:grid-cols-3
+                    gap-4
+                    mb-5
+                "
+            >
+
+                <PriceCard
+                    theme={theme}
+                    title="Vendor Range"
+                    value={
+                        hasPricing
+                            ? `₹${vendorMin} - ₹${vendorMax}`
+                            : "Unavailable"
+                    }
+                    description="Vendor service pricing"
+                    icon={<IndianRupee />}
+                />
+
+                <PriceCard
+                    theme={theme}
+                    title="Average Vendor Price"
+                    value={
+                        hasPricing
+                            ? `₹${averageVendorPrice}`
+                            : "Unavailable"
+                    }
+                    description="AI calculated average"
+                    highlight
+                    icon={<Wallet />}
+                />
+
+                <PriceCard
+                    theme={theme}
+                    title="Market Benchmark"
+                    value={`₹${averageMarketPrice}`}
+                    description={
+                        hasPricing
+                            ? (
+                                aboveMarket
+                                    ? `₹${Math.abs(difference)} above benchmark`
+                                    : `₹${Math.abs(difference)} below benchmark`
+                            )
+                            : "No pricing available"
+                    }
+                    trend={trend}
+                    icon={
+                        trend === "up"
+                            ? <TrendingUp />
+                            : <TrendingDown />
+                    }
+                />
+
+            </div>
+
+            {/* Insight */}
+
+            <div
+                style={{
+                    background: theme.panelBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: "18px",
+                    padding: "16px",
+
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "24px",
+                    flexWrap: "wrap"
+                }}
+            >
+
+                <div>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "6px"
+                        }}
+                    >
+
+                        <BarChart3
+                            size={18}
+                            color="#7C5AF6"
+                        />
+
+                        <h4
+                            style={{
+                                fontWeight: 700,
+                                color: theme.textPrimary
+                            }}
+                        >
+                            Pricing Insight
+                        </h4>
+
+                    </div>
+
+                    <p
+                        style={{
+                            color: theme.textMuted,
+                            lineHeight: 1.8
+                        }}
+                    >
+                        {
+                            !hasPricing
+                                ? "Pricing information not available yet."
+                                : aboveMarket
+                                    ? "Vendor pricing indicates premium positioning."
+                                    : "Vendor pricing remains competitive."
+                        }
+                    </p>
+
+                </div>
+
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        color: "#7C5AF6",
+                        fontWeight: 600
+                    }}
+                >
+                    <BadgeDollarSign />
+                    AI Pricing Engine
+                </div>
+
+            </div>
+
+        </Card>
+    );
 };
 
-
 function PriceCard({
+    title,
+    value,
+    description,
+    icon,
+    highlight = false,
+    trend,
+    theme
+}) {
 
-title,
-value,
-description,
-icon,
-highlight=false,
-trend
+    return (
 
-}){
+        <div
+            style={{
+                background: theme.panelBg,
+                border: `1px solid ${theme.cardBorder}`,
+                borderRadius: "18px",
+                padding: "14px 16px"
+            }}
+        >
 
-return(
+            <p
+                style={{
+                    color: theme.textMuted,
+                    fontSize: "11px",
+                    marginBottom: "8px"
+                }}
+            >
+                {title}
+            </p>
 
-<div
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "12px"
+                }}
+            >
 
-className="
+                <div
+                    style={{
+                        color: highlight
+                            ? "#7C5AF6"
+                            : theme.textSecondary
+                    }}
+                >
+                    {icon}
+                </div>
 
-bg-slate-50
+                <h3
+                    style={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: highlight
+                            ? "#7C5AF6"
+                            : theme.textPrimary
+                    }}
+                >
+                    {value}
+                </h3>
 
-border
+            </div>
 
-border-slate-200
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "11px",
+                    color: theme.textMuted
+                }}
+            >
 
-rounded-[28px]
+                {trend && icon}
 
-p-6
+                {description}
 
-"
+            </div>
 
->
+        </div>
 
-<p
-
-className="
-
-text-slate-500
-
-mb-3
-
-"
-
->
-
-{title}
-
-</p>
-
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-mb-3
-
-"
-
->
-
-<div
-
-className={`
-
-${
-
-highlight
-
-?
-
-"text-indigo-600"
-
-:
-
-"text-slate-700"
-
+    );
 }
-
-`}
-
->
-
-{icon}
-
-</div>
-
-
-<h3
-
-className={`
-
-font-bold
-
-text-3xl
-
-${
-
-highlight
-
-?
-
-"text-indigo-600"
-
-:
-
-"text-slate-800"
-
-}
-
-`}
-
->
-
-{value}
-
-</h3>
-
-</div>
-
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-2
-
-text-sm
-
-text-slate-500
-
-"
-
->
-
-{
-
-trend&&icon
-
-}
-
-{description}
-
-</div>
-
-</div>
-
-);
-
-}
-
 
 export default VendorPricing;

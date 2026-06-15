@@ -13,6 +13,10 @@ TrendingUp
 
 import axiosInstance from "../../api/axiosInstance";
 
+import { useLocation } from "react-router-dom";
+
+import { useTheme } from "../../context/ThemeContext";
+
 import MainLayout from "../../components/layouts/MainLayout/MainLayout";
 
 import VendorFilters from "../../components/vendor/VendorFilters/VendorFilters";
@@ -35,7 +39,7 @@ import KpiCard from "../../components/common/KpiCard/KpiCard";
 
 
 const VendorDetailsPage=()=>{
-
+const theme = useTheme();
 const[
 vendors,
 setVendors
@@ -102,6 +106,24 @@ fetchVendorCategories();
 
 },[]);
 
+const location = useLocation();
+useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const openId = params.get("open");
+    if (openId) {
+        fetchVendorByIdAndOpen(openId);
+    }
+}, [location.search]);
+
+const fetchVendorByIdAndOpen = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/vendors/${id}`);
+        const vendor = response.data?.data || response.data;
+        setSelectedVendor(vendor);
+    } catch (error) {
+        console.log("Failed to open vendor", error);
+    }
+};
 
 const fetchVendorCategories=
 
@@ -113,7 +135,7 @@ const response=
 
 await axiosInstance.get(
 
-"/vendors/internal-team"
+"/vendors/categories"
 
 );
 
@@ -123,25 +145,25 @@ response.data?.data||
 
 response.data;
 
-const teams=
+const categoryList=
 
-payload?.teams||
+payload?.categories||
 
 [];
 
 setCategories(
 
-teams.map(
+categoryList.map(
 
-team=>({
+name=>({
 
 category_id:
 
-team.vendor_id,
+name,
 
 name:
 
-team.name
+name
 
 })
 
@@ -262,13 +284,25 @@ response.data?.data||
 
 response.data;
 
-setVendors(
+const vendorResults =
+    payload?.vendors || [];
 
-payload?.vendors||
+const filteredResults =
+    filters.query
+        ? vendorResults.filter(vendor =>
+              (
+                  vendor.name ||
+                  vendor.vendor_name ||
+                  ""
+              )
+                  .toLowerCase()
+                  .includes(
+                      filters.query.toLowerCase()
+                  )
+          )
+        : vendorResults;
 
-[]
-
-);
+setVendors(filteredResults);
 
 setTotalResults(
 
@@ -510,65 +544,38 @@ vendor.avg_rating||
 },[vendors]);
 
 
-const stats=[
+const stats = [
 
-{
+    {
+        title: "Vendors",
+        value: totalResults,
+        icon: <Building2 />,
+        color: "#3B82F6"
+    },
 
-title:"Vendors",
+    {
+        title: "Categories",
+        value: categories.length,
+        icon: <Users />,
+        color: "#7C5AF6"
+    },
 
-value:totalResults,
+    {
+        title: "Avg Rating",
+        value: averageRating,
+        icon: <Star />,
+        color: "#F59E0B"
+    },
 
-icon:<Building2/>,
-
-color:"bg-blue-100"
-
-},
-
-{
-
-title:"Categories",
-
-value:categories.length,
-
-icon:<Users/>,
-
-color:"bg-purple-100"
-
-},
-
-{
-
-title:"Avg Rating",
-
-value:averageRating,
-
-icon:<Star/>,
-
-color:"bg-amber-100"
-
-},
-
-{
-
-title:"Growth",
-
-value:
-
-vendors.length
-
-?
-
-`+${vendors.length*3}%`
-
-:
-
-"0%",
-
-icon:<TrendingUp/>,
-
-color:"bg-green-100"
-
-}
+    {
+        title: "Growth",
+        value:
+            vendors.length
+                ? `+${vendors.length * 3}%`
+                : "0%",
+        icon: <TrendingUp />,
+        color: "#22C55E"
+    }
 
 ];
 
@@ -576,15 +583,18 @@ color:"bg-green-100"
 return(
 
 <MainLayout>
+<div
+    className="
+        max-w-7xl
+        mx-auto
+        space-y-8
+    "
+>
 
-<div className="space-y-8">
 
 <PageHeader
-
-title="Vendor Marketplace"
-
-subtitle="Search vendors compare pricing and analyze intelligence"
-
+    title="Vendor Marketplace"
+    subtitle="Search vendors, compare pricing, ratings and business intelligence."
 />
 
 

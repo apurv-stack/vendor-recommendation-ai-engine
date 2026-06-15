@@ -4,7 +4,7 @@ useEffect,
 useState
 
 } from "react";
-
+import { useTheme } from "../../context/ThemeContext";
 import {
 
 useNavigate
@@ -64,121 +64,89 @@ focus:border-indigo-500
 `;
 
 
-const InputField=({
+const InputField = ({
+    label,
+    name,
+    icon,
+    type = "text",
+    value,
+    onChange,
+    error,
+    theme
+}) => (
 
-label,
-name,
-icon,
-type="text",
-value,
-onChange,
-error
+    <div>
 
-})=>(
+        <label
+            style={{
+                fontWeight: 600,
+                color: theme.textPrimary,
+                marginBottom: "8px",
+                display: "block"
+            }}
+        >
+            {label}
+        </label>
 
-<div>
+        <div
+            style={{
+                position: "relative"
+            }}
+        >
 
-<label
+            <div
+                style={{
+                    position: "absolute",
+                    left: "16px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: theme.textMuted
+                }}
+            >
+                {icon}
+            </div>
 
-className="
+            <input
+                name={name}
+                type={type}
+                value={value}
+                onChange={onChange}
+                style={{
+                    width: "100%",
+                    background: theme.panelBg,
+                    border: error
+                        ? "1px solid #EF4444"
+                        : `1px solid ${theme.cardBorder}`,
+                    borderRadius: "16px",
+                    padding: "10px 14px 10px 40px",
+                    color: theme.textPrimary,
+                    outline: "none"
+                }}
+            />
 
-font-semibold
-text-slate-700
-mb-2
-block
+        </div>
 
-"
+        {error && (
 
->
+            <p
+                style={{
+                    color: "#EF4444",
+                    fontSize: "14px",
+                    marginTop: "6px"
+                }}
+            >
+                {error}
+            </p>
 
-{label}
+        )}
 
-</label>
-
-<div className="relative">
-
-<div
-
-className="
-
-absolute
-left-4
-top-1/2
--translate-y-1/2
-text-slate-400
-
-"
-
->
-
-{icon}
-
-</div>
-
-<input
-
-name={name}
-
-type={type}
-
-value={value}
-
-onChange={onChange}
-
-className={`
-
-${inputClass}
-
-${
-
-error
-
-?
-
-"border-red-500"
-
-:
-
-""
-
-}
-
-`}
-
-/>
-
-</div>
-
-{
-
-error&&(
-
-<p
-
-className="
-
-text-red-500
-text-sm
-mt-1
-
-"
-
->
-
-{error}
-
-</p>
-
-)
-
-}
-
-</div>
+    </div>
 
 );
 
-
 const EditProfilePage=()=>{
+
+    const theme = useTheme();
 
 const navigate=
 
@@ -623,203 +591,153 @@ subtitle="Manage vendor information"
 />
 
 
-<Card>
+<Card
+    style={{
+        background: theme.cardBg,
+        border: `1px solid ${theme.cardBorder}`
+    }}
+>
 
 <div
-
 className="
-
 flex
 justify-end
-mb-8
-
+mb-4
 "
-
 >
-
 <Button
-
 variant="outline"
-
 icon={<FaArrowLeft/>}
-
 onClick={()=>navigate("/profile")}
-
 >
-
 Back
-
 </Button>
-
 </div>
-
-
 <form
-
 onSubmit={handleSubmit}
-
-className="space-y-8"
-
+className="space-y-5"
 >
-
 <div
-
 className="
-
 grid
 md:grid-cols-2
 gap-6
-
 "
-
 >
 
 <InputField
-
-label="Company Name"
-
-name="name"
-
-icon={<FaBuilding/>}
-
-value={formData.name}
-
-onChange={handleChange}
-
-error={errors.name}
-
+    theme={theme}
+    label="Company Name"
+    name="name"
+    icon={<FaBuilding />}
+    value={formData.name}
+    onChange={handleChange}
+    error={errors.name}
 />
-
 
 <InputField
-
-label="Business Email"
-
-name="business_email"
-
-icon={<FaEnvelope/>}
-
-value={formData.business_email}
-
-onChange={handleChange}
-
-error={errors.business_email}
-
+    theme={theme}
+    label="Business Email"
+    name="business_email"
+    icon={<FaEnvelope />}
+    value={formData.business_email}
+    onChange={handleChange}
+    error={errors.business_email}
 />
-
 
 <InputField
-
-label="City"
-
-name="city"
-
-icon={<FaMapMarkerAlt/>}
-
-value={formData.city}
-
-onChange={handleChange}
-
+    theme={theme}
+    label="City"
+    name="city"
+    icon={<FaMapMarkerAlt />}
+    value={formData.city}
+    onChange={handleChange}
 />
-
 
 <InputField
-
-label="Phone"
-
-name="contact_phone"
-
-icon={<FaPhone/>}
-
-value={formData.contact_phone}
-
-onChange={handleChange}
-
-error={errors.contact_phone}
-
+    theme={theme}
+    label="Phone"
+    name="contact_phone"
+    icon={<FaPhone />}
+    value={formData.contact_phone}
+    onChange={handleChange}
+    error={errors.contact_phone}
 />
-
 
 <InputField
-
-label="Website"
-
-name="website"
-
-icon={<FaGlobe/>}
-
-value={formData.website}
-
-onChange={handleChange}
-
+    theme={theme}
+    label="Website"
+    name="website"
+    icon={<FaGlobe />}
+    value={formData.website}
+    onChange={handleChange}
 />
-
 
 <InputField
-
-label="Minimum Price"
-
-name="price_min"
-
-type="number"
-
-icon={<FaRupeeSign/>}
-
-value={formData.price_min}
-
-onChange={handleChange}
-
-error={errors.price_min}
-
+    theme={theme}
+    label="Minimum Price"
+    name="price_min"
+    type="number"
+    icon={<FaRupeeSign />}
+    value={formData.price_min}
+    onChange={handleChange}
+    error={errors.price_min}
 />
-
 
 <InputField
-
-label="Maximum Price"
-
-name="price_max"
-
-type="number"
-
-icon={<FaRupeeSign/>}
-
-value={formData.price_max}
-
-onChange={handleChange}
-
-error={errors.price_max}
-
+    theme={theme}
+    label="Maximum Price"
+    name="price_max"
+    type="number"
+    icon={<FaRupeeSign />}
+    value={formData.price_max}
+    onChange={handleChange}
+    error={errors.price_max}
 />
+
+<div className="md:col-span-2">
+
+    <label
+        style={{
+            fontWeight: 600,
+            color: theme.textPrimary,
+            marginBottom: "8px",
+            display: "block"
+        }}
+    >
+        Description
+    </label>
+
+    <textarea
+        name="description"
+        value={formData.description}
+        onChange={handleChange}
+        rows={5}
+        style={{
+            width: "100%",
+            background: theme.panelBg,
+            border: `1px solid ${theme.cardBorder}`,
+            borderRadius: "16px",
+            padding: "10px 14px",
+            color: theme.textPrimary,
+            resize: "vertical"
+        }}
+    />
 
 </div>
 
-
+</div>
 <Button
-
 type="submit"
-
 loading={loading}
-
 icon={<FaSave/>}
-
 >
-
 Save Changes
-
 </Button>
-
 </form>
-
 </Card>
-
 </div>
-
 </MainLayout>
-
 );
-
 };
-
-
 export default EditProfilePage;

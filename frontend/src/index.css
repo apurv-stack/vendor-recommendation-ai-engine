@@ -204,7 +204,7 @@ input,
 select,
 textarea{
 
-font-size:15px;
+font-size:13px;
 
 outline:none;
 
@@ -388,6 +388,24 @@ background:
 }
 
 
+/* HIDE NUMBER SPINNERS */
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button{
+
+-webkit-appearance:none;
+
+margin:0;
+
+}
+
+.no-spinner{
+
+-moz-appearance:textfield;
+
+}
+
+
 /* PREMIUM */
 
 .shadow-premium{
@@ -519,14 +537,6 @@ letter-spacing:
 
 -.03em;
 
-font-weight:
-
-700;
-
-color:
-
-#0F172A;
-
 }
 
 p{
@@ -534,10 +544,6 @@ p{
 line-height:
 
 1.65;
-
-color:
-
-#64748B;
 
 }
 

@@ -27,6 +27,9 @@ useEffect
 import axiosInstance
 from "../../../api/axiosInstance";
 
+import { useTheme }
+from "../../../context/ThemeContext";
+
 import Card
 from "../../common/Card/Card";
 
@@ -48,6 +51,8 @@ const VendorDetails=({
 vendor
 
 })=>{
+
+const theme = useTheme();
 
 const[
 
@@ -295,9 +300,8 @@ message=
 
 const services=
 
-vendor?.services||
-
-[];
+(vendor?.managed_teams || [])
+    .flatMap(team => team?.services || []);
 
 const verified=
 
@@ -371,7 +375,7 @@ return(
 
 <div
 
-className="space-y-7"
+className="space-y-4"
 
 >
 
@@ -389,49 +393,29 @@ overflow-hidden
 
 <div
 
-className="
-
-absolute
-
--right-20
-
--top-20
-
-h-56
-
-w-56
-
-bg-indigo-100
-
-blur-3xl
-
-rounded-full
-
-opacity-60
-
-"
+style={{
+position: "absolute",
+right: "-80px",
+top: "-80px",
+height: "224px",
+width: "224px",
+borderRadius: "999px",
+background: "rgba(124,90,246,0.12)",
+filter: "blur(60px)",
+opacity: 0.8
+}}
 
 />
 
 
 <div
-
 className="
-
 relative
-
-flex
-
-flex-col
-
-xl:flex-row
-
-justify-between
-
-gap-8
-
+grid
+xl:grid-cols-[1fr_260px]
+gap-4
+items-stretch
 "
-
 >
 
 <div>
@@ -446,7 +430,7 @@ items-center
 
 gap-3
 
-mb-5
+mb-3
 
 "
 
@@ -454,16 +438,11 @@ mb-5
 
 <h1
 
-className="
-
-text-5xl
-
-font-bold
-
-text-slate-800
-
-"
-
+style={{
+fontSize:"16px",
+fontWeight:700,
+color:theme.textPrimary
+}}
 >
 
 {
@@ -484,7 +463,7 @@ verified&&(
 
 size={24}
 
-className="text-indigo-600"
+color="#7C5AF6"
 
 />
 
@@ -497,13 +476,13 @@ className="text-indigo-600"
 
 <div
 
-className="
-
-space-y-4
-
-text-slate-600
-
-"
+style={{
+display:"flex",
+flexDirection:"column",
+gap:"7px",
+color:theme.textMuted,
+fontSize:"13px"
+}}
 
 >
 
@@ -592,7 +571,7 @@ flex
 
 gap-3
 
-mt-6
+mt-3
 
 flex-wrap
 
@@ -614,39 +593,20 @@ followLoading
 
 }
 
-className={`
-
-px-5
-
-py-3
-
-rounded-2xl
-
-font-semibold
-
-flex
-
-items-center
-
-gap-2
-
-transition
-
-${
-
-following
-
-?
-
-"bg-red-500 text-white"
-
-:
-
-"bg-indigo-600 text-white"
-
-}
-
-`}
+style={{
+padding: "10px 16px",
+borderRadius: "16px",
+fontWeight: 600,
+display: "flex",
+alignItems: "center",
+gap: "8px",
+border: "none",
+cursor: "pointer",
+background: following
+? "#EF4444"
+: "linear-gradient(135deg,#7C5AF6,#A78BFA)",
+color: "#fff"
+}}
 
 >
 
@@ -691,42 +651,22 @@ saveLoading
 
 }
 
-className={`
-
-px-5
-
-py-3
-
-rounded-2xl
-
-font-semibold
-
-flex
-
-items-center
-
-gap-2
-
-border
-
-transition
-
-${
-
-saved
-
-?
-
-"bg-amber-500 text-white"
-
-:
-
-"bg-white"
-
-}
-
-`}
-
+style={{
+padding: "10px 16px",
+borderRadius: "16px",
+fontWeight: 600,
+display: "flex",
+alignItems: "center",
+gap: "8px",
+cursor: "pointer",
+background: saved
+? "#F59E0B"
+: theme.panelBg,
+color: saved
+? "#fff"
+: theme.textPrimary,
+border: `1px solid ${theme.cardBorder}`
+}}
 >
 
 <Bookmark size={18}/>
@@ -760,22 +700,18 @@ saved
 </div>
 
 
-<Card
-
-className="
-
-min-w-[260px]
-
-bg-gradient-to-r
-
-from-indigo-50
-
-to-purple-50
-
-"
-
+<div
+style={{
+background: theme.panelBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "20px",
+padding: "16px",
+height: "100%",
+display: "flex",
+flexDirection: "column",
+justifyContent: "center"
+}}
 >
-
 <VendorRating
 
 rating={
@@ -798,25 +734,21 @@ vendor?.review_count||
 
 <div
 
-className="
-
-mt-5
-
-flex
-
-items-center
-
-gap-2
-
-font-semibold
-
-text-emerald-600
-
-"
+style={{
+marginTop: "12px",
+display: "flex",
+alignItems: "center",
+gap: "8px",
+fontWeight: 600,
+fontSize: "13px",
+color: verified
+? "#22C55E"
+: theme.textMuted
+}}
 
 >
 
-<TrendingUp/>
+<TrendingUp size={16}/>
 
 {
 
@@ -834,7 +766,7 @@ verified
 
 </div>
 
-</Card>
+</div>
 
 </div>
 
@@ -844,17 +776,12 @@ verified
 <Card>
 
 <h2
-
-className="
-
-text-2xl
-
-font-bold
-
-mb-5
-
-"
-
+style={{
+fontSize: "16px",
+fontWeight: 700,
+marginBottom: "12px",
+color: theme.textPrimary
+}}
 >
 
 About Vendor
@@ -863,13 +790,10 @@ About Vendor
 
 <p
 
-className="
-
-leading-8
-
-text-slate-600
-
-"
+style={{
+color:theme.textMuted,
+lineHeight:1.5
+}}
 
 >
 
@@ -911,6 +835,7 @@ item=>(
 key={item.label}
 
 {...item}
+theme={theme}
 
 />
 
@@ -926,17 +851,12 @@ key={item.label}
 <Card>
 
 <h2
-
-className="
-
-text-2xl
-
-font-bold
-
-mb-6
-
-"
-
+style={{
+fontSize: "16px",
+fontWeight: 700,
+marginBottom: "16px",
+color: theme.textPrimary
+}}
 >
 
 Services
@@ -949,10 +869,12 @@ services.length===0
 
 ?
 
-<p>
-
+<p
+style={{
+color: theme.textMuted
+}}
+>
 No services available
-
 </p>
 
 :
@@ -992,23 +914,19 @@ index
 
 }
 
-className="
-
-px-5
-
-py-3
-
-rounded-2xl
-
-bg-slate-100
-
-"
+style={{
+padding:"10px 16px",
+background:theme.panelBg,
+border:`1px solid ${theme.cardBorder}`,
+borderRadius:"16px",
+color:theme.textSecondary
+}}
 
 >
 
 {
 
-service.service_name||
+service.name||
 
 service
 
@@ -1107,7 +1025,8 @@ function MetricCard({
 
 label,
 value,
-icon
+icon,
+theme
 
 }){
 
@@ -1117,25 +1036,17 @@ return(
 
 <div
 
-className="
-
-h-14
-
-w-14
-
-rounded-2xl
-
-bg-indigo-50
-
-flex
-
-items-center
-
-justify-center
-
-mb-5
-
-"
+style={{
+height:"40px",
+width:"40px",
+borderRadius:"12px",
+background:"rgba(124,90,246,0.12)",
+display:"flex",
+alignItems:"center",
+justifyContent:"center",
+marginBottom:"12px",
+color:"#7C5AF6"
+}}
 
 >
 
@@ -1144,27 +1055,22 @@ mb-5
 </div>
 
 <h2
-
-className="
-
-text-4xl
-
-font-bold
-
-mb-2
-
-"
-
+style={{
+fontSize: "16px",
+fontWeight: 700,
+marginBottom: "8px",
+color: theme.textPrimary
+}}
 >
-
 {value}
-
 </h2>
 
-<p>
-
+<p
+style={{
+color: theme.textMuted
+}}
+>
 {label}
-
 </p>
 
 </Card>

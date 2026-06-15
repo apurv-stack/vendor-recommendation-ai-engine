@@ -2511,6 +2511,43 @@ def update_my_preferences_api(
     }
 
 # ==========================================
+# ALL DISTINCT CATEGORIES
+# ==========================================
+
+@router.get(
+    "/categories"
+)
+def get_all_categories_api(
+    db: Session = Depends(get_db)
+):
+    rows = (
+        db.query(Vendor.name)
+        .filter(Vendor.parent_vendor_id.isnot(None))
+        .filter(Vendor.is_active == True)
+        .distinct()
+        .all()
+    )
+
+    seen = set()
+    categories = []
+
+    for (name,) in rows:
+        if not name:
+            continue
+
+        normalized = name.strip().lower()
+
+        if normalized and normalized not in seen:
+            seen.add(normalized)
+            categories.append(name.strip())
+
+    categories.sort()
+
+    return {
+        "categories": categories
+    }
+
+# ==========================================
 # SINGLE
 # ==========================================
 

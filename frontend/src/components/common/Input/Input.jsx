@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useTheme } from "../../../context/ThemeContext";
 
 const Input = ({
     label,
@@ -16,9 +15,9 @@ const Input = ({
     icon = null
 }) => {
 
-    const theme = useTheme();
-
     const [showPassword, setShowPassword] = useState(false);
+    const [focused, setFocused] = useState(false);
+    const [hovered, setHovered] = useState(false);
 
     const actualType =
         type === "password"
@@ -26,6 +25,8 @@ const Input = ({
                 ? "text"
                 : "password"
             : type;
+
+    const isActive = focused || hovered;
 
     return (
         <div className="w-full">
@@ -38,7 +39,7 @@ const Input = ({
                         marginBottom: "8px",
                         fontSize: "14px",
                         fontWeight: 600,
-                        color: theme.text
+                        color: "#1E293B"
                     }}
                 >
                     {label}
@@ -69,8 +70,9 @@ const Input = ({
                             left: "16px",
                             top: "50%",
                             transform: "translateY(-50%)",
-                            color: theme.textMuted,
-                            zIndex: 2
+                            color: focused ? "#6366F1" : "#94A3B8",
+                            zIndex: 2,
+                            transition: "color 0.25s ease"
                         }}
                     >
                         {icon}
@@ -84,6 +86,10 @@ const Input = ({
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
                     required={required}
                     disabled={disabled}
                     style={{
@@ -92,17 +98,31 @@ const Input = ({
                         paddingLeft: icon ? "48px" : "20px",
                         paddingRight: type === "password" ? "48px" : "20px",
 
-                        background: theme.cardBg,
+                        background: isActive
+                            ? "rgba(255, 255, 255, 0.65)"
+                            : "rgba(255, 255, 255, 0.4)",
+
+                        backdropFilter: "blur(12px)",
+                        WebkitBackdropFilter: "blur(12px)",
+
                         border: error
                             ? "1px solid #EF4444"
-                            : `1px solid ${theme.border}`,
+                            : focused
+                                ? "1px solid #6366F1"
+                                : "1px solid rgba(226, 232, 240, 0.8)",
 
                         borderRadius: "16px",
 
-                        color: theme.text,
+                        color: "#1E293B",
                         fontSize: "14px",
 
                         outline: "none",
+
+                        boxShadow: focused
+                            ? "0 0 0 4px rgba(99, 102, 241, 0.12)"
+                            : isActive
+                                ? "0 4px 12px rgba(15, 23, 42, 0.06)"
+                                : "none",
 
                         transition: "all 0.25s ease",
 
@@ -124,7 +144,7 @@ const Input = ({
                             background: "transparent",
                             border: "none",
                             cursor: "pointer",
-                            color: theme.textMuted
+                            color: "#94A3B8"
                         }}
                     >
                         {showPassword
@@ -153,7 +173,7 @@ const Input = ({
                     style={{
                         marginTop: "8px",
                         fontSize: "13px",
-                        color: theme.textMuted
+                        color: "#94A3B8"
                     }}
                 >
                     {helperText}

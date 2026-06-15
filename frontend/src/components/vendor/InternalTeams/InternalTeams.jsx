@@ -10,15 +10,14 @@ from "../../../api/axiosInstance";
 
 import Card
 from "../../common/Card/Card";
+import { useTheme }
+from "../../../context/ThemeContext";
 
 import {
 
 Plus,
 Trash2,
 FolderTree,
-Layers3,
-ChevronDown,
-ChevronUp,
 Pencil,
 Check,
 X
@@ -26,6 +25,7 @@ X
 } from "lucide-react";
 
 const InternalTeams=()=>{
+const theme = useTheme();
 
 const[
 hierarchy,
@@ -432,21 +432,25 @@ return(
 <Card>
 
 <div
-className="
-flex
-items-center
-gap-3
-mb-8
-"
+style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "7px",
+    marginBottom: "15px"
+}}
 >
 
-<FolderTree/>
+<FolderTree
+    size={18}
+    color="#7C5AF6"
+/>
 
 <h2
-className="
-font-bold
-text-2xl
-"
+style={{
+fontWeight: 700,
+fontSize: "20px",
+color: theme.textPrimary
+}}
 >
 
 Vendor Hierarchy
@@ -456,12 +460,13 @@ Vendor Hierarchy
 </div>
 
 <div
-className="
-bg-slate-50
-rounded-3xl
-p-6
-mb-8
-"
+style={{
+background: theme.cardBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "16px",
+padding: "16px",
+marginBottom: "20px"
+}}
 >
 
 <div
@@ -487,12 +492,14 @@ e.target.value
 
 }
 
-className="
-flex-1
-border
-rounded-xl
-p-4
-"
+style={{
+flex: 1,
+padding: "10px 12px",
+background: theme.pageBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "12px",
+color: theme.textPrimary
+}}
 
 />
 
@@ -500,12 +507,13 @@ p-4
 
 onClick={createCategory}
 
-className="
-bg-indigo-600
-text-white
-px-5
-rounded-xl
-"
+style={{
+background: "linear-gradient(135deg,#7C5AF6,#A78BFA)",
+color: "#fff",
+border: "none",
+padding: "10px 14px",
+borderRadius: "10px"
+}}
 
 >
 
@@ -520,13 +528,14 @@ rounded-xl
 {error&&(
 
 <div
-className="
-bg-red-100
-text-red-700
-p-3
-rounded-xl
-mb-5
-"
+style={{
+background: "rgba(239,68,68,0.12)",
+color: "#EF4444",
+padding: "12px",
+borderRadius: "12px",
+marginBottom: "20px",
+border: "1px solid rgba(239,68,68,0.25)"
+}}
 >
 
 {error}
@@ -538,13 +547,14 @@ mb-5
 {success&&(
 
 <div
-className="
-bg-green-100
-text-green-700
-p-3
-rounded-xl
-mb-5
-"
+style={{
+background: "rgba(34,197,94,0.12)",
+color: "#22C55E",
+padding: "12px",
+borderRadius: "12px",
+marginBottom: "20px",
+border: "1px solid rgba(34,197,94,0.25)"
+}}
 >
 
 {success}
@@ -579,11 +589,12 @@ key={
 category.vendor_id
 }
 
-className="
-border
-rounded-3xl
-p-6
-"
+style={{
+background: theme.cardBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "16px",
+padding: "16px"
+}}
 
 >
 
@@ -612,26 +623,18 @@ flex-1
 >
 
 <input
-
 value={editValue}
-
 onChange={(e)=>
-
-setEditValue(
-
-e.target.value
-
-)
-
+setEditValue(e.target.value)
 }
-
-className="
-border
-p-2
-rounded
-flex-1
-"
-
+style={{
+flex: 1,
+padding: "10px 12px",
+background: theme.pageBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "10px",
+color: theme.textPrimary
+}}
 />
 
 <button
@@ -674,10 +677,14 @@ setEditing(null)
 
 <>
 
-<h3>
-
-{category.name}
-
+<h3
+    style={{
+        fontSize: "16px",
+        fontWeight: 700,
+        color: theme.textPrimary
+    }}
+>
+    {category.name}
 </h3>
 
 <div
@@ -688,47 +695,35 @@ gap-2
 >
 
 <button
-
-onClick={()=>{
-
-setEditing(
-
-category.vendor_id
-
-);
-
-setEditValue(
-
-category.name
-
-);
-
-}}
-
+    onClick={() => {
+        setEditing(category.vendor_id);
+        setEditValue(category.name);
+    }}
+    style={{
+        background: "transparent",
+        border: "none",
+        color: theme.textMuted,
+        cursor: "pointer"
+    }}
 >
-
-<Pencil/>
-
+    <Pencil size={16} />
 </button>
 
 <button
-
-onClick={()=>
-
-deleteNode(
-
-category.vendor_id,
-
-false
-
-)
-
-}
-
+    onClick={() =>
+        deleteNode(
+            category.vendor_id,
+            false
+        )
+    }
+    style={{
+        background: "transparent",
+        border: "none",
+        color: "#EF4444",
+        cursor: "pointer"
+    }}
 >
-
-<Trash2/>
-
+    <Trash2 size={16} />
 </button>
 
 </div>
@@ -751,14 +746,15 @@ key={
 service.service_id
 }
 
-className="
-flex
-justify-between
-bg-slate-50
-rounded-xl
-p-3
-mb-2
-"
+style={{
+display: "flex",
+justifyContent: "space-between",
+background: theme.panelBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "12px",
+padding: "8px 10px",
+marginBottom: "6px"
+}}
 
 >
 
@@ -779,26 +775,20 @@ flex-1
 >
 
 <input
-
-value={editValue}
-
-onChange={(e)=>
-
-setEditValue(
-
-e.target.value
-
-)
-
-}
-
-className="
-border
-rounded
-p-2
-flex-1
-"
-
+    value={editValue}
+    onChange={(e)=>
+        setEditValue(
+            e.target.value
+        )
+    }
+    style={{
+        flex: 1,
+        padding: "10px 12px",
+        background: theme.pageBg,
+        border: `1px solid ${theme.cardBorder}`,
+        borderRadius: "10px",
+        color: theme.textPrimary
+    }}
 />
 
 <button
@@ -841,10 +831,13 @@ setEditing(null)
 
 <>
 
-<span>
-
-{service.name}
-
+<span
+    style={{
+        color: theme.textPrimary,
+        fontWeight: 500
+    }}
+>
+    {service.name}
 </span>
 
 <div
@@ -855,49 +848,35 @@ gap-2
 >
 
 <button
-
-onClick={()=>{
-
-setEditing(
-
-service.service_id
-
-);
-
-setEditValue(
-
-service.name
-
-);
-
-}}
-
+    onClick={() => {
+        setEditing(service.service_id);
+        setEditValue(service.name);
+    }}
+    style={{
+        background: "transparent",
+        border: "none",
+        color: theme.textMuted,
+        cursor: "pointer"
+    }}
 >
-
-<Pencil size={14}/>
-
+    <Pencil size={14} />
 </button>
 
 <button
-
-onClick={()=>
-
-deleteNode(
-
-service.service_id,
-
-true
-
-)
-
-}
-
+    onClick={() =>
+        deleteNode(
+            service.service_id,
+            true
+        )
+    }
+    style={{
+        background: "transparent",
+        border: "none",
+        color: "#EF4444",
+        cursor: "pointer"
+    }}
 >
-
-<Trash2
-size={14}
-/>
-
+    <Trash2 size={14} />
 </button>
 
 </div>
@@ -918,20 +897,16 @@ size={14}
 className="
 flex
 gap-3
-mt-4
+mt-3
 "
 >
 
 <input
-
+placeholder="Add Service"
 value={
-
 serviceInputs[
 category.vendor_id
-]||
-
-""
-
+] || ""
 }
 
 onChange={(e)=>{
@@ -952,36 +927,36 @@ e.target.value
 
 }}
 
-className="
-border
-rounded-xl
-p-3
-flex-1
-"
+style={{
+flex: 1,
+padding: "10px 12px",
+background: theme.pageBg,
+border: `1px solid ${theme.cardBorder}`,
+borderRadius: "12px",
+color: theme.textPrimary
+}}
 
 />
 
 <button
 
 onClick={()=>
-
 createService(
-
 category.vendor_id
-
 )
-
 }
-
-className="
-bg-indigo-600
-text-white
-px-4
-rounded-xl
-"
-
+style={{
+padding: "10px 14px",
+background:
+"linear-gradient(135deg,#7C5AF6,#A78BFA)",
+color: "#fff",
+border: "none",
+borderRadius: "12px",
+fontWeight: 600,
+cursor: "pointer"
+}}
 >
-
+    
 + Add Service
 
 </button>

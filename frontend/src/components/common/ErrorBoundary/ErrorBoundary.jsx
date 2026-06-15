@@ -126,11 +126,11 @@ border
 
 border-slate-200
 
-rounded-[36px]
+rounded-[28px]
 
-p-10
+p-7
 
-max-w-2xl
+max-w-xl
 
 w-full
 
@@ -187,13 +187,13 @@ className="
 
 mx-auto
 
-mb-6
+mb-4
 
-w-24
+w-16
 
-h-24
+h-16
 
-rounded-3xl
+rounded-2xl
 
 bg-red-100
 
@@ -209,7 +209,7 @@ justify-center
 
 <AlertTriangle
 
-size={42}
+size={28}
 
 className="
 
@@ -251,13 +251,13 @@ System Exception
 
 className="
 
-text-4xl
+text-2xl
 
 font-bold
 
 text-slate-800
 
-mb-5
+mb-4
 
 "
 
@@ -274,13 +274,15 @@ className="
 
 text-slate-500
 
-leading-8
+leading-7
 
-mb-8
+mb-5
 
 max-w-lg
 
 mx-auto
+
+text-sm
 
 "
 
@@ -342,17 +344,17 @@ import.meta.env.DEV&&(
 
 className="
 
-mt-8
+mt-5
 
 bg-slate-50
 
-rounded-3xl
+rounded-2xl
 
 border
 
 border-slate-200
 
-p-5
+p-4
 
 overflow-auto
 

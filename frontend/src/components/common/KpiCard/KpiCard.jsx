@@ -1,41 +1,35 @@
 import { useTheme } from "../../../context/ThemeContext";
 
-const KpiCard = ({
-    title,
-    value,
-    icon,
-    color
-}) => {
-
+const KpiCard = ({ title, value, icon, color, subtitle }) => {
     const theme = useTheme();
 
     return (
         <div
             style={{
                 background: theme.cardBg,
-                border: `1px solid ${theme.border}`,
-                borderRadius: "20px",
-                padding: "20px",
-                minHeight: "120px",
+                border: `1px solid ${theme.cardBorder}`,
+                borderRadius: "14px",
+                padding: "12px 14px",
+                minHeight: "88px",
                 transition: "all 0.25s ease",
                 boxShadow: theme.isDark
                     ? "0 8px 24px rgba(0,0,0,0.25)"
-                    : "0 4px 12px rgba(15,23,42,0.08)"
+                    : "0 4px 12px rgba(15,23,42,0.06)"
             }}
         >
             <div
                 style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "flex-start"
+                    alignItems: "center"
                 }}
             >
-                <div>
+                <div style={{ flex: 1 }}>
                     <p
                         style={{
-                            fontSize: "13px",
+                            fontSize: "10px",
                             color: theme.textMuted,
-                            marginBottom: "10px",
+                            marginBottom: "4px",
                             fontWeight: 500
                         }}
                     >
@@ -44,26 +38,37 @@ const KpiCard = ({
 
                     <h2
                         style={{
-                            fontSize: "32px",
+                            fontSize: "18px",
                             fontWeight: 700,
-                            color: theme.text,
-                            margin: 0
+                            color: theme.textPrimary,
+                            margin: "0 0 2px 0",
+                            lineHeight: 1
                         }}
                     >
                         {value}
                     </h2>
+
+                    <p
+                        style={{
+                            fontSize: "10px",
+                            color: theme.textFaint
+                        }}
+                    >
+                        {subtitle || "0% vs last 7 days"}
+                    </p>
                 </div>
 
                 <div
                     style={{
-                        width: "52px",
-                        height: "52px",
-                        borderRadius: "14px",
-                        background: color,
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "10px",
+                        background: `${color}22`,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        color: "#fff"
+                        color: color,
+                        flexShrink: 0
                     }}
                 >
                     {icon}

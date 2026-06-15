@@ -1,14 +1,9 @@
-import {
-    useState,
-    useEffect
-} from "react";
-
+import { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import Sidebar from "../Sidebar/Sidebar";
 import { useTheme } from "../../../context/ThemeContext";
 
 const MainLayout = ({ children }) => {
-
     const theme = useTheme();
 
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -19,9 +14,7 @@ const MainLayout = ({ children }) => {
         const handleResize = () => {
             const mobile = window.innerWidth < 1024;
             setIsMobile(mobile);
-            if (!mobile) {
-                setMobileSidebar(false);
-            }
+            if (!mobile) setMobileSidebar(false);
         };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
@@ -30,24 +23,38 @@ const MainLayout = ({ children }) => {
     const handleSidebarToggle = () => {
         if (isMobile) {
             setMobileSidebar(previous => !previous);
-            return;
+        } else {
+            setSidebarCollapsed(previous => !previous);
         }
-        setSidebarCollapsed(previous => !previous);
     };
+
+    const sidebarWidth = isMobile ? 0 : sidebarCollapsed ? 72 : 200;
 
     return (
         <div
-            className="h-screen flex relative"
-            style={{ background: theme.pageBg }}
+            style={{
+                height: "100vh",
+                width: "100vw",
+                display: "flex",
+                overflow: "hidden",
+                background: theme.pageBg
+            }}
         >
-
+            {/* MOBILE OVERLAY */}
             {mobileSidebar && (
                 <div
                     onClick={() => setMobileSidebar(false)}
-                    className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.4)",
+                        backdropFilter: "blur(4px)",
+                        zIndex: 40
+                    }}
                 />
             )}
 
+            {/* SIDEBAR */}
             <Sidebar
                 sidebarOpen={mobileSidebar}
                 setSidebarOpen={setMobileSidebar}
@@ -55,32 +62,41 @@ const MainLayout = ({ children }) => {
                 setCollapsed={setSidebarCollapsed}
             />
 
-            <div className={`
-                flex-1 flex flex-col
-                transition-all duration-300
-                min-w-0 overflow-hidden
-                ${sidebarCollapsed ? "lg:ml-[95px]" : "lg:ml-[280px]"}
-            `}>
-
+            {/* MAIN CONTENT AREA */}
+            <div
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    minWidth: 0,
+                    height: "100vh",
+                    marginLeft: `${sidebarWidth}px`,
+                    transition: "margin-left 0.3s ease"
+                }}
+            >
+                {/* NAVBAR */}
                 <Navbar
                     toggleSidebar={handleSidebarToggle}
                     setSidebarOpen={setMobileSidebar}
                 />
 
+                {/* PAGE CONTENT */}
                 <main
-                    className="flex-1 flex flex-col p-4 overflow-y-auto"
                     style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                        padding: "20px",
                         background: theme.pageBg
                     }}
                 >
-                    {children}
+                    <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+                        {children}
+                    </div>
                 </main>
-
             </div>
-
         </div>
     );
-
 };
 
 export default MainLayout;

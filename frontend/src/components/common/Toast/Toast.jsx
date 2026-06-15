@@ -46,7 +46,7 @@ const Toast = ({
 
                 gap: "16px",
 
-                padding: "18px",
+                padding: "12px 14px",
 
                 background: theme.cardBg,
                 border: `1px solid ${theme.border}`,
@@ -62,15 +62,15 @@ const Toast = ({
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "14px"
+                    gap: "10px"
                 }}
             >
                 <div
                     style={{
-                        width: "44px",
-                        height: "44px",
+                        width: "34px",
+                        height: "34px",
 
-                        borderRadius: "14px",
+                        borderRadius: "10px",
 
                         display: "flex",
                         alignItems: "center",
@@ -112,11 +112,11 @@ const Toast = ({
             <button
                 onClick={onClose}
                 style={{
-                    width: "36px",
-                    height: "36px",
+                    width: "28px",
+                    height: "28px",
 
                     border: "none",
-                    borderRadius: "12px",
+                    borderRadius: "8px",
 
                     background: "transparent",
                     cursor: "pointer",

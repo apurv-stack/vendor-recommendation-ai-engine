@@ -11,6 +11,8 @@ useNavigate
 
 } from "react-router-dom";
 
+import { useTheme } from "../../context/ThemeContext";
+
 import MainLayout
 from "../../components/layouts/MainLayout/MainLayout";
 
@@ -54,6 +56,7 @@ FaChartLine
 } from "react-icons/fa";
 
 const ProfilePage=()=>{
+    const theme = useTheme();
 
 const navigate=
 
@@ -335,56 +338,25 @@ views
 
 :0;
 
-const stats=[
-
-{
-
-title:"Followers",
-
-value:
-
-followers,
-
-icon:<FaUsers/>,
-
-color:
-
-"bg-violet-100"
-
-},
-
-{
-
-title:"Views",
-
-value:
-
-views,
-
-icon:<FaEye/>,
-
-color:
-
-"bg-blue-100"
-
-},
-
-{
-
-title:"Engagement",
-
-value:
-
-`${engagement}%`,
-
-icon:<FaChartLine/>,
-
-color:
-
-"bg-green-100"
-
-}
-
+const stats = [
+    {
+        title: "Followers",
+        value: followers,
+        icon: <FaUsers />,
+        color: "#7C5AF6"
+    },
+    {
+        title: "Views",
+        value: views,
+        icon: <FaEye />,
+        color: "#3B82F6"
+    },
+    {
+        title: "Engagement",
+        value: `${engagement}%`,
+        icon: <FaChartLine />,
+        color: "#22C55E"
+    }
 ];
 
 return(
@@ -434,13 +406,14 @@ navigate(
 className="
 
 glass
-px-6
-py-4
-rounded-2xl
+px-4
+py-2
+rounded-xl
 flex
-gap-3
+gap-2
 items-center
 font-semibold
+text-sm
 
 "
 
@@ -458,116 +431,75 @@ Edit Profile
 
 <Card>
 
-<div
+    <div
+        style={{
+            display: "flex",
+            gap: "24px",
+            alignItems: "center",
+            flexWrap: "wrap"
+        }}
+    >
 
-className="
+        <div
+            style={{
+                height: "56px",
+                width: "56px",
+                borderRadius: "16px",
+                background: "rgba(124,90,246,0.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+            }}
+        >
 
-flex
-flex-col
-lg:flex-row
-gap-6
-items-center
+            <FaBuilding
+                size={22}
+                color="#7C5AF6"
+            />
 
-"
+        </div>
 
->
+        <div>
 
-<div
+            <h2
+                style={{
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    color: theme.textPrimary,
+                    marginBottom: "8px"
+                }}
+            >
+                {vendor.name || "Vendor"}
+            </h2>
 
-className="
+            <p
+                style={{
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "center",
+                    color: theme.textMuted,
+                    marginBottom: "8px"
+                }}
+            >
+                <FaEnvelope />
+                {vendor.business_email || "N/A"}
+            </p>
 
-h-24
-w-24
-rounded-[28px]
-bg-indigo-100
-flex
-items-center
-justify-center
+            <p
+                style={{
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "center",
+                    color: theme.textMuted
+                }}
+            >
+                <FaMapMarkerAlt />
+                {vendor.city || "Location"}
+            </p>
 
-"
+        </div>
 
->
-
-<FaBuilding
-
-size={34}
-
-className="
-
-text-indigo-600
-
-"
-
-/>
-
-</div>
-
-<div>
-
-<div
-
-className="
-
-space-y-3
-text-slate-500
-
-"
-
->
-
-<p
-
-className="
-
-flex
-gap-3
-items-center
-
-"
-
->
-
-<FaEnvelope/>
-
-{
-
-vendor.business_email||
-
-"N/A"
-
-}
-
-</p>
-
-<p
-
-className="
-
-flex
-gap-3
-items-center
-
-"
-
->
-
-<FaMapMarkerAlt/>
-
-{
-
-vendor.city||
-
-"Location"
-
-}
-
-</p>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </Card>
 
@@ -623,6 +555,7 @@ card.color
 
 />
 
+
 )
 
 )
@@ -631,24 +564,20 @@ card.color
 
 </div>
 
-<InternalTeams/>
-
-<VendorPricing
-
-minPrice={
-
-vendor.price_min
-
-}
-
-maxPrice={
-
-vendor.price_max
-
-}
-
+<VendorAnalytics
+    analytics={analytics}
 />
 
+<RecentlyViewed
+    visitors={visitors}
+/>
+
+<InternalTeams />
+
+<VendorPricing
+    minPrice={vendor.price_min}
+    maxPrice={vendor.price_max}
+/>
 </div>
 
 </MainLayout>

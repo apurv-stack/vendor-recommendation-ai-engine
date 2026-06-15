@@ -150,7 +150,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
                         <Sparkles size={16} color="#fff" />
                     </div>
                     <div>
-                        <div style={{ fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: t.textPrimary, letterSpacing: "-0.3px" }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: t.textPrimary, letterSpacing: "-0.3px" }}>
                             Vendor Discovery AI
                         </div>
 
@@ -280,20 +280,20 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
                             {!isUser && hasRecs && (
                                 <div style={{
                                     width: "100%", maxWidth: "82%",
-                                    marginTop: 8,
-                                    padding: "14px 16px",
-                                    borderRadius: 14,
+                                    marginTop: 6,
+                                    padding: "10px 12px",
+                                    borderRadius: 12,
                                     background: t.recWrapBg,
                                     border: `1px solid ${t.recWrapBorder}`,
                                     transition: "background 0.3s"
                                 }}>
                                     <div style={{
-                                        fontSize: 11, fontWeight: 700, color: t.recLabelText,
-                                        textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12
+                                        fontSize: 10, fontWeight: 700, color: t.recLabelText,
+                                        textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8
                                     }}>
                                         Here are the best vendor recommendations for you:
                                     </div>
-                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                                         {msg.recommendations.map((vendor, j) => (
                                             <RecommendationCard key={j} vendor={vendor} />
                                         ))}
@@ -362,7 +362,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
                         rows={1}
                         style={{
                             flex: 1, background: "transparent", border: "none", outline: "none",
-                            resize: "none", fontSize: 14, lineHeight: 1.5,
+                            resize: "none", fontSize: 12, lineHeight: 1.5,
                             color: t.inputText, fontFamily: "inherit",
                             maxHeight: 120, overflowY: "auto"
                         }}

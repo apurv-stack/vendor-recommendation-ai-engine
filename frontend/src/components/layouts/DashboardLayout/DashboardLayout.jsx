@@ -1,329 +1,100 @@
 import { useState, useEffect } from "react";
-
+import { useTheme } from "../../../context/ThemeContext";
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 
-const DashboardLayout = ({
-    children
-}) => {
+const DashboardLayout = ({ children }) => {
+    const theme = useTheme();
 
-    const [
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
+    const [mobile, setMobile] = useState(window.innerWidth < 1024);
 
-        sidebarOpen,
-
-        setSidebarOpen
-
-    ] = useState(false);
-
-    const [
-
-        collapsed,
-
-        setCollapsed
-
-    ] = useState(false);
-
-    const [
-
-        mobile,
-
-        setMobile
-
-    ] = useState(
-
-        window.innerWidth < 1024
-
-    );
-
-    useEffect(()=>{
-
-        const handleResize=()=>{
-
-            const mobileScreen=
-
-                window.innerWidth<1024;
-
-            setMobile(
-
-                mobileScreen
-
-            );
-
-            if(
-
-                !mobileScreen
-
-            ){
-
-                setSidebarOpen(
-
-                    false
-
-                );
-
-            }
-
+    useEffect(() => {
+        const handleResize = () => {
+            const mobileScreen = window.innerWidth < 1024;
+            setMobile(mobileScreen);
+            if (!mobileScreen) setSidebarOpen(false);
         };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
-        window.addEventListener(
-
-            "resize",
-
-            handleResize
-
-        );
-
-        return()=>{
-
-            window.removeEventListener(
-
-                "resize",
-
-                handleResize
-
-            );
-
-        };
-
-    },[]);
-
-
-    const toggleSidebar=()=>{
-
-        if(
-
-            mobile
-
-        ){
-
-            setSidebarOpen(
-
-                previous=>
-
-                !previous
-
-            );
-
+    const toggleSidebar = () => {
+        if (mobile) {
+            setSidebarOpen(previous => !previous);
+        } else {
+            setCollapsed(previous => !previous);
         }
-
-        else{
-
-            setCollapsed(
-
-                previous=>
-
-                !previous
-
-            );
-
-        }
-
     };
 
-    return(
-
+    return (
         <div
-
-            className="
-
-            min-h-screen
-
-            flex
-
-            bg-gradient-to-br
-
-            from-[#F8FAFF]
-
-            via-[#F4F7FC]
-
-            to-[#EEF3FF]
-
-            overflow-hidden
-
-            "
-
+            style={{
+                minHeight: "100vh",
+                display: "flex",
+                overflow: "hidden",
+                background: theme.pageBg
+            }}
         >
-
             {/* MOBILE OVERLAY */}
-
-            {
-
-                sidebarOpen &&
-
-                mobile && (
-
-                    <div
-
-                        onClick={()=>
-
-                            setSidebarOpen(
-
-                                false
-
-                            )
-
-                        }
-
-                        className="
-
-                        fixed
-
-                        inset-0
-
-                        bg-black/30
-
-                        backdrop-blur-sm
-
-                        z-40
-
-                        lg:hidden
-
-                        "
-
-                    />
-
-                )
-
-            }
+            {sidebarOpen && mobile && (
+                <div
+                    onClick={() => setSidebarOpen(false)}
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.4)",
+                        backdropFilter: "blur(4px)",
+                        zIndex: 40
+                    }}
+                    className="lg:hidden"
+                />
+            )}
 
             {/* SIDEBAR */}
-
             <Sidebar
-
-                sidebarOpen={
-
-                    sidebarOpen
-
-                }
-
-                setSidebarOpen={
-
-                    setSidebarOpen
-
-                }
-
-                collapsed={
-
-                    collapsed
-
-                }
-
-                setCollapsed={
-
-                    setCollapsed
-
-                }
-
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                collapsed={collapsed}
+                setCollapsed={setCollapsed}
             />
 
             {/* CONTENT */}
-
             <div
-
-                className={`
-
-                flex-1
-
-                flex
-
-                flex-col
-
-                min-w-0
-
-                transition-all
-
-                duration-300
-
-                ease-in-out
-
-                ${
-
-                    mobile
-
-                    ?
-
-                    ""
-
-                    :
-
-                    collapsed
-
-                    ?
-
-                    "lg:ml-[95px]"
-
-                    :
-
-                    "lg:ml-[280px]"
-
-                }
-
-                `}
-
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    minWidth: 0,
+                    height: "100vh",
+                    transition: "margin-left 0.3s ease",
+                    marginLeft: mobile ? "0" : collapsed ? "80px" : "240px"
+                }}
             >
-
                 {/* NAVBAR */}
-
                 <Navbar
-
-                    toggleSidebar={
-
-                        toggleSidebar
-
-                    }
-
-                    setSidebarOpen={
-
-                        setSidebarOpen
-
-                    }
-
+                    toggleSidebar={toggleSidebar}
+                    setSidebarOpen={setSidebarOpen}
                 />
 
                 {/* MAIN */}
-
                 <main
-
-                    className="
-
-                    flex-1
-
-                    overflow-y-auto
-
-                    p-6
-
-                    md:p-8
-
-                    lg:p-10
-
-                    "
-
+                    style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                        padding: "32px",
+                        background: theme.pageBg
+                    }}
                 >
-
-                    <div
-
-                        className="
-
-                        max-w-[1650px]
-
-                        mx-auto
-
-                        "
-
-                    >
-
+                    <div style={{ maxWidth: "1650px", margin: "0 auto" }}>
                         {children}
-
                     </div>
-
                 </main>
-
             </div>
-
         </div>
-
     );
-
 };
 
 export default DashboardLayout;

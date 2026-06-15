@@ -12,517 +12,259 @@ import {
     X
 } from "lucide-react";
 
-import {
-    useNavigate,
-    useLocation
-} from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
+import { useTheme } from "../../../context/ThemeContext";
 
-import {
-    useTheme
-} from "../../../context/ThemeContext";
-
-const Sidebar = ({
-    sidebarOpen,
-    setSidebarOpen,
-    collapsed,
-    setCollapsed
-}) => {
-
+const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
     const navigate = useNavigate();
-
     const location = useLocation();
-
-    const {
-        logout
-    } = useAuth();
-
-    useTheme();
+    const { logout } = useAuth();
+    const theme = useTheme();
 
     const menuItems = [
-
-        {
-            label: "Dashboard",
-            icon: <LayoutDashboard size={22} />,
-            path: "/dashboard"
-        },
-
-        {
-            label: "Vendor Marketplace",
-            icon: <Building2 size={22} />,
-            path: "/vendors"
-        },
-
-        {
-            label: "Profile",
-            icon: <User size={22} />,
-            path: "/profile"
-        },
-
-        {
-            label: "Recommendations",
-            icon: <BrainCircuit size={22} />,
-            path: "/recommendations"
-        },
-
-        {
-            label: "Saved Vendors",
-            icon: <Bookmark size={22} />,
-            path: "/saved-vendors"
-        },
-
-        {
-            label: "Settings",
-            icon: <Settings size={22} />,
-            path: "/settings"
-        }
-
+        { label: "Dashboard",          icon: <LayoutDashboard size={14} />, path: "/dashboard" },
+        { label: "Vendor Marketplace", icon: <Building2 size={14} />,       path: "/vendors" },
+        { label: "Profile",            icon: <User size={14} />,            path: "/profile" },
+        { label: "Recommendations",    icon: <BrainCircuit size={14} />,    path: "/recommendations" },
+        { label: "Saved Vendors",      icon: <Bookmark size={14} />,        path: "/saved-vendors" },
+        { label: "Settings",           icon: <Settings size={14} />,        path: "/settings" },
     ];
 
     const handleNavigate = (path) => {
-
         navigate(path);
-
-        if (
-            window.innerWidth < 1024
-        ) {
-
-            setSidebarOpen(false);
-
-        }
-
+        if (window.innerWidth < 1024) setSidebarOpen(false);
     };
 
     const handleLogout = async () => {
-
         await logout();
-
         navigate("/login");
-
     };
 
     return (
-
         <aside
             className={`
-
-            fixed
-            top-0
-            left-0
-
-            h-screen
-
-            z-50
-
-            overflow-hidden
-
-            border-r
-            border-slate-200
-
-            bg-white/80
-
-            backdrop-blur-2xl
-
-            shadow-xl
-
-            transition-all
-            duration-300
-
-            ${collapsed
-                ? "w-[95px]"
-                : "w-[280px]"
-            }
-
-            ${sidebarOpen
-                ? "translate-x-0"
-                : "-translate-x-full lg:translate-x-0"
-            }
-
+                fixed top-0 left-0 h-screen z-50 overflow-hidden transition-all duration-300
+                ${collapsed ? "w-[64px]" : "w-[170px]"}
+                ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
             `}
+            style={{
+                background: theme.sidebarBg,
+                borderRight: `1px solid ${theme.cardBorder}`,
+                backdropFilter: "blur(20px)",
+                boxShadow: theme.isDark
+                    ? "0 0 30px rgba(0,0,0,0.35)"
+                    : "0 0 20px rgba(15,23,42,0.08)"
+            }}
         >
-
-            <div
-                className="
-                h-full
-                flex
-                flex-col
-                "
-            >
+            <div className="h-full flex flex-col">
 
                 {/* HEADER */}
+                <div style={{ borderBottom: `1px solid ${theme.cardBorder}`, padding: "10px 10px" }}>
+                    <div className="flex items-center justify-between">
 
-                <div
-                    className="
-                    px-4
-                    pt-6
-                    pb-5
-
-                    border-b
-                    border-slate-200
-                    "
-                >
-
-                    <div
-                        className="
-                        flex
-                        items-center
-                        justify-between
-                        "
-                    >
-
-                        {
-
-                            !collapsed && (
-
+                        {!collapsed && (
+                            <div className="flex items-center gap-3">
                                 <div
-                                    className="
-                                    flex
-                                    items-center
-                                    gap-3
-                                    "
+                                    style={{
+                                        height: "32px",
+                                        width: "32px",
+                                        borderRadius: "8px",
+                                        background: "linear-gradient(135deg, #7C5AF6, #a78bfa)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        flexShrink: 0
+                                    }}
                                 >
-
-                                    <div
-                                        className="
-                                        h-12
-                                        w-12
-
-                                        rounded-2xl
-
-                                        bg-gradient-to-r
-                                        from-indigo-500
-                                        to-purple-500
-
-                                        flex
-                                        items-center
-                                        justify-center
-
-                                        text-white
-
-                                        shadow-lg
-                                        "
-                                    >
-
-                                        <Sparkles size={20} />
-
-                                    </div>
-
-                                    <div>
-
-                                        <h1
-                                            className="
-                                            font-bold
-                                            text-xl
-                                            text-slate-900
-                                            "
-                                        >
-
-                                            Vendor Hub
-
-                                        </h1>
-
-                                        <p
-                                            className="
-                                            text-xs
-                                            text-slate-400
-                                            "
-                                        >
-
-                                            Enterprise Suite
-
-                                        </p>
-
-                                    </div>
-
+                                    <Sparkles size={20} color="#fff" />
                                 </div>
+                                <div>
+                                    <h1 style={{ fontWeight: 700, fontSize: "13px", color: theme.textPrimary, lineHeight: 1.2 }}>
+                                        Vendor Hub
+                                    </h1>
+                                    <p style={{ fontSize: "9px", color: theme.textMuted }}>
+                                        Enterprise Suite
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
-                            )
-
-                        }
-
-                        <div
-                            className="
-                            flex
-                            gap-2
-                            "
-                        >
-
-                            <button
-
-                                onClick={() =>
-                                    setCollapsed(
-                                        previous =>
-                                            !previous
-                                    )
-                                }
-
-                                className="
-                                hidden
-                                lg:flex
-
-                                h-11
-                                w-11
-
-                                items-center
-                                justify-center
-
-                                rounded-xl
-
-                                border
-                                border-slate-200
-
-                                bg-white
-
-                                shadow-sm
-
-                                hover:bg-slate-50
-                                "
+                        {collapsed && (
+                            <div
+                                style={{
+                                    height: "36px",
+                                    width: "36px",
+                                    borderRadius: "10px",
+                                    background: "linear-gradient(135deg, #7C5AF6, #a78bfa)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    margin: "0 auto"
+                                }}
                             >
+                                <Sparkles size={20} color="#fff" />
+                            </div>
+                        )}
 
-                                {
+                        {!collapsed && (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setCollapsed(prev => !prev)}
+                                    style={{
+                                        background: theme.panelBg,
+                                        border: `1px solid ${theme.cardBorder}`,
+                                        color: theme.textPrimary,
+                                        padding: "6px",
+                                        borderRadius: "8px",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}
+                                >
+                                    <ChevronLeft size={16} />
+                                </button>
 
-                                    collapsed
+                                <div className="lg:hidden">
+                                    <button
+                                        onClick={() => setSidebarOpen(false)}
+                                        style={{
+                                            background: theme.panelBg,
+                                            border: `1px solid ${theme.cardBorder}`,
+                                            color: theme.textPrimary,
+                                            padding: "6px",
+                                            borderRadius: "8px",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center"
+                                        }}
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
-                                        ?
-
-                                        <ChevronRight size={18} />
-
-                                        :
-
-                                        <ChevronLeft size={18} />
-
-                                }
-
-                            </button>
-
+                        {collapsed && (
                             <button
-
-                                onClick={() =>
-                                    setSidebarOpen(false)
-                                }
-
-                                className="
-                                lg:hidden
-
-                                h-11
-                                w-11
-
-                                flex
-                                items-center
-                                justify-center
-
-                                rounded-xl
-
-                                border
-                                border-slate-200
-
-                                bg-white
-                                "
+                                onClick={() => setCollapsed(prev => !prev)}
+                                style={{
+                                    position: "absolute",
+                                    bottom: "80px",
+                                    left: "50%",
+                                    transform: "translateX(-50%)",
+                                    background: theme.panelBg,
+                                    border: `1px solid ${theme.cardBorder}`,
+                                    color: theme.textPrimary,
+                                    padding: "6px",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
                             >
-
-                                <X />
-
+                                <ChevronRight size={16} />
                             </button>
-
-                        </div>
+                        )}
 
                     </div>
-
                 </div>
 
                 {/* MENU */}
-
                 <div
-                    className="
-                    flex-1
-
-                    overflow-y-auto
-                    overflow-x-hidden
-
-                    px-4
-                    py-5
-
-                    space-y-2
-                    "
+                    className="flex-1 overflow-y-auto overflow-x-hidden py-4"
+                    style={{ padding: "10px 8px" }}
                 >
-
-                    {
-
-                        menuItems.map((item) => {
-
-                            const active =
-
-                                location.pathname === item.path;
-
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                        {menuItems.map((item) => {
+                            const active = location.pathname === item.path;
                             return (
-
                                 <button
-
                                     key={item.label}
-
-                                    onClick={() =>
-                                        handleNavigate(
-                                            item.path
-                                        )
-                                    }
-
-                                    className={`
-
-                                    w-full
-
-                                    flex
-                                    items-center
-
-                                    ${collapsed
-                                            ? "justify-center"
-                                            : "gap-4"
-                                        }
-
-                                    px-4
-                                    py-4
-
-                                    rounded-2xl
-
-                                    transition-all
-
-                                    ${active
-
-                                            ?
-
-                                            "bg-indigo-50 text-indigo-600 shadow-sm"
-
-                                            :
-
-                                            "text-slate-600 hover:bg-slate-100 hover:text-indigo-600"
-
-                                        }
-
-                                    `}
+                                    onClick={() => handleNavigate(item.path)}
+                                    style={{
+                                        width: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: collapsed ? "center" : "flex-start",
+                                        gap: collapsed ? "0" : "12px",
+                                        padding: collapsed ? "8px 0" : "8px 10px",
+                                        borderRadius: "12px",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        background: active ? "rgba(124,90,246,0.12)" : "transparent",
+                                        color: active ? "#7C5AF6" : theme.textMuted,
+                                        fontWeight: active ? 600 : 400,
+                                        fontSize: "13px",
+                                        transition: "all 0.2s",
+                                        position: "relative"
+                                    }}
+                                    onMouseEnter={e => {
+                                        if (!active) e.currentTarget.style.background = theme.menuHoverBg;
+                                    }}
+                                    onMouseLeave={e => {
+                                        if (!active) e.currentTarget.style.background = "transparent";
+                                    }}
                                 >
+                                    {/* Active left bar */}
+                                    {active && !collapsed && (
+                                        <div style={{
+                                            position: "absolute",
+                                            left: 0,
+                                            top: "20%",
+                                            height: "60%",
+                                            width: "3px",
+                                            borderRadius: "0 3px 3px 0",
+                                            background: "#7C5AF6"
+                                        }} />
+                                    )}
 
-                                    <div
-                                        className={`
+                                    <span style={{ color: active ? "#7C5AF6" : theme.textMuted, flexShrink: 0 }}>
+                                        {item.icon}
+                                    </span>
 
-                                        min-w-[42px]
-                                        h-[42px]
-
-                                        flex
-                                        items-center
-                                        justify-center
-
-                                        rounded-xl
-
-                                        ${active
-
-                                                ?
-
-                                                "bg-indigo-100"
-
-                                                :
-
-                                                ""
-
-                                            }
-
-                                        `}
-                                    >
-
-                                        {
-
-                                            item.icon
-
-                                        }
-
-                                    </div>
-
-                                    {
-
-                                        !collapsed && (
-
-                                            <span>
-
-                                                {
-
-                                                    item.label
-
-                                                }
-
-                                            </span>
-
-                                        )
-
-                                    }
-
+                                    {!collapsed && (
+                                        <span>{item.label}</span>
+                                    )}
                                 </button>
-
                             );
-
-                        })
-
-                    }
-
+                        })}
+                    </div>
                 </div>
 
                 {/* FOOTER */}
-
-                <div
-                    className="
-                    p-4
-
-                    border-t
-                    border-slate-200
-                    "
-                >
-
+                <div style={{ borderTop: `1px solid ${theme.cardBorder}`, padding: "10px 18px" }}>
                     <button
-
                         onClick={handleLogout}
-
-                        className="
-                        w-full
-
-                        flex
-                        items-center
-                        justify-center
-                        gap-3
-
-                        py-4
-
-                        rounded-2xl
-
-                        bg-red-50
-
-                        text-red-500
-
-                        hover:bg-red-100
-
-                        font-semibold
-
-                        transition-all
-                        "
+                        style={{
+                            background: "rgba(239,68,68,0.10)",
+                            color: "#EF4444",
+                            width: "100%",
+                            padding: "10px",
+                            borderRadius: "10px",
+                            border: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: collapsed ? "center" : "flex-start",
+                            gap: "10px",
+                            fontSize: "13px",
+                            fontWeight: 500
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.10)"}
                     >
-
-                        <LogOut size={18} />
-
-                        {
-
-                            !collapsed &&
-
-                            "Logout"
-
-                        }
-
+                        <LogOut size={14} />
+                        {!collapsed && "Logout"}
                     </button>
-
                 </div>
 
             </div>
-
         </aside>
-
     );
-
 };
 
 export default Sidebar;

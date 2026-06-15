@@ -1,678 +1,594 @@
 import {
-
-useState,
-useEffect
-
+    useState,
+    useEffect
 } from "react";
 
-import axiosInstance
-from "../../../api/axiosInstance";
+import axiosInstance from "../../../api/axiosInstance";
 
-import Card
-from "../../common/Card/Card";
-
-import Button
-from "../../common/Button/Button";
+import Card from "../../common/Card/Card";
+import Button from "../../common/Button/Button";
 
 import {
-
-Plus,
-Trash2
-
+    Plus,
+    Trash2,
+    Wrench,
+    IndianRupee,
+    FileText
 } from "lucide-react";
 
+import { useTheme } from "../../../context/ThemeContext";
 
-const VendorServices=()=>{
+const VendorServices = () => {
 
-const[
-services,
-setServices
-]=useState([]);
+    const theme = useTheme();
 
-const[
-serviceName,
-setServiceName
-]=useState("");
+    const [
+        services,
+        setServices
+    ] = useState([]);
 
-const[
-description,
-setDescription
-]=useState("");
+    const [
+        serviceName,
+        setServiceName
+    ] = useState("");
 
-const[
-price,
-setPrice
-]=useState("");
+    const [
+        description,
+        setDescription
+    ] = useState("");
 
-const[
-loading,
-setLoading
-]=useState(false);
+    const [
+        price,
+        setPrice
+    ] = useState("");
 
-const[
-error,
-setError
-]=useState("");
+    const [
+        loading,
+        setLoading
+    ] = useState(false);
 
-const[
-success,
-setSuccess
-]=useState("");
+    const [
+        error,
+        setError
+    ] = useState("");
 
+    const [
+        success,
+        setSuccess
+    ] = useState("");
 
-useEffect(()=>{
+    useEffect(() => {
+        fetchServices();
+    }, []);
 
-fetchServices();
+    const fetchServices = async () => {
 
-},[]);
+        try {
 
+            const response =
+                await axiosInstance.get(
+                    "/vendors/service"
+                );
 
-// ====================
-// FETCH SERVICES
-// ====================
+            const payload =
+                response.data?.data ||
+                response.data;
 
-const fetchServices=
+            setServices(
+                payload?.services || []
+            );
 
-async()=>{
+        } catch (error) {
 
-try{
+            console.log(
+                "Service fetch failed",
+                error
+            );
 
-const response=
+        }
 
-await axiosInstance.get(
+    };
 
-"/vendors/service"
+    const validate = () => {
 
-);
+        if (!serviceName.trim()) {
+            return "Service name required";
+        }
 
-const payload=
+        if (
+            price &&
+            Number(price) < 0
+        ) {
+            return "Price cannot be negative";
+        }
 
-response.data?.data||
+        if (
+            price &&
+            Number(price) < 500
+        ) {
+            return "Minimum price ₹500";
+        }
 
-response.data;
+        return "";
+    };
 
-setServices(
+    const addService = async () => {
 
-payload?.services||
+        setError("");
+        setSuccess("");
 
-[]
+        const validation =
+            validate();
 
-);
+        if (validation) {
 
-}
+            setError(validation);
 
-catch(error){
+            return;
+        }
 
-console.log(
+        try {
 
-"Service fetch failed",
+            setLoading(true);
 
-error
+            await axiosInstance.post(
+                "/vendors/service",
+                {
+                    service_name:
+                        serviceName.trim(),
 
-);
+                    description:
+                        description.trim(),
 
-}
+                    price:
+                        price
+                            ? Number(price)
+                            : null
+                }
+            );
 
-};
+            setSuccess(
+                "Service added successfully"
+            );
 
+            setServiceName("");
+            setDescription("");
+            setPrice("");
 
-// ====================
-// VALIDATION
-// ====================
+            fetchServices();
 
-const validate=()=>{
+        } catch (error) {
 
-if(
+            setError(
+                error?.response?.data?.message ||
+                error?.response?.data?.detail ||
+                "Unable to add service"
+            );
 
-!serviceName.trim()
+        } finally {
 
-){
+            setLoading(false);
 
-return
+        }
 
-"Service name required";
+    };
 
-}
+    const deleteService = async (
+        serviceId
+    ) => {
 
-
-if(
-
-price&&
-
-Number(price)<0
-
-){
-
-return
-
-"Price cannot be negative";
-
-}
-
-
-if(
-
-price&&
-
-Number(price)<500
-
-){
-
-return
-
-"Minimum price ₹500";
-
-}
-
-return "";
-
-};
-
-
-// ====================
-// ADD SERVICE
-// ====================
-
-const addService=
-
-async()=>{
-
-setError("");
-
-setSuccess("");
-
-const validation=
-
-validate();
-
-if(validation){
-
-setError(
-
-validation
-
-);
-
-return;
-
-}
-
-try{
-
-setLoading(true);
-
-await axiosInstance.post(
-
-"/vendors/service",
-
-{
-
-service_name:
-
-serviceName.trim(),
-
-description:
-
-description.trim(),
-
-price:
-
-price
-
-?
-
-Number(price)
-
-:
-
-null
-
-}
-
-);
-
-setSuccess(
-
-"Service added successfully"
-
-);
-
-setServiceName("");
-
-setDescription("");
-
-setPrice("");
-
-fetchServices();
-
-}
-
-catch(error){
-
-setError(
-
-error?.response
-
-?.data
-
-?.message
-
-||
-
-error?.response
-
-?.data
-
-?.detail
-
-||
-
-"Unable to add service"
-
-);
-
-}
-
-finally{
-
-setLoading(false);
-
-}
-
-};
-
-
-// ====================
-// DELETE
-// ====================
-
-const deleteService=
-
-async(
-
-serviceId
-
-)=>{
-
-try{
-
-await axiosInstance.delete(
-
-`/vendors/service/${serviceId}`
-
-);
-
-fetchServices();
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-};
-
-
-return(
-
-<Card>
-
-<h2
-
-className="
-
-text-xl
-
-font-bold
-
-mb-5
-
-"
-
->
-
-Manage Services
-
-</h2>
-
-
-<div
-
-className="
-
-grid
-
-md:grid-cols-3
-
-gap-4
-
-mb-4
-
-"
-
->
-
-<input
-
-placeholder=
-
-"Service Name"
-
-value={serviceName}
-
-onChange={(event)=>
-
-setServiceName(
-
-event.target.value
-
-)
-
-}
-
-className="
-
-border
-
-rounded-xl
-
-p-3
-
-"
-
-/>
-
-
-<input
-
-placeholder=
-
-"Description"
-
-value={description}
-
-onChange={(event)=>
-
-setDescription(
-
-event.target.value
-
-)
-
-}
-
-className="
-
-border
-
-rounded-xl
-
-p-3
-
-"
-
-/>
-
-
-<input
-
-type="number"
-
-min="500"
-
-placeholder="Price"
-
-value={price}
-
-onChange={(event)=>
-
-setPrice(
-
-event.target.value
-
-)
-
-}
-
-className="
-
-border
-
-rounded-xl
-
-p-3
-
-"
-
-/>
-
-</div>
-
-
-{
-
-error&&(
-
-<p
-
-className="
-
-text-red-500
-
-mb-3
-
-"
-
->
-
-{error}
-
-</p>
-
-)
-
-}
-
-
-{
-
-success&&(
-
-<p
-
-className="
-
-text-emerald-600
-
-mb-3
-
-"
-
->
-
-{success}
-
-</p>
-
-)
-
-}
-
-
-<Button
-
-onClick={addService}
-
-disabled={loading}
-
-icon={<Plus/>}
-
->
-
-{
-
-loading
-
-?
-
-"Adding..."
-
-:
-
-"Add Service"
-
-}
-
-</Button>
-
-
-<div
-
-className="
-
-mt-6
-
-space-y-4
-
-"
-
->
-
-{
-
-!services.length&&(
-
-<p
-
-className="
-
-text-slate-400
-
-"
-
->
-
-No services added yet
-
-</p>
-
-)
-
-}
-
-
-{
-
-services.map(
-
-service=>(
-
-<div
-
-key={
-
-service.service_id
-
-}
-
-className="
-
-border
-
-rounded-2xl
-
-p-5
-
-flex
-
-justify-between
-
-"
-
->
-
-<div>
-
-<h3
-
-className="font-semibold"
-
->
-
-{
-
-service.service_name
-
-}
-
-</h3>
-
-
-<p>
-
-{
-
-service.description||
-
-"No description"
-
-}
-
-</p>
-
-
-<p>
-
-₹{
-
-service.price||
-
-0
-
-}
-
-</p>
-
-</div>
-
-
-<button
-
-onClick={()=>
-
-deleteService(
-
-service.service_id
-
-)
-
-}
-
->
-
-<Trash2/>
-
-</button>
-
-</div>
-
-)
-
-)
-
-}
-
-</div>
-
-</Card>
-
-);
+        try {
+
+            await axiosInstance.delete(
+                `/vendors/service/${serviceId}`
+            );
+
+            fetchServices();
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
+    return (
+
+        <Card>
+
+            {/* Header */}
+
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "14px",
+                    marginBottom: "24px"
+                }}
+            >
+
+                <div
+                    style={{
+                        width: "52px",
+                        height: "52px",
+                        borderRadius: "16px",
+                        background:
+                            "rgba(124,90,246,0.12)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                    }}
+                >
+                    <Wrench
+                        size={22}
+                        color="#7C5AF6"
+                    />
+                </div>
+
+                <div>
+
+                    <p
+                        style={{
+                            textTransform:
+                                "uppercase",
+                            letterSpacing: "3px",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            color: "#7C5AF6",
+                            marginBottom: "4px"
+                        }}
+                    >
+                        Service Management
+                    </p>
+
+                    <h2
+                        style={{
+                            fontSize: "28px",
+                            fontWeight: 700,
+                            color:
+                                theme.textPrimary
+                        }}
+                    >
+                        Manage Services
+                    </h2>
+
+                </div>
+
+            </div>
+
+            {/* Form */}
+
+            <div
+                className="
+                    grid
+                    md:grid-cols-3
+                    gap-4
+                    mb-5
+                "
+            >
+
+                <div
+                    style={{
+                        position: "relative"
+                    }}
+                >
+
+                    <Wrench
+                        size={18}
+                        style={{
+                            position:
+                                "absolute",
+                            left: "14px",
+                            top: "50%",
+                            transform:
+                                "translateY(-50%)",
+                            color:
+                                theme.textMuted
+                        }}
+                    />
+
+                    <input
+                        placeholder="Service Name"
+                        value={serviceName}
+                        onChange={(event) =>
+                            setServiceName(
+                                event.target.value
+                            )
+                        }
+                        style={{
+                            width: "100%",
+                            padding:
+                                "14px 14px 14px 44px",
+                            background:
+                                theme.panelBg,
+                            border:
+                                `1px solid ${theme.cardBorder}`,
+                            borderRadius:
+                                "14px",
+                            color:
+                                theme.textPrimary
+                        }}
+                    />
+
+                </div>
+
+                <div
+                    style={{
+                        position: "relative"
+                    }}
+                >
+
+                    <FileText
+                        size={18}
+                        style={{
+                            position:
+                                "absolute",
+                            left: "14px",
+                            top: "50%",
+                            transform:
+                                "translateY(-50%)",
+                            color:
+                                theme.textMuted
+                        }}
+                    />
+
+                    <input
+                        placeholder="Description"
+                        value={description}
+                        onChange={(event) =>
+                            setDescription(
+                                event.target.value
+                            )
+                        }
+                        style={{
+                            width: "100%",
+                            padding:
+                                "14px 14px 14px 44px",
+                            background:
+                                theme.panelBg,
+                            border:
+                                `1px solid ${theme.cardBorder}`,
+                            borderRadius:
+                                "14px",
+                            color:
+                                theme.textPrimary
+                        }}
+                    />
+
+                </div>
+
+                <div
+                    style={{
+                        position: "relative"
+                    }}
+                >
+
+                    <IndianRupee
+                        size={18}
+                        style={{
+                            position:
+                                "absolute",
+                            left: "14px",
+                            top: "50%",
+                            transform:
+                                "translateY(-50%)",
+                            color:
+                                theme.textMuted
+                        }}
+                    />
+
+                    <input
+                        type="number"
+                        min="500"
+                        placeholder="Price"
+                        value={price}
+                        onChange={(event) =>
+                            setPrice(
+                                event.target.value
+                            )
+                        }
+                        style={{
+                            width: "100%",
+                            padding:
+                                "14px 14px 14px 44px",
+                            background:
+                                theme.panelBg,
+                            border:
+                                `1px solid ${theme.cardBorder}`,
+                            borderRadius:
+                                "14px",
+                            color:
+                                theme.textPrimary
+                        }}
+                    />
+
+                </div>
+
+            </div>
+
+            {/* Alerts */}
+
+            {error && (
+
+                <div
+                    style={{
+                        background:
+                            "rgba(239,68,68,0.12)",
+                        color: "#EF4444",
+                        border:
+                            "1px solid rgba(239,68,68,0.25)",
+                        padding: "12px",
+                        borderRadius: "12px",
+                        marginBottom: "16px"
+                    }}
+                >
+                    {error}
+                </div>
+
+            )}
+
+            {success && (
+
+                <div
+                    style={{
+                        background:
+                            "rgba(34,197,94,0.12)",
+                        color: "#22C55E",
+                        border:
+                            "1px solid rgba(34,197,94,0.25)",
+                        padding: "12px",
+                        borderRadius: "12px",
+                        marginBottom: "16px"
+                    }}
+                >
+                    {success}
+                </div>
+
+            )}
+
+            <Button
+                onClick={addService}
+                disabled={loading}
+                icon={<Plus />}
+            >
+                {
+                    loading
+                        ? "Adding..."
+                        : "Add Service"
+                }
+            </Button>
+
+            {/* Services List */}
+
+            <div
+                className="
+                    mt-6
+                    space-y-4
+                "
+            >
+
+                {!services.length && (
+
+                    <p
+                        style={{
+                            color:
+                                theme.textMuted
+                        }}
+                    >
+                        No services added yet
+                    </p>
+
+                )}
+
+                {services.map(service => (
+
+                    <div
+                        key={
+                            service.service_id
+                        }
+                        style={{
+                            background:
+                                theme.panelBg,
+                            border:
+                                `1px solid ${theme.cardBorder}`,
+                            borderRadius:
+                                "20px",
+                            padding: "20px",
+                            display: "flex",
+                            justifyContent:
+                                "space-between",
+                            alignItems:
+                                "center",
+                            gap: "20px"
+                        }}
+                    >
+
+                        <div>
+
+                            <h3
+                                style={{
+                                    fontWeight: 700,
+                                    color:
+                                        theme.textPrimary,
+                                    marginBottom:
+                                        "6px"
+                                }}
+                            >
+                                {
+                                    service.service_name
+                                }
+                            </h3>
+
+                            <p
+                                style={{
+                                    color:
+                                        theme.textMuted,
+                                    marginBottom:
+                                        "8px"
+                                }}
+                            >
+                                {
+                                    service.description ||
+                                    "No description"
+                                }
+                            </p>
+
+                            <p
+                                style={{
+                                    fontWeight: 600,
+                                    color:
+                                        "#7C5AF6"
+                                }}
+                            >
+                                ₹
+                                {
+                                    service.price ||
+                                    0
+                                }
+                            </p>
+
+                        </div>
+
+                        <button
+                            onClick={() =>
+                                deleteService(
+                                    service.service_id
+                                )
+                            }
+                            style={{
+                                width: "44px",
+                                height: "44px",
+                                borderRadius:
+                                    "12px",
+                                border: "none",
+                                background:
+                                    "rgba(239,68,68,0.12)",
+                                color:
+                                    "#EF4444",
+                                cursor:
+                                    "pointer",
+                                display: "flex",
+                                alignItems:
+                                    "center",
+                                justifyContent:
+                                    "center"
+                            }}
+                        >
+                            <Trash2
+                                size={18}
+                            />
+                        </button>
+
+                    </div>
+
+                ))}
+
+            </div>
+
+        </Card>
+
+    );
 
 };
 

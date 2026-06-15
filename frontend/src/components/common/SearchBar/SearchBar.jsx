@@ -20,10 +20,10 @@ const SearchBar = ({
             }}
         >
             <Search
-                size={18}
+                size={14}
                 style={{
                     position: "absolute",
-                    left: "18px",
+                    left: "14px",
                     top: "50%",
                     transform: "translateY(-50%)",
                     color: theme.textMuted,
@@ -37,15 +37,14 @@ const SearchBar = ({
                 placeholder={placeholder}
                 style={{
                     width: "100%",
-                    height: "56px",
-                    paddingLeft: "50px",
-                    paddingRight: "48px",
+                    padding: "10px 40px 10px 36px",
 
-                    background: theme.cardBg,
-                    border: `1px solid ${theme.border}`,
-                    borderRadius: "18px",
+                    background: theme.panelBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: "12px",
 
-                    color: theme.text,
+                    color: theme.textPrimary,
+                    fontSize: "12px",
                     outline: "none",
 
                     transition: "all .25s ease"
@@ -57,12 +56,12 @@ const SearchBar = ({
                     onClick={onClear}
                     style={{
                         position: "absolute",
-                        right: "14px",
+                        right: "10px",
                         top: "50%",
                         transform: "translateY(-50%)",
 
-                        width: "32px",
-                        height: "32px",
+                        width: "22px",
+                        height: "22px",
 
                         border: "none",
                         borderRadius: "999px",

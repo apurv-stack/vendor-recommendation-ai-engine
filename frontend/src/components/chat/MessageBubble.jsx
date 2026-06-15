@@ -127,7 +127,7 @@ const MessageBubble = ({ role, text, timestamp, isDark, theme }) => {
                 border: isUser ? "none" : `1px solid ${theme.aiBubbleBorder}`,
                 boxShadow: isUser ? theme.userBubbleShadow : theme.aiBubbleShadow,
                 color: isUser ? theme.userBubbleText : theme.aiBubbleText,
-                fontSize: 14,
+                fontSize: 13,
                 lineHeight: 1.65,
                 whiteSpace: isComparison ? "normal" : "pre-wrap",
                 wordBreak: "break-word",

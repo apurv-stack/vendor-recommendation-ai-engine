@@ -321,11 +321,11 @@ Administrative Center
 
 className="
 
-text-5xl
+text-2xl
 
 font-bold
 
-mb-3
+mb-2
 
 text-slate-900
 
@@ -442,11 +442,11 @@ card.title
 
 className="
 
-text-4xl
+text-2xl
 
 font-bold
 
-mt-3
+mt-2
 
 text-slate-900
 
@@ -471,11 +471,11 @@ className={`
 
 ${card.bg}
 
-h-14
+h-10
 
-w-14
+w-10
 
-rounded-2xl
+rounded-xl
 
 flex
 
@@ -534,9 +534,9 @@ flex
 
 items-center
 
-gap-4
+gap-3
 
-mb-8
+mb-5
 
 "
 
@@ -546,11 +546,11 @@ mb-8
 
 className="
 
-h-20
+h-12
 
-w-20
+w-12
 
-rounded-3xl
+rounded-2xl
 
 bg-indigo-100
 
@@ -561,12 +561,11 @@ items-center
 justify-center
 
 "
-
 >
 
 <UserCircle2
 
-size={40}
+size={24}
 
 className="
 
@@ -585,7 +584,7 @@ text-indigo-600
 
 className="
 
-text-3xl
+text-xl
 
 font-bold
 
@@ -594,7 +593,6 @@ text-slate-900
 "
 
 >
-
 Admin Profile
 
 </h2>

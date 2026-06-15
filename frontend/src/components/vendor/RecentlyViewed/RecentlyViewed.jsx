@@ -1,570 +1,148 @@
-import {
+import Card from "../../common/Card/Card";
+import { useTheme } from "../../../context/ThemeContext";
 
-useEffect,
-useState
+const RecentlyViewed = ({
+    visitors = []
+}) => {
 
-} from "react";
+    const theme = useTheme();
 
-import axiosInstance
-from "../../../api/axiosInstance";
+    const activityData = Array.isArray(visitors)
+        ? visitors
+        : [];
 
-import Card
-from "../../common/Card/Card";
+    return (
 
-import Button
-from "../../common/Button/Button";
+        <Card
+            className="
+                h-full
+                relative
+                overflow-hidden
+            "
+        >
 
-import {
+            <div
+                style={{
+                    position: "absolute",
+                    top: "-100px",
+                    right: "-100px",
+                    width: "220px",
+                    height: "220px",
+                    borderRadius: "999px",
+                    background:
+                        "rgba(124,90,246,0.08)",
+                    filter: "blur(80px)"
+                }}
+            />
 
-Users,
-Plus,
-Building2
+            <div
+                style={{
+                    position: "relative",
+                    zIndex: 2
+                }}
+            >
 
-} from "lucide-react";
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "24px"
+                    }}
+                >
 
+                    <h3
+                        style={{
+                            fontSize: "24px",
+                            fontWeight: 700,
+                            color: theme.textPrimary
+                        }}
+                    >
+                        Profile Activity
+                    </h3>
 
-const InternalTeams=()=>{
+                    <button
+                        style={{
+                            background: "transparent",
+                            border: "none",
+                            color: "#7C5AF6",
+                            fontWeight: 600,
+                            cursor: "pointer"
+                        }}
+                    >
+                        View All Activity
+                    </button>
 
-const[
+                </div>
 
-teams,
-setTeams
+                {activityData.length === 0 ? (
 
-]=useState([]);
+                    <div
+                        style={{
+                            minHeight: "220px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: theme.textMuted,
+                            fontSize: "14px"
+                        }}
+                    >
+                        No recent activity available
+                    </div>
 
-const[
+                ) : (
 
-teamName,
-setTeamName
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "16px"
+                        }}
+                    >
 
-]=useState("");
+                        {activityData.map((item, index) => (
 
-const[
+                            <div
+                                key={item.id || index}
+                                style={{
+                                    padding: "16px",
+                                    borderRadius: "16px",
+                                    border:
+                                        `1px solid ${theme.cardBorder}`,
+                                    background: theme.panelBg
+                                }}
+                            >
 
-description,
-setDescription
+                                <pre
+                                    style={{
+                                        margin: 0,
+                                        color: theme.textPrimary,
+                                        fontSize: "13px",
+                                        whiteSpace: "pre-wrap",
+                                        wordBreak: "break-word"
+                                    }}
+                                >
+                                    {JSON.stringify(
+                                        item,
+                                        null,
+                                        2
+                                    )}
+                                </pre>
 
-]=useState("");
+                            </div>
 
-const[
+                        ))}
 
-loading,
-setLoading
+                    </div>
 
-]=useState(false);
+                )}
 
-const[
+            </div>
 
-error,
-setError
+        </Card>
 
-]=useState("");
-
-const[
-
-success,
-setSuccess
-
-]=useState("");
-
-
-// =============================
-// FETCH INTERNAL TEAMS
-// =============================
-
-useEffect(()=>{
-
-fetchTeams();
-
-},[]);
-
-
-const fetchTeams=
-
-async()=>{
-
-try{
-
-const response=
-
-await axiosInstance.get(
-
-"/vendors/internal-team"
-
-);
-
-const payload=
-
-response.data?.data||
-
-response.data;
-
-setTeams(
-
-payload?.teams||
-
-[]
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-"Team fetch failed",
-
-error
-
-);
-
-}
+    );
 
 };
 
-
-// =============================
-// CREATE TEAM
-// =============================
-
-const createTeam=
-
-async()=>{
-
-setError("");
-
-setSuccess("");
-
-
-if(
-
-!teamName.trim()
-
-){
-
-setError(
-
-"Team name required"
-
-);
-
-return;
-
-}
-
-
-try{
-
-setLoading(true);
-
-await axiosInstance.post(
-
-"/vendors/internal-team",
-
-{
-
-name:
-
-teamName,
-
-description:
-
-description
-
-}
-
-);
-
-setSuccess(
-
-"Team created successfully"
-
-);
-
-setTeamName("");
-
-setDescription("");
-
-fetchTeams();
-
-}
-
-catch(error){
-
-setError(
-
-error?.response
-
-?.data
-
-?.message
-
-||
-
-error?.response
-
-?.data
-
-?.detail
-
-||
-
-"Unable to create team"
-
-);
-
-}
-
-finally{
-
-setLoading(false);
-
-}
-
-};
-
-
-// =============================
-// UI
-// =============================
-
-return(
-
-<Card>
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-3
-
-mb-6
-
-"
-
->
-
-<Users/>
-
-<h2
-
-className="
-
-font-bold
-
-text-xl
-
-"
-
->
-
-Internal Teams
-
-</h2>
-
-</div>
-
-
-<div
-
-className="
-
-grid
-
-md:grid-cols-2
-
-gap-4
-
-mb-5
-
-"
-
->
-
-<input
-
-placeholder=
-
-"Category Vendor Name"
-
-value={teamName}
-
-onChange={(event)=>
-
-setTeamName(
-
-event.target.value
-
-)
-
-}
-
-className="
-
-border
-
-rounded-xl
-
-p-3
-
-"
-
-/>
-
-
-<input
-
-placeholder=
-
-"Description"
-
-value={description}
-
-onChange={(event)=>
-
-setDescription(
-
-event.target.value
-
-)
-
-}
-
-className="
-
-border
-
-rounded-xl
-
-p-3
-
-"
-
-/>
-
-</div>
-
-
-{
-
-error&&(
-
-<p
-
-className="
-
-text-red-500
-
-mb-3
-
-"
-
->
-
-{error}
-
-</p>
-
-)
-
-}
-
-
-{
-
-success&&(
-
-<p
-
-className="
-
-text-emerald-600
-
-mb-3
-
-"
-
->
-
-{success}
-
-</p>
-
-)
-
-}
-
-
-<Button
-
-onClick={createTeam}
-
-disabled={loading}
-
-icon={<Plus/>}
-
->
-
-{
-
-loading
-
-?
-
-"Creating..."
-
-:
-
-"Create Team"
-
-}
-
-</Button>
-
-
-<div
-
-className="
-
-mt-6
-
-space-y-4
-
-"
-
->
-
-{
-
-!teams.length&&(
-
-<p
-
-className="
-
-text-slate-400
-
-"
-
->
-
-No category vendors created
-
-</p>
-
-)
-
-}
-
-
-{
-
-teams.map(
-
-team=>(
-
-<div
-
-key={
-
-team.vendor_id
-
-}
-
-className="
-
-border
-
-rounded-xl
-
-p-5
-
-"
-
->
-
-<div
-
-className="
-
-flex
-
-items-center
-
-gap-3
-
-mb-2
-
-"
-
->
-
-<Building2
-
-size={18}
-
-/>
-
-<h3
-
-className="
-
-font-bold
-
-"
-
->
-
-{
-
-team.name
-
-}
-
-</h3>
-
-</div>
-
-
-<p
-
-className="
-
-text-slate-500
-
-"
-
->
-
-{
-
-team.description||
-
-"No description"
-
-}
-
-</p>
-
-</div>
-
-)
-
-)
-
-}
-
-</div>
-
-</Card>
-
-);
-
-};
-
-export default InternalTeams;
+export default RecentlyViewed;

@@ -8,6 +8,8 @@ useState
 import MainLayout
 from "../../components/layouts/MainLayout/MainLayout";
 
+import { useTheme } from "../../context/ThemeContext";
+
 import axiosInstance
 from "../../api/axiosInstance";
 
@@ -39,6 +41,7 @@ TrendingUp
 } from "lucide-react";
 
 const InternalTeamsPage=()=>{
+    const theme = useTheme();
 
 const[
 
@@ -98,36 +101,28 @@ setLoading(false);
 
 };
 
-const getStatusColor=(status)=>{
+const getStatusColor = (status) => {
 
-if(
+    if (status?.toLowerCase() === "active") {
 
-status?.toLowerCase()==="active"
+        return {
+            background: "rgba(34,197,94,0.12)",
+            color: "#22C55E"
+        };
+    }
 
-){
+    if (status?.toLowerCase() === "away") {
 
-return
+        return {
+            background: "rgba(249,115,22,0.12)",
+            color: "#F97316"
+        };
+    }
 
-"bg-emerald-100 text-emerald-700";
-
-}
-
-if(
-
-status?.toLowerCase()==="away"
-
-){
-
-return
-
-"bg-orange-100 text-orange-700";
-
-}
-
-return
-
-"bg-slate-100 text-slate-600";
-
+    return {
+        background: "rgba(100,116,139,0.12)",
+        color: "#94A3B8"
+    };
 };
 
 const activeMembers=
@@ -152,7 +147,7 @@ value:teamMembers.length,
 
 icon:<Users/>,
 
-color:"bg-blue-100"
+color:"purple"
 
 },
 
@@ -164,7 +159,7 @@ value:activeMembers,
 
 icon:<TrendingUp/>,
 
-color:"bg-emerald-100"
+color:"green"
 
 }
 
@@ -193,31 +188,20 @@ subtitle="Manage collaboration, roles and vendor operations"
 action={
 
 <button
-
-className="
-
-glass
-
-px-6
-
-py-4
-
-rounded-2xl
-
-font-semibold
-
-flex
-
-items-center
-
-gap-3
-
-hover:scale-[1.02]
-
-transition-all
-
-"
-
+style={{
+    background:
+        "linear-gradient(135deg,#7C5AF6,#A78BFA)",
+    color:"#fff",
+    padding:"8px 16px",
+    borderRadius:"10px",
+    display:"flex",
+    alignItems:"center",
+    gap:"8px",
+    border:"none",
+    fontWeight:600,
+    fontSize:"13px",
+    cursor:"pointer"
+}}
 >
 
 <UserPlus/>
@@ -394,7 +378,7 @@ gap-4
 
 className="
 
-text-2xl
+text-base
 
 font-bold
 
@@ -414,19 +398,13 @@ member.name||
 
 <div
 
-className="
-
-flex
-
-items-center
-
-gap-2
-
-text-slate-500
-
-mt-3
-
-"
+style={{
+    display:"flex",
+    alignItems:"center",
+    gap:"8px",
+    marginTop:"12px",
+    color:theme.textMuted
+}}
 
 >
 
@@ -448,21 +426,14 @@ member.role||
 
 <div
 
-className="
-
-flex
-
-items-center
-
-gap-2
-
-text-slate-500
-
-mt-2
-
-break-all
-
-"
+style={{
+    display:"flex",
+    alignItems:"center",
+    gap:"8px",
+    marginTop:"8px",
+    wordBreak:"break-all",
+    color:theme.textMuted
+}}
 
 >
 
@@ -485,35 +456,15 @@ member.email||
 </div>
 
 <div
-
-className={`
-
-px-4
-
-py-2
-
-rounded-full
-
-flex
-
-items-center
-
-gap-2
-
-font-medium
-
-${
-
-getStatusColor(
-
-member.status
-
-)
-
-}
-
-`}
-
+style={{
+    ...getStatusColor(member.status),
+    padding:"8px 16px",
+    borderRadius:"999px",
+    display:"flex",
+    alignItems:"center",
+    gap:"8px",
+    fontWeight:600
+}}
 >
 
 <Circle
@@ -538,33 +489,22 @@ member.status||
 
 <div
 
-className="
-
-mt-6
-
-pt-5
-
-border-t
-
-border-slate-200
-
-"
+style={{
+    marginTop:"12px",
+    paddingTop:"12px",
+    borderTop:`1px solid ${theme.cardBorder}`
+}}
 
 >
 
 <div
 
-className="
-
-flex
-
-items-center
-
-gap-2
-
-text-slate-500
-
-"
+style={{
+    display:"flex",
+    alignItems:"center",
+    gap:"8px",
+    color:theme.textMuted
+}}
 
 >
 

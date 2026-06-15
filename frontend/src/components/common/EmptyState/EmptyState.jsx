@@ -23,13 +23,13 @@ const EmptyState = ({
                 background: theme.cardBg,
                 border: `1px solid ${theme.border}`,
                 borderRadius: "32px",
-                minHeight: "360px",
+                minHeight: "260px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                padding: "56px 40px",
+                padding: "36px 32px",
                 boxShadow: theme.isDark
                     ? "0 12px 40px rgba(0,0,0,0.25)"
                     : "0 8px 24px rgba(15,23,42,0.08)"
@@ -58,7 +58,7 @@ const EmptyState = ({
             <div
                 style={{
                     position: "relative",
-                    marginBottom: "32px"
+                    marginBottom: "20px"
                 }}
             >
 
@@ -77,8 +77,8 @@ const EmptyState = ({
                 <div
                     style={{
                         position: "relative",
-                        width: "96px",
-                        height: "96px",
+                        width: "72px",
+                        height: "72px",
                         borderRadius: "999px",
                         display: "flex",
                         alignItems: "center",
@@ -90,7 +90,7 @@ const EmptyState = ({
                     }}
                 >
                     <SearchX
-                        size={38}
+                        size={28}
                         color={theme.primary}
                     />
                 </div>
@@ -102,8 +102,8 @@ const EmptyState = ({
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "16px"
+                    gap: "6px",
+                    marginBottom: "10px"
                 }}
             >
                 <Sparkles
@@ -129,10 +129,10 @@ const EmptyState = ({
 
             <h2
                 style={{
-                    fontSize: "32px",
+                    fontSize: "20px",
                     fontWeight: 700,
                     color: theme.textPrimary,
-                    marginBottom: "16px",
+                    marginBottom: "10px",
                     marginTop: 0
                 }}
             >
@@ -143,10 +143,11 @@ const EmptyState = ({
 
             <p
                 style={{
-                    maxWidth: "640px",
-                    lineHeight: 1.8,
+                    maxWidth: "480px",
+                    fontSize: "13px",
+                    lineHeight: 1.7,
                     color: theme.textMuted,
-                    marginBottom: "32px"
+                    marginBottom: "20px"
                 }}
             >
                 {message}

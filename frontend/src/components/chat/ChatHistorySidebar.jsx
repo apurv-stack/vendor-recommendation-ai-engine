@@ -95,7 +95,7 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
                         border: "1px solid rgba(124,90,246,0.5)",
                         color: "#c4b5fd", cursor: "pointer",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 16, fontWeight: 700,
+                        fontSize: 13, fontWeight: 700,
                         boxShadow: "0 0 10px rgba(124,90,246,0.3)",
                         transition: "all 0.2s"
                     }}
