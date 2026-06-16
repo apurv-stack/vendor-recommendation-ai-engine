@@ -20,6 +20,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
     const [messages, setMessages] = useState([WELCOME_MESSAGE]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [historyLoading, setHistoryLoading] = useState(false);
     const [sessionId, setSessionId] = useState(null);
     const [error, setError] = useState(null);
 
@@ -48,6 +49,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
 
         const loadHistory = async () => {
             try {
+                setHistoryLoading(true);
                 const history = await getSessionHistory(selectedSessionId);
                 const loaded = [WELCOME_MESSAGE];
                 history.forEach(item => {
@@ -61,6 +63,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                 setMessages(loaded);
                 setSessionId(selectedSessionId);
             } catch (e) { console.error(e); }
+            finally { setHistoryLoading(false); }
         };
         loadHistory();
     }, [selectedSessionId]);
@@ -270,7 +273,8 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                             display: "flex",
                             flexDirection: "column",
                             alignItems: isUser ? "flex-end" : "flex-start",
-                            gap: 6
+                            gap: 6,
+                            animation: "fadeInUp 0.25s ease"
                         }}>
                             {/* Bubble */}
                             <MessageBubble
@@ -309,23 +313,77 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                     );
                 })}
 
-                {/* Loading dots */}
+                {/* Typing indicator */}
                 {loading && (
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <style>{`
+                            @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+                            @keyframes fadeInUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+                            @keyframes pulse-ring { 0%{transform:scale(0.8);opacity:0.8} 100%{transform:scale(1.4);opacity:0} }
+                        `}</style>
+                        <div style={{ position: "relative", width: 32, height: 32, flexShrink: 0 }}>
+                            <div style={{
+                                position: "absolute", inset: 0, borderRadius: "50%",
+                                background: "rgba(124,90,246,0.3)",
+                                animation: "pulse-ring 1.2s ease-out infinite"
+                            }} />
+                            <div style={{
+                                width: 32, height: 32, borderRadius: "50%",
+                                background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                position: "relative", zIndex: 1
+                            }}>
+                                <span style={{ fontSize: 14 }}>✦</span>
+                            </div>
+                        </div>
                         <div style={{
                             padding: "12px 18px", borderRadius: "4px 18px 18px 18px",
                             background: t.aiBubbleBg, border: `1px solid ${t.aiBubbleBorder}`,
-                            display: "flex", gap: 5, alignItems: "center"
+                            display: "flex", flexDirection: "column", gap: 4,
+                            animation: "fadeInUp 0.3s ease"
                         }}>
-                            {[0, 1, 2].map(d => (
-                                <div key={d} style={{
-                                    width: 7, height: 7, borderRadius: "50%",
-                                    background: t.loadingDotBg,
-                                    animation: `bounce 1.2s ease-in-out ${d * 0.2}s infinite`
-                                }} />
-                            ))}
+                            <div style={{ fontSize: 10, color: t.textMuted, fontWeight: 500 }}>
+                                AI is thinking...
+                            </div>
+                            <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                                {[0, 1, 2].map(d => (
+                                    <div key={d} style={{
+                                        width: 7, height: 7, borderRadius: "50%",
+                                        background: t.loadingDotBg,
+                                        animation: `bounce 1.2s ease-in-out ${d * 0.2}s infinite`
+                                    }} />
+                                ))}
+                            </div>
                         </div>
-                        <style>{`@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }`}</style>
+                    </div>
+                )}
+
+                {/* History loading overlay */}
+                {historyLoading && (
+                    <div style={{
+                        display: "flex", flexDirection: "column",
+                        alignItems: "center", justifyContent: "center",
+                        flex: 1, gap: 16, padding: "40px",
+                        animation: "fadeInUp 0.3s ease"
+                    }}>
+                        <div style={{ position: "relative", width: 48, height: 48 }}>
+                            <div style={{
+                                position: "absolute", inset: 0, borderRadius: "50%",
+                                background: "rgba(124,90,246,0.2)",
+                                animation: "pulse-ring 1s ease-out infinite"
+                            }} />
+                            <div style={{
+                                width: 48, height: 48, borderRadius: "50%",
+                                background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                position: "relative", zIndex: 1
+                            }}>
+                                <span style={{ fontSize: 20 }}>✦</span>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: 13, color: t.textMuted, fontWeight: 500 }}>
+                            Loading conversation...
+                        </p>
                     </div>
                 )}
 
@@ -391,7 +449,8 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                                 border: "none", cursor: input.trim() && !loading ? "pointer" : "not-allowed",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 transition: "all 0.2s",
-                                boxShadow: input.trim() && !loading ? "0 0 12px rgba(124,90,246,0.4)" : "none"
+                                boxShadow: loading ? "0 0 16px rgba(124,90,246,0.6)" : input.trim() ? "0 0 12px rgba(124,90,246,0.4)" : "none",
+                                animation: loading ? "pulse-ring 1s ease-out infinite" : "none"
                             }}
                         >
                             <Send size={15} color={input.trim() && !loading ? "#fff" : "#5a5a8a"} />
