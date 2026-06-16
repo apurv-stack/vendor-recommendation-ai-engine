@@ -99,7 +99,8 @@ const VendorCard = ({
                             style={{
                                 fontSize: "16px",
                                 fontWeight: 700,
-                                whiteSpace: "nowrap",
+                                whiteSpace: "normal",
+                                wordBreak: "break-word",
                                 color: theme.textPrimary,
                                 margin: 0,
                                 lineHeight: 1.3
@@ -239,7 +240,8 @@ const VendorCard = ({
                     borderRadius: "18px",
                     padding: "10px 14px",
                     marginBottom: "14px",
-                    whiteSpace: "nowrap"
+                    whiteSpace: "normal",
+                    wordBreak: "break-word"
                 }}
             >
 
@@ -316,7 +318,7 @@ const VendorCard = ({
                 style={{
                     display: "grid",
                     gridTemplateColumns:
-                        "repeat(3,1fr)",
+                        "repeat(3, minmax(0, 1fr))",
                     gap: "6px",
                     marginBottom: "14px"
                 }}
@@ -354,12 +356,15 @@ const VendorCard = ({
 
             </div>
 
-            <Button
-                onClick={() => onView?.(vendor)}
-                icon={<ArrowUpRight />}
-            >
-                View Details
-            </Button>
+            <div style={{ width: "100%" }}>
+                <Button
+                    onClick={() => onView?.(vendor)}
+                    icon={<ArrowUpRight />}
+                    style={{ width: "100%" }}
+                >
+                    View Details
+                </Button>
+            </div>
 
         </Card>
     );

@@ -79,11 +79,11 @@ const Pagination = ({
                 marginTop: "16px",
 
                 display: "flex",
+                flexWrap: "wrap",
                 justifyContent: "space-between",
                 alignItems: "center",
-
+                gap: "10px",
                 padding: "12px 16px",
-
                 background: theme.cardBg,
                 border: `1px solid ${theme.border}`,
                 borderRadius: "16px"

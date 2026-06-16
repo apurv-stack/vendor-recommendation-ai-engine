@@ -29,7 +29,7 @@ const EmptyState = ({
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                padding: "36px 32px",
+                padding: "28px 16px",
                 boxShadow: theme.isDark
                     ? "0 12px 40px rgba(0,0,0,0.25)"
                     : "0 8px 24px rgba(15,23,42,0.08)"
@@ -114,7 +114,7 @@ const EmptyState = ({
                 <p
                     style={{
                         textTransform: "uppercase",
-                        letterSpacing: "3px",
+                        letterSpacing: "1.5px",
                         fontSize: "12px",
                         fontWeight: 600,
                         color: theme.primary,

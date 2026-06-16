@@ -21,7 +21,7 @@ const RightInfoPanel = () => {
 
     return (
         <div style={{
-            width: "clamp(220px, 16vw, 248px)", flexShrink: 0,
+            width: "clamp(200px, 15vw, 248px)", flexShrink: 0,
             height: "100%",
             display: "flex", flexDirection: "column",
             background: t.panelBg,

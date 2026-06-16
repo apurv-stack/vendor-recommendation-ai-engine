@@ -62,7 +62,7 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
     return (
         <div style={{
             display: "flex", flexDirection: "column",
-            height: "100%", width: "clamp(220px, 18vw, 268px)", flexShrink: 0,
+            height: "100%", width: "clamp(200px, 22vw, 268px)", flexShrink: 0,
             background: t.sidebarBg,
             borderRight: `1px solid ${t.sidebarBorder}`,
             overflow: "hidden",

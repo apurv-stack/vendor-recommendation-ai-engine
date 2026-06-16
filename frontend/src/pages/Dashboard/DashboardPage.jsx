@@ -156,15 +156,16 @@ const DashboardPage = () => {
                         background: theme.cardBg,
                         border: `1px solid ${theme.cardBorder}`,
                         borderRadius: "18px",
-                        padding: "18px 24px",
+                        padding: "14px 18px",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        gap: "16px"
+                        gap: "12px",
+                        flexWrap: "wrap"
                     }}
                 >
                     <div>
-                        <h1 style={{ fontSize: "24px", fontWeight: 700, color: theme.textPrimary, margin: 0, lineHeight: 1.2 }}>
+                        <h1 style={{ fontSize: "clamp(16px, 4vw, 24px)", fontWeight: 700, color: theme.textPrimary, margin: 0, lineHeight: 1.2, wordBreak: "break-word" }}>
                             {greeting}, {vendorName} {greetingEmoji}
                         </h1>
                         <p style={{ color: theme.textMuted, marginTop: "4px", fontSize: "13px" }}>
@@ -209,8 +210,8 @@ const DashboardPage = () => {
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(5, 1fr)",
-                        gap: "14px"
+                        gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                        gap: "12px"
                     }}
                 >
                     {stats.map(card => (
@@ -225,7 +226,7 @@ const DashboardPage = () => {
                 </div>
 
                 {/* ANALYTICS + PROFILE ACTIVITY */}
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
                     <VendorAnalytics analytics={dashboard.analytics} />
 
                     <Card style={{ padding: "16px" }}>
@@ -284,7 +285,7 @@ const DashboardPage = () => {
                 </div>
 
                 {/* TOP CATEGORIES + AI RECOMMENDATION ENGINE */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
                     <Card style={{ padding: "16px" }}>
                         <h3 style={{ fontWeight: 700, fontSize: "16px", color: theme.textPrimary, margin: "0 0 12px 0" }}>
                             Top Categories
@@ -370,15 +371,20 @@ const DashboardPage = () => {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: "2fr 2fr 1fr",
+                            gridTemplateColumns: "2fr 1fr",
                             padding: "8px 12px",
                             borderRadius: "10px",
                             background: theme.panelBg,
                             marginBottom: "8px"
                         }}
+                        className="sm:grid-cols-[2fr_2fr_1fr]"
                     >
-                        {["Activity", "Details", "Time"].map(h => (
-                            <p key={h} style={{ fontSize: "12px", fontWeight: 600, color: theme.textMuted, margin: 0, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                        {["Activity", "Details", "Time"].map((h, i) => (
+                            <p
+                                key={h}
+                                className={i === 1 ? "hidden sm:block" : ""}
+                                style={{ fontSize: "12px", fontWeight: 600, color: theme.textMuted, margin: 0, textTransform: "uppercase", letterSpacing: "0.5px" }}
+                            >
                                 {h}
                             </p>
                         ))}
@@ -405,38 +411,39 @@ const DashboardPage = () => {
                                 key={i}
                                 style={{
                                     display: "grid",
-                                    gridTemplateColumns: "2fr 2fr 1fr",
+                                    gridTemplateColumns: "2fr 1fr",
                                     padding: "10px 12px",
                                     borderBottom: i < recentActivityItems.length - 1 ? `1px solid ${theme.cardBorder}` : "none",
                                     alignItems: "center"
                                 }}
+                                className="sm:grid-cols-[2fr_2fr_1fr]"
                             >
                                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                     <div
                                         style={{
-                                            width: "24px", height: "24px",
-                                            borderRadius: "8px",
-                                            background: `${item.color}18`,
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            color: item.color,
-                                            flexShrink: 0
-                                        }}
-                                    >
-                                        {item.icon}
-                                    </div>
-                                    <span style={{ fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
-                                        {item.activity}
-                                    </span>
+                                        width: "24px", height: "24px",
+                                        borderRadius: "8px",
+                                        background: `${item.color}18`,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: item.color,
+                                        flexShrink: 0
+                                    }}
+                                >
+                                    {item.icon}
                                 </div>
-                                <span style={{ fontSize: "13px", color: theme.textMuted }}>
-                                    {item.details}
-                                </span>
-                                <span style={{ fontSize: "13px", color: theme.textFaint }}>
-                                    {item.time}
+                                <span style={{ fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
+                                    {item.activity}
                                 </span>
                             </div>
+                            <span className="hidden sm:block" style={{ fontSize: "13px", color: theme.textMuted }}>
+                                {item.details}
+                            </span>
+                            <span style={{ fontSize: "13px", color: theme.textFaint }}>
+                                {item.time}
+                            </span>
+                        </div>
                         ))}
                 </Card>
 

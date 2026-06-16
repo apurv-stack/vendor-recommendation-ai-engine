@@ -216,7 +216,7 @@ const SettingsPage = () => {
 
         <MainLayout>
 
-            <div className="space-y-4">
+            <div className="space-y-4 px-4 sm:px-6 lg:px-8">
 
                 <PageHeader
                     title="Settings"
@@ -289,7 +289,8 @@ const SettingsPage = () => {
                         className="
                             grid
                             md:grid-cols-2
-                            gap-5
+                            gap-3
+                            md:gap-5
                         "
                     >
 
@@ -306,6 +307,7 @@ const SettingsPage = () => {
                             placeholder="Display Name"
                             style={{
                                 width: "100%",
+                                boxSizing: "border-box",
                                 padding: "10px 14px",
                                 borderRadius: "12px",
                                 border: `1px solid ${theme.inputBorder}`,
@@ -323,6 +325,7 @@ const SettingsPage = () => {
                             readOnly
                             style={{
                                 width: "100%",
+                                boxSizing: "border-box",
                                 padding: "10px 14px",
                                 borderRadius: "12px",
                                 border: `1px solid ${theme.inputBorder}`,
@@ -528,15 +531,18 @@ const SettingsPage = () => {
                         borderRadius:
                             "12px",
                         padding:
-                            "9px 18px",
+                            "10px 18px",
                         fontWeight: 600,
                         fontSize: "13px",
                         display: "flex",
                         alignItems:
                             "center",
+                        justifyContent: "center",
                         gap: "8px",
                         cursor: "pointer",
-                        width: "fit-content"
+                        width: "100%",
+                        maxWidth: "200px",
+                        minHeight: "42px"
                     }}
                 >
 

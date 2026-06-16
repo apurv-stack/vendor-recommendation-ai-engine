@@ -199,7 +199,7 @@ const MainLayout = ({ children }) => {
                 style={{
                     position: "fixed",
                     bottom: "28px",
-                    right: "90px",
+                    right: "28px",
                     height: "52px",
                     width: "52px",
                     borderRadius: "50%",

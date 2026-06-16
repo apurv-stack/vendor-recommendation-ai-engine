@@ -47,13 +47,15 @@ const RecentlyViewed = ({
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: "24px"
+                        marginBottom: "24px",
+                        flexWrap: "wrap",
+                        gap: "8px"
                     }}
                 >
 
                     <h3
                         style={{
-                            fontSize: "24px",
+                            fontSize: "clamp(16px, 3vw, 24px)",
                             fontWeight: 700,
                             color: theme.textPrimary
                         }}

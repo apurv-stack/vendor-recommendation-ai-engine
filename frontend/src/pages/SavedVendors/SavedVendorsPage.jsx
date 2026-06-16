@@ -58,7 +58,7 @@ const SavedVendorsPage = () => {
 
     return (
         <MainLayout>
-            <div className="space-y-8">
+            <div className="space-y-6 px-4 sm:px-6 lg:px-8">
 
                 <PageHeader
                     title="Saved Vendors"
@@ -70,11 +70,11 @@ const SavedVendorsPage = () => {
                         <Bookmark size={18} color="#7C5AF6" />
                         {vendors.length} saved vendors
                     </div>
-                    <Button onClick={fetchSaved} fullWidth={false} icon={<RefreshCw size={18} />}>Refresh</Button>
+                    <Button onClick={fetchSaved} fullWidth={false} icon={<RefreshCw size={18} />} style={{ minHeight: "40px" }}>Refresh</Button>
                 </div>
 
                 {loading ? (
-                    <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {Array.from({ length: 6 }).map((_, index) => (
                             <Skeleton key={index} className="h-[280px] rounded-3xl" />
                         ))}
@@ -88,7 +88,7 @@ const SavedVendorsPage = () => {
                         icon={<Bookmark />}
                     />
                 ) : (
-                    <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {vendors.map(vendor => (
                             <VendorCard
                                 key={vendor.vendor_id}

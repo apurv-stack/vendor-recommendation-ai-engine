@@ -270,7 +270,7 @@ function RecommendationCard({ vendor }) {
                                         }}>⭐ {featuredBadge}</span>
                                     )}
                                 </div>
-                                <div style={{ display: "flex", gap: 8, marginTop: 3, flexWrap: "wrap" }}>
+                                <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
                                     <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: t.vendorCityText }}>
                                         <MapPin size={9} color="#7c5af6" />{city}
                                     </span>

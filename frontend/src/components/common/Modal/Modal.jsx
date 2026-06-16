@@ -238,7 +238,7 @@ text-indigo-600
 
 uppercase
 
-tracking-[3px]
+tracking-[1.5px]
 
 text-xs
 

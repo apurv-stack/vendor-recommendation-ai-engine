@@ -593,7 +593,10 @@ return(
     className="
         max-w-7xl
         mx-auto
-        space-y-8
+        space-y-6
+        px-4
+        sm:px-6
+        lg:px-8
     "
 >
 
@@ -605,9 +608,7 @@ return(
 
 
 <div
-
-className="grid md:grid-cols-2 xl:grid-cols-4 gap-6"
-
+className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-4"
 >
 
 {
@@ -721,9 +722,7 @@ onClick={resetFilters}
 <>
 
 <div
-
-className="grid xl:grid-cols-3 lg:grid-cols-2 gap-6"
-
+className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
 >
 
 {

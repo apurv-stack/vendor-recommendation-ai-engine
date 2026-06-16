@@ -14,18 +14,22 @@ const ChatPageInner = () => {
     const [appSidebarCollapsed, setAppSidebarCollapsed] = useState(true);
     const [appSidebarOpen, setAppSidebarOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1400);
+    const [isNarrow, setIsNarrow] = useState(window.innerWidth < 768);
 
     useEffect(() => {
         const handleResize = () => {
-            setIsDesktop(window.innerWidth > 1400);
+            const w = window.innerWidth;
+            setIsDesktop(w > 1400);
+            setIsNarrow(w < 768);
+            if (w < 768) {
+                setChatSidebarCollapsed(true);
+                setAppSidebarCollapsed(true);
+            }
         };
-
         window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []); 
+        handleResize();
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const handleSessionSelect = (sessionId) => setSelectedSessionId(sessionId);
 
@@ -60,24 +64,26 @@ const ChatPageInner = () => {
                     }}
                 />
             )}
-            <div style={{
-                position: "fixed",
-                top: 0, left: 0,
-                height: "100vh",
-                zIndex: 50,
-                transform: "translateX(0)"
-            }}>
-                <Sidebar
-                    sidebarOpen={true}
-                    setSidebarOpen={setAppSidebarOpen}
-                    collapsed={appSidebarCollapsed}
-                    setCollapsed={setAppSidebarCollapsed}
-                />
-            </div>
+            {!isNarrow && (
+                <div style={{
+                    position: "fixed",
+                    top: 0, left: 0,
+                    height: "100vh",
+                    zIndex: 50,
+                    transform: "translateX(0)"
+                }}>
+                    <Sidebar
+                        sidebarOpen={true}
+                        setSidebarOpen={setAppSidebarOpen}
+                        collapsed={appSidebarCollapsed}
+                        setCollapsed={setAppSidebarCollapsed}
+                    />
+                </div>
+            )}
 
             {/* MAIN CHAT AREA — offset by app sidebar width */}
             <div style={{
-                marginLeft: appSidebarCollapsed ? "64px" : "200px",
+                marginLeft: isNarrow ? "0px" : appSidebarCollapsed ? "64px" : "200px",
                 flex: 1,
                 display: "flex",
                 height: "100vh",

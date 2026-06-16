@@ -470,10 +470,11 @@ marginBottom: "20px"
 >
 
 <div
-className="
-flex
-gap-3
-"
+    className="
+        flex
+        gap-3
+        flex-wrap
+    "
 >
 
 <input
@@ -599,13 +600,15 @@ padding: "16px"
 >
 
 <div
-className="
-flex
-justify-between
-mb-4
-"
+    className="
+        flex
+        justify-between
+        items-center
+        mb-4
+        gap-2
+        flex-wrap
+    "
 >
-
 {
 
 editing===
@@ -741,21 +744,19 @@ services.map(
 service=>(
 
 <div
-
-key={
-service.service_id
-}
-
-style={{
-display: "flex",
-justifyContent: "space-between",
-background: theme.panelBg,
-border: `1px solid ${theme.cardBorder}`,
-borderRadius: "12px",
-padding: "8px 10px",
-marginBottom: "6px"
-}}
-
+    key={service.service_id}
+    style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "8px",
+        background: theme.panelBg,
+        border: `1px solid ${theme.cardBorder}`,
+        borderRadius: "12px",
+        padding: "8px 10px",
+        marginBottom: "6px"
+    }}
 >
 
 {
@@ -834,7 +835,9 @@ setEditing(null)
 <span
     style={{
         color: theme.textPrimary,
-        fontWeight: 500
+        fontWeight: 500,
+        wordBreak: "break-word",
+        flex: 1
     }}
 >
     {service.name}
@@ -894,11 +897,12 @@ gap-2
 }
 
 <div
-className="
-flex
-gap-3
-mt-3
-"
+    className="
+        flex
+        gap-3
+        mt-3
+        flex-wrap
+    "
 >
 
 <input

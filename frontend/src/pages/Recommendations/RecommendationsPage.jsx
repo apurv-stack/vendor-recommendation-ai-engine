@@ -211,7 +211,10 @@ const RecommendationsPage = () => {
 
             <div
                 className="
-                    space-y-8
+                    space-y-6
+                    px-4
+                    sm:px-6
+                    lg:px-8
                 "
             >
 
@@ -250,9 +253,11 @@ const RecommendationsPage = () => {
                             <div
                                 className="
                                     grid
-                                    xl:grid-cols-3
+                                    grid-cols-1
+                                    sm:grid-cols-2
                                     lg:grid-cols-2
-                                    gap-6
+                                    xl:grid-cols-3
+                                    gap-4
                                 "
                             >
 
@@ -274,10 +279,10 @@ const RecommendationsPage = () => {
                                                     <div
                                                         style={{
                                                             display: "flex",
-                                                            justifyContent:
-                                                                "space-between",
-                                                            alignItems:
-                                                                "center"
+                                                            justifyContent: "space-between",
+                                                            alignItems: "center",
+                                                            flexWrap: "wrap",
+                                                            gap: "12px"
                                                         }}
                                                     >
 
@@ -312,17 +317,12 @@ const RecommendationsPage = () => {
 
                                                             <h2
                                                                 style={{
-                                                                    fontSize:
-                                                                        "22px",
-                                                                    fontWeight:
-                                                                        700,
-                                                                    color:
-                                                                        theme.textPrimary
+                                                                    fontSize: "clamp(18px, 4vw, 22px)",
+                                                                    fontWeight: 700,
+                                                                    color: theme.textPrimary
                                                                 }}
                                                             >
-                                                                {
-                                                                    vendor.aiScore
-                                                                }
+                                                                {vendor.aiScore}
                                                             </h2>
 
                                                         </div>

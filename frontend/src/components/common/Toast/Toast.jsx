@@ -37,8 +37,8 @@ const Toast = ({
             style={{
                 position: "relative",
 
-                minWidth: "340px",
-                maxWidth: "500px",
+                minWidth: "min(340px, 90vw)",
+                maxWidth: "min(500px, 95vw)",
 
                 display: "flex",
                 alignItems: "center",

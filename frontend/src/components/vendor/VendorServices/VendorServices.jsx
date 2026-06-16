@@ -232,7 +232,7 @@ const VendorServices = () => {
                         style={{
                             textTransform:
                                 "uppercase",
-                            letterSpacing: "3px",
+                            letterSpacing: "1.5px",
                             fontSize: "12px",
                             fontWeight: 600,
                             color: "#7C5AF6",
@@ -244,7 +244,7 @@ const VendorServices = () => {
 
                     <h2
                         style={{
-                            fontSize: "28px",
+                            fontSize: "clamp(18px, 4vw, 28px)",
                             fontWeight: 700,
                             color:
                                 theme.textPrimary
@@ -262,6 +262,8 @@ const VendorServices = () => {
             <div
                 className="
                     grid
+                    grid-cols-1
+                    sm:grid-cols-2
                     md:grid-cols-3
                     gap-4
                     mb-5
@@ -496,11 +498,10 @@ const VendorServices = () => {
                                 "20px",
                             padding: "20px",
                             display: "flex",
-                            justifyContent:
-                                "space-between",
-                            alignItems:
-                                "center",
-                            gap: "20px"
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: "12px"
                         }}
                     >
 
@@ -512,7 +513,8 @@ const VendorServices = () => {
                                     color:
                                         theme.textPrimary,
                                     marginBottom:
-                                        "6px"
+                                        "6px",
+                                    wordBreak: "break-word"
                                 }}
                             >
                                 {

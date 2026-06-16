@@ -80,7 +80,7 @@ const VendorAnalytics = ({
                 <p
                     style={{
                         textTransform: "uppercase",
-                        letterSpacing: "3px",
+                        letterSpacing: "1.5px",
                         fontSize: "10px",
                         fontWeight: 600,
                         color: "#7C5AF6",
@@ -174,11 +174,11 @@ const VendorAnalytics = ({
                     minHeight:
                         safeAnalytics.length === 0
                             ? "80px"
-                            : "180px",
+                            : "200px",
                     height:
                         safeAnalytics.length === 0
                             ? "80px"
-                            : "180px",
+                            : "200px",
                     width: "100%",
                     position: "relative",
                     zIndex: 2
@@ -204,7 +204,7 @@ const VendorAnalytics = ({
 
                     <ResponsiveContainer
                         width="100%"
-                        height={180}
+                        height={200}
                     >
 
                         <AreaChart
@@ -292,22 +292,22 @@ const VendorAnalytics = ({
                             <XAxis
                                 dataKey="day"
                                 tick={{
-                                    fill:
-                                        theme.textMuted,
-                                    fontSize: 12
+                                    fill: theme.textMuted,
+                                    fontSize: 10
                                 }}
                                 tickLine={false}
                                 axisLine={false}
+                                interval="preserveStartEnd"
                             />
 
                             <YAxis
                                 tick={{
-                                    fill:
-                                        theme.textMuted,
-                                    fontSize: 12
+                                    fill: theme.textMuted,
+                                    fontSize: 10
                                 }}
                                 tickLine={false}
                                 axisLine={false}
+                                width={30}
                             />
 
                             <Tooltip

@@ -39,7 +39,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
 
     const handleNavigate = (path) => {
         navigate(path);
-        if (window.innerWidth < 1024) setSidebarOpen(false);
+        if (window.innerWidth < 768) {
+            setSidebarOpen(false);
+            setCollapsed(false);
+        } else if (window.innerWidth < 1024) {
+            setSidebarOpen(false);
+        }
     };
 
     const handleLogout = async () => {
@@ -49,7 +54,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
 
     return (
         <>
-        {collapsed && hoveredItem && (
+        {collapsed && hoveredItem && window.innerWidth >= 768 && (
             <span style={{
                 position: "fixed",
                 left: "72px",
@@ -69,6 +74,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
                 {hoveredItem}
             </span>
         )}
+
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+            <div
+                onClick={() => setSidebarOpen(false)}
+                style={{
+                    position: "fixed",
+                    inset: 0,
+                    background: "rgba(0,0,0,0.4)",
+                    zIndex: 40,
+                    backdropFilter: "blur(2px)"
+                }}
+                className="lg:hidden"
+            />
+        )}
+
         <aside
             className={`
                 fixed top-0 left-0 h-screen z-50 overflow-hidden transition-all duration-300

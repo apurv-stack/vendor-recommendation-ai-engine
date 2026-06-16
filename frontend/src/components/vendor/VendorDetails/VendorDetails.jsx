@@ -423,6 +423,7 @@ opacity: 0.8
 className="
 relative
 grid
+grid-cols-1
 xl:grid-cols-[1fr_260px]
 gap-4
 items-stretch
@@ -574,19 +575,13 @@ available
 
 
 <div
-
 className="
-
 flex
-
 gap-3
-
 mt-3
-
 flex-wrap
-
+w-full
 "
-
 >
 
 {/* <button
@@ -675,14 +670,13 @@ fontSize: "13px",
 fontWeight: 600,
 display: "flex",
 alignItems: "center",
+justifyContent: "center",
 gap: "8px",
 cursor: "pointer",
-background: saved
-? "#F59E0B"
-: theme.panelBg,
-color: saved
-? "#fff"
-: theme.textPrimary,
+width: "100%",
+maxWidth: "200px",
+background: saved ? "#F59E0B" : theme.panelBg,
+color: saved ? "#fff" : theme.textPrimary,
 border: `1px solid ${theme.cardBorder}`
 }}
 >
@@ -727,10 +721,13 @@ background: theme.panelBg,
 border: `1px solid ${theme.cardBorder}`,
 borderRadius: "20px",
 padding: "16px",
-height: "100%",
+height: "auto",
+minHeight: "120px",
 display: "flex",
 flexDirection: "column",
-justifyContent: "center"
+justifyContent: "center",
+minWidth: 0,
+overflow: "hidden"
 }}
 >
 <VendorRating
@@ -832,17 +829,12 @@ vendor?.description||
 
 
 <div
-
 className="
-
 grid
-
-md:grid-cols-3
-
-gap-6
-
+grid-cols-1
+sm:grid-cols-3
+gap-4
 "
-
 >
 
 {
@@ -986,22 +978,15 @@ vendor?.price_max
 />
 
 
+<div style={{ width: "100%" }}>
 <Button
-
-icon={
-
-<ArrowUpRight/>
-
-}
-
+    icon={<ArrowUpRight />}
+    style={{ width: "100%" }}
 >
-
-<IndianRupee/>
-
-Request Vendor Quote
-
+    <IndianRupee />
+    Request Vendor Quote
 </Button>
-
+</div>
 </div>
 
 );

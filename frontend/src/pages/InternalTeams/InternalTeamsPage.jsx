@@ -170,13 +170,12 @@ return(
 <MainLayout>
 
 <div
-
-className="
-
-space-y-8
-
-"
-
+    className="
+        space-y-6
+        px-4
+        sm:px-6
+        lg:px-8
+    "
 >
 
 <PageHeader
@@ -188,26 +187,26 @@ subtitle="Manage collaboration, roles and vendor operations"
 action={
 
 <button
-style={{
-    background:
-        "linear-gradient(135deg,#7C5AF6,#A78BFA)",
-    color:"#fff",
-    padding:"8px 16px",
-    borderRadius:"10px",
-    display:"flex",
-    alignItems:"center",
-    gap:"8px",
-    border:"none",
-    fontWeight:600,
-    fontSize:"13px",
-    cursor:"pointer"
-}}
+    style={{
+        background:
+            "linear-gradient(135deg,#7C5AF6,#A78BFA)",
+        color:"#fff",
+        padding:"8px 16px",
+        borderRadius:"10px",
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
+        gap:"8px",
+        border:"none",
+        fontWeight:600,
+        fontSize:"13px",
+        cursor:"pointer",
+        minHeight:"40px",
+        whiteSpace:"nowrap"
+    }}
 >
-
-<UserPlus/>
-
-Add Team Member
-
+    <UserPlus/>
+    Add Team Member
 </button>
 
 }
@@ -215,19 +214,13 @@ Add Team Member
 />
 
 <div
-
-className="
-
-grid
-
-md:grid-cols-2
-
-xl:grid-cols-3
-
-gap-6
-
-"
-
+    className="
+        grid
+        grid-cols-2
+        md:grid-cols-2
+        xl:grid-cols-3
+        gap-4
+    "
 >
 
 {
@@ -317,19 +310,13 @@ message="Start building your vendor team."
 (
 
 <div
-
-className="
-
-grid
-
-lg:grid-cols-2
-
-gap-6
-
-"
-
+    className="
+        grid
+        grid-cols-1
+        lg:grid-cols-2
+        gap-4
+    "
 >
-
 {
 
 teamMembers.map(
@@ -357,21 +344,14 @@ transition-all
 >
 
 <div
-
-className="
-
-flex
-
-justify-between
-
-items-start
-
-gap-4
-
-"
-
+    className="
+        flex
+        justify-between
+        items-start
+        gap-3
+        flex-wrap
+    "
 >
-
 <div>
 
 <h3
@@ -456,15 +436,18 @@ member.email||
 </div>
 
 <div
-style={{
-    ...getStatusColor(member.status),
-    padding:"8px 16px",
-    borderRadius:"999px",
-    display:"flex",
-    alignItems:"center",
-    gap:"8px",
-    fontWeight:600
-}}
+    style={{
+        ...getStatusColor(member.status),
+        padding:"6px 12px",
+        borderRadius:"999px",
+        display:"flex",
+        alignItems:"center",
+        gap:"6px",
+        fontWeight:600,
+        fontSize:"12px",
+        whiteSpace:"nowrap",
+        flexShrink: 0
+    }}
 >
 
 <Circle

@@ -97,7 +97,7 @@ const VendorPricing = ({
                     <p
                         style={{
                             textTransform: "uppercase",
-                            letterSpacing: "3px",
+                            letterSpacing: "1.5px",
                             fontSize: "10px",
                             fontWeight: 600,
                             color: "#7C5AF6",
@@ -154,6 +154,8 @@ const VendorPricing = ({
             <div
                 className="
                     grid
+                    grid-cols-1
+                    sm:grid-cols-2
                     lg:grid-cols-3
                     gap-4
                     mb-5
@@ -339,11 +341,12 @@ function PriceCard({
 
                 <h3
                     style={{
-                        fontSize: "18px",
+                        fontSize: "clamp(13px, 2.5vw, 18px)",
                         fontWeight: 700,
                         color: highlight
                             ? "#7C5AF6"
-                            : theme.textPrimary
+                            : theme.textPrimary,
+                        wordBreak: "break-word"
                     }}
                 >
                     {value}

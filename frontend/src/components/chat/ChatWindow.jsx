@@ -5,6 +5,7 @@ import { getSessionHistory } from "../../api/sessionApi";
 import RecommendationCard from "./RecommendationCard";
 import { useTheme } from "../../context/ThemeContext";
 import MessageBubble from "./MessageBubble";
+import TypingIndicator from "./TypingIndicator";
 
 const MAX_MESSAGE_LENGTH = 500;
 const STORAGE_KEY = "vendor_chat_session";
@@ -139,11 +140,13 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                 flexShrink: 0,
                 background: t.headerBg,
                 borderBottom: `1px solid ${t.headerBorder}`,
-                padding: "10px 20px",
+                padding: "10px 12px",
                 display: "flex", alignItems: "center", justifyContent: "space-between",
+                gap: 8,
                 transition: "background 0.3s"
             }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                {/* LEFT: sidebar toggle + title */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
                     <button
                         onClick={onToggleSidebar}
                         style={{
@@ -153,33 +156,43 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                             boxShadow: "0 0 16px rgba(124,90,246,0.4)",
                             border: "none", cursor: "pointer", flexShrink: 0
                         }}
-                        title="Toggle chat history"
+                            title="Toggle chat history"
                     >
                         <span style={{ color: "#fff", fontSize: 20, lineHeight: 1 }}>☰</span>
                     </button>
-                    <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: t.textPrimary, letterSpacing: "-0.3px" }}>
+                    <div style={{ minWidth: 0 }}>
+                        <div style={{
+                            fontSize: 13, fontWeight: 700, color: t.textPrimary,
+                            letterSpacing: "-0.3px", whiteSpace: "nowrap",
+                            overflow: "hidden", textOverflow: "ellipsis"
+                        }}>
                             Vendor Discovery AI
                         </div>
-
-                        <div style={{ fontSize: 12, color: t.textSecondary || "#CBD5E1", marginTop: 2 }}>
+                        <div style={{
+                            fontSize: 11, color: t.textSecondary || "#CBD5E1", marginTop: 1,
+                            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+                        }}>
                             AI-powered vendor recommendations
                         </div>
                     </div>
                 </div>
 
-                {/* RIGHT: AI badge + theme toggle */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {/* RIGHT: AI badge (hidden on mobile) + theme toggle */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                    <style>{`
+                        @media (max-width: 480px) { .ai-badge { display: none !important; } }
+                    `}</style>
+
                     {/* AI Powered badge */}
-                    <div style={{
-                        display: "flex", alignItems: "center", gap: 6,
-                        padding: "6px 14px", borderRadius: 20,
+                    <div className="ai-badge" style={{
+                        display: "flex", alignItems: "center", gap: 5,
+                        padding: "5px 10px", borderRadius: 20,
                         background: "rgba(124,90,246,0.12)",
                         border: "1px solid rgba(124,90,246,0.2)"
                     }}>
-                        <span style={{ fontSize: 13 }}>⚡</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#a78bfa" }}>AI Powered</span>
-                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e" }} />
+                        <span style={{ fontSize: 12 }}>⚡</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "#a78bfa" }}>AI Powered</span>
+                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e" }} />
                     </div>
 
                     {/* Theme toggle */}
@@ -187,8 +200,8 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                         onClick={t.toggleTheme}
                         title={t.isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         style={{
-                            display: "flex", alignItems: "center", gap: 6,
-                            padding: "5px 12px", borderRadius: 20,
+                            display: "flex", alignItems: "center", gap: 5,
+                            padding: "5px 10px", borderRadius: 20,
                             background: t.toggleBg,
                             border: `1px solid ${t.toggleBorder}`,
                             cursor: "pointer", transition: "all 0.2s",
@@ -197,14 +210,13 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                         onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
                         onMouseLeave={e => e.currentTarget.style.opacity = "1"}
                     >
-                        <span style={{ fontSize: 14 }}>{t.toggleIcon}</span>
+                        <span style={{ fontSize: 13 }}>{t.toggleIcon}</span>
                         <span style={{ fontSize: 11, fontWeight: 600, color: t.toggleTextColor }}>
                             {t.toggleText}
                         </span>
                     </button>
                 </div>
             </div>}
-
             {/* ── MESSAGES ── */}
             <div className="msg-scroll" style={{
                 flex: 1, overflowY: "auto",
@@ -314,49 +326,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                 })}
 
                 {/* Typing indicator */}
-                {loading && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <style>{`
-                            @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
-                            @keyframes fadeInUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-                            @keyframes pulse-ring { 0%{transform:scale(0.8);opacity:0.8} 100%{transform:scale(1.4);opacity:0} }
-                        `}</style>
-                        <div style={{ position: "relative", width: 32, height: 32, flexShrink: 0 }}>
-                            <div style={{
-                                position: "absolute", inset: 0, borderRadius: "50%",
-                                background: "rgba(124,90,246,0.3)",
-                                animation: "pulse-ring 1.2s ease-out infinite"
-                            }} />
-                            <div style={{
-                                width: 32, height: 32, borderRadius: "50%",
-                                background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                position: "relative", zIndex: 1
-                            }}>
-                                <span style={{ fontSize: 14 }}>✦</span>
-                            </div>
-                        </div>
-                        <div style={{
-                            padding: "12px 18px", borderRadius: "4px 18px 18px 18px",
-                            background: t.aiBubbleBg, border: `1px solid ${t.aiBubbleBorder}`,
-                            display: "flex", flexDirection: "column", gap: 4,
-                            animation: "fadeInUp 0.3s ease"
-                        }}>
-                            <div style={{ fontSize: 10, color: t.textMuted, fontWeight: 500 }}>
-                                AI is thinking...
-                            </div>
-                            <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                                {[0, 1, 2].map(d => (
-                                    <div key={d} style={{
-                                        width: 7, height: 7, borderRadius: "50%",
-                                        background: t.loadingDotBg,
-                                        animation: `bounce 1.2s ease-in-out ${d * 0.2}s infinite`
-                                    }} />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {loading && <TypingIndicator />}
 
                 {/* History loading overlay */}
                 {historyLoading && (
@@ -400,14 +370,14 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                 flexShrink: 0,
                 background: t.inputAreaBg,
                 borderTop: `1px solid ${t.inputAreaBorder}`,
-                padding: "14px 20px",
+                padding: "8px 14px",
                 transition: "background 0.3s"
             }}>
                 <div style={{
-                    display: "flex", alignItems: "flex-end", gap: 10,
+                    display: "flex", alignItems: "center", gap: 8,
                     background: t.inputBg,
                     border: `1.5px solid ${t.inputBorder}`,
-                    borderRadius: 14, padding: "10px 14px",
+                    borderRadius: 12, padding: "6px 10px",
                     transition: "background 0.3s, border-color 0.3s"
                 }}>
                     <button style={{

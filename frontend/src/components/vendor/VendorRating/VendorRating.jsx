@@ -64,11 +64,13 @@ const VendorRating = ({
                 style={{
                     position: "relative",
                     textTransform: "uppercase",
-                    letterSpacing: "3px",
-                    fontSize: "12px",
+                    letterSpacing: "1px",
+                    fontSize: "11px",
                     fontWeight: 600,
                     marginBottom: "6px",
-                    color: "#7C5AF6"
+                    color: "#7C5AF6",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere"
                 }}
             >
                 Vendor Reputation
@@ -108,7 +110,9 @@ const VendorRating = ({
                         display: "flex",
                         justifyContent:
                             "space-between",
-                        alignItems: "center"
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "8px"
                     }}
                 >
 

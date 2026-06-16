@@ -114,7 +114,7 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
           <Menu size={18} color={theme.textPrimary} />
         </button>
 
-        <div>
+        <div className="hidden sm:block">
           <p
             style={{
               textTransform: "uppercase",
@@ -199,13 +199,13 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
         {/* Chat */}
         <button
             onClick={() => onChatOpen?.()}
+            className="hidden sm:flex"
             style={{
                 height: "42px",
                 width: "42px",
                 borderRadius: "12px",
                 background: "rgba(124,90,246,0.12)",
                 border: "1px solid rgba(124,90,246,0.3)",
-                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
@@ -217,7 +217,7 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
         </button>
 
         {/* Notifications */}
-        <div ref={notificationRef} className="relative">
+        <div ref={notificationRef} className="relative hidden sm:block">
           <button
             onClick={() => {
               setNotificationOpen(previous => !previous);
@@ -262,10 +262,11 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
 
           {notificationOpen && (
             <div
-              className="absolute right-0 top-16 w-80 rounded-3xl shadow-xl p-5 z-50"
+              className="absolute right-0 top-16 rounded-3xl shadow-xl p-5 z-50"
               style={{
                 background: theme.cardBg,
-                border: `1px solid ${theme.cardBorder}`
+                border: `1px solid ${theme.cardBorder}`,
+                width: "min(320px, 90vw)"
               }}
             >
               <h3
@@ -309,21 +310,22 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
               background: theme.panelBg,
               border: `1px solid ${theme.cardBorder}`,
               borderRadius: "12px",
-              padding: "6px 12px",
+              padding: "6px 8px",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
               cursor: "pointer"
             }}
           >
             <div
               style={{
-                height: "38px",
-                width: "38px",
+                height: "32px",
+                width: "32px",
                 borderRadius: "50%",
                 background: "linear-gradient(135deg, #7C5AF6, #A78BFA)",
                 color: "#fff",
                 fontWeight: 700,
+                fontSize: "12px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"

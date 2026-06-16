@@ -114,13 +114,15 @@ const InputField = ({
                 style={{
                     width: "100%",
                     background: theme.panelBg,
+                    boxSizing: "border-box",
                     border: error
                         ? "1px solid #EF4444"
                         : `1px solid ${theme.cardBorder}`,
                     borderRadius: "16px",
                     padding: "10px 14px 10px 40px",
                     color: theme.textPrimary,
-                    outline: "none"
+                    outline: "none",
+                    fontSize: "14px"
                 }}
             />
 
@@ -587,15 +589,14 @@ return(
 <MainLayout>
 
 <div
-
-className="
-
-max-w-6xl
-mx-auto
-space-y-8
-
-"
-
+    className="
+        max-w-6xl
+        mx-auto
+        space-y-6
+        px-4
+        sm:px-6
+        lg:px-8
+    "
 >
 
 <PageHeader
@@ -630,30 +631,32 @@ subtitle="Manage vendor information"
     }}
 >
 <div
-className="
-flex
-justify-end
-mb-4
-"
+    className="
+        flex
+        justify-end
+        mb-4
+    "
 >
-<Button
-variant="outline"
-icon={<FaArrowLeft/>}
-onClick={()=>navigate("/profile")}
->
-Back
-</Button>
+    <Button
+        variant="outline"
+        icon={<FaArrowLeft />}
+        onClick={() => navigate("/profile")}
+        style={{ minHeight: "40px" }}
+    >
+        Back
+    </Button>
 </div>
 <form
 onSubmit={handleSubmit}
 className="space-y-5"
 >
 <div
-className="
-grid
-md:grid-cols-2
-gap-6
-"
+    className="
+        grid
+        md:grid-cols-2
+        gap-4
+        md:gap-6
+    "
 >
 
 <InputField
@@ -751,20 +754,24 @@ gap-6
             borderRadius: "16px",
             padding: "10px 14px",
             color: theme.textPrimary,
-            resize: "vertical"
+            resize: "vertical",
+            fontSize: "14px"
         }}
     />
 
 </div>
 
 </div>
-<Button
-type="submit"
-loading={loading}
-icon={<FaSave/>}
->
-Save Changes
-</Button>
+<div style={{ width: "100%" }}>
+    <Button
+        type="submit"
+        loading={loading}
+        icon={<FaSave />}
+        style={{ width: "100%" }}
+    >
+        Save Changes
+    </Button>
+</div>
 </form>
 </Card>
 </div>

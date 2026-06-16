@@ -259,17 +259,14 @@ return(
 <MainLayout>
 
 <div
-
-className="
-
-max-w-7xl
-
-mx-auto
-
-space-y-8
-
-"
-
+    className="
+        max-w-7xl
+        mx-auto
+        space-y-6
+        px-4
+        sm:px-6
+        lg:px-8
+    "
 >
 
 <PageHeader
@@ -287,37 +284,25 @@ subtitle="Manage vendor hierarchy, pricing and business intelligence"
 action={
 
 <button
-
-onClick={()=>
-
-navigate(
-
-"/profile/edit"
-
-)
-
-}
-
-className="
-
-glass
-px-4
-py-2
-rounded-xl
-flex
-gap-2
-items-center
-font-semibold
-text-sm
-
-"
-
+    onClick={()=>
+        navigate(
+            "/profile/edit"
+        )
+    }
+    className="
+        glass
+        px-4
+        py-2
+        rounded-xl
+        flex
+        gap-2
+        items-center
+        font-semibold
+        text-sm
+    "
 >
-
-<FaUserEdit/>
-
-Edit Profile
-
+    <FaUserEdit/>
+    Edit Profile
 </button>
 
 }
@@ -345,8 +330,8 @@ Edit Profile
     <div
         style={{
             display: "flex",
-            gap: "24px",
-            alignItems: "center",
+            gap: "16px",
+            alignItems: "flex-start",
             flexWrap: "wrap"
         }}
     >
@@ -374,10 +359,11 @@ Edit Profile
 
             <h2
                 style={{
-                    fontSize: "18px",
+                    fontSize: "clamp(15px, 3vw, 18px)",
                     fontWeight: 700,
                     color: theme.textPrimary,
-                    marginBottom: "8px"
+                    marginBottom: "8px",
+                    wordBreak: "break-word"
                 }}
             >
                 {vendor.name || "Vendor"}
@@ -386,25 +372,30 @@ Edit Profile
             <p
                 style={{
                     display: "flex",
-                    gap: "10px",
+                    gap: "8px",
                     alignItems: "center",
                     color: theme.textMuted,
-                    marginBottom: "8px"
+                    marginBottom: "8px",
+                    fontSize: "13px",
+                    wordBreak: "break-all",
+                    flexWrap: "wrap"
                 }}
             >
-                <FaEnvelope />
+                <FaEnvelope style={{ flexShrink: 0 }} />
                 {vendor.business_email || "N/A"}
             </p>
 
             <p
                 style={{
                     display: "flex",
-                    gap: "10px",
+                    gap: "8px",
                     alignItems: "center",
-                    color: theme.textMuted
+                    color: theme.textMuted,
+                    fontSize: "13px",
+                    flexWrap: "wrap"
                 }}
             >
-                <FaMapMarkerAlt />
+                <FaMapMarkerAlt style={{ flexShrink: 0 }} />
                 {vendor.city || "Location"}
             </p>
 
@@ -415,15 +406,12 @@ Edit Profile
 </Card>
 
 <div
-
-className="
-
-grid
-md:grid-cols-3
-gap-6
-
-"
-
+    className="
+        grid
+        grid-cols-2
+        md:grid-cols-3
+        gap-4
+    "
 >
 
 {

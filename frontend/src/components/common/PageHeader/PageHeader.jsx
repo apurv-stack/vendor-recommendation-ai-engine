@@ -9,22 +9,24 @@ const PageHeader = ({ title, subtitle, action }) => {
                 background: theme.cardBg,
                 border: `1px solid ${theme.cardBorder}`,
                 borderRadius: "18px",
-                padding: "18px 24px",
+                padding: "14px 18px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                gap: "16px",
-                marginBottom: "16px"
+                gap: "12px",
+                marginBottom: "16px",
+                flexWrap: "wrap"
             }}
         >
-            <div>
+            <div style={{ minWidth: 0 }}>
                 <h1
                     style={{
-                        fontSize: "24px",
+                        fontSize: "clamp(16px, 4vw, 24px)",
                         fontWeight: 700,
                         color: theme.textPrimary,
                         margin: 0,
-                        lineHeight: 1.2
+                        lineHeight: 1.2,
+                        wordBreak: "break-word"
                     }}
                 >
                     {title}
@@ -34,7 +36,8 @@ const PageHeader = ({ title, subtitle, action }) => {
                     style={{
                         color: theme.textMuted,
                         marginTop: "4px",
-                        fontSize: "13px"
+                        fontSize: "clamp(11px, 2vw, 13px)",
+                        wordBreak: "break-word"
                     }}
                 >
                     {subtitle}

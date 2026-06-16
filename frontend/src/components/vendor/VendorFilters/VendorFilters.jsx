@@ -233,11 +233,15 @@ const VendorFilters = ({
                         <p
                             style={{
                                 textTransform: "uppercase",
-                                letterSpacing: "3px",
+                                letterSpacing: "1.5px",
                                 fontSize: "10px",
                                 fontWeight: 600,
                                 color: "#7C5AF6",
-                                marginBottom: "2px"
+                                marginBottom: "2px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                maxWidth: "200px"
                             }}
                         >
                             Marketplace Intelligence
@@ -274,8 +278,8 @@ const VendorFilters = ({
                 style={{
                     display: "grid",
                     gridTemplateColumns:
-                        "repeat(auto-fit,minmax(220px,1fr))",
-                    gap: "12px"
+                        "repeat(auto-fit,minmax(160px,1fr))",
+                    gap: "10px"
                 }}
             >
 
@@ -458,32 +462,34 @@ const VendorFilters = ({
             <div
                 style={{
                     display: "flex",
-                    gap: "16px",
+                    gap: "10px",
                     flexWrap: "wrap",
                     marginTop: "16px"
                 }}
             >
-
+                <div style={{ flex: "1 1 140px" }}>
                 <Button
                     onClick={handleSearch}
-                    fullWidth={false}
                     icon={<Search size={14} />}
                     size="sm"
+                    style={{ width: "100%" }}
                 >
                     Search Vendors
                 </Button>
+            </div>
 
+            <div style={{ flex: "1 1 100px" }}>
                 <Button
                     variant="outline"
                     onClick={handleReset}
-                    fullWidth={false}
                     icon={<RotateCcw size={14} />}
                     size="sm"
+                    style={{ width: "100%" }}
                 >
                     Reset
                 </Button>
-
             </div>
+        </div>
 
         </Card>
     );
