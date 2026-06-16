@@ -84,9 +84,6 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
                             <div style={{ fontSize: 13, fontWeight: 700, color: t.textPrimary }}>
                                 VendorDiscovery AI
                             </div>
-                            <div style={{ fontSize: 12, color: t.isDark ? "#CBD5E1" : "#64748B", marginTop: 2, fontWeight: 500 }}>
-                                Smart vendor discovery
-                            </div>
                         </div>
                     </div>
                     <button onClick={onCollapse} style={{

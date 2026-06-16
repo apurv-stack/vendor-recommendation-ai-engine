@@ -145,6 +145,8 @@ function RecommendationCard({ vendor }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [saved, setSaved] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [fullVendor, setFullVendor] = useState(null);
+    const [loadingVendor, setLoadingVendor] = useState(false);
 
     const name = vendor?.vendor_name || vendor?.name || "Unknown Vendor";
     const city = vendor?.city || "Location unavailable";
@@ -368,7 +370,21 @@ function RecommendationCard({ vendor }) {
                     {/* ✅ BUTTONS */}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7, marginTop: 10 }}>
                         <button
-                            onClick={() => setModalOpen(true)}
+                            onClick={async () => {
+                                setModalOpen(true);
+                                if (!fullVendor && vendor?.vendor_id) {
+                                    try {
+                                        setLoadingVendor(true);
+                                        const res = await axiosInstance.get(`/vendors/${vendor.vendor_id}`);
+                                        const raw = res.data?.vendor || res.data?.data || res.data;
+                                        setFullVendor(raw);
+                                    } catch (e) {
+                                        console.error("Failed to fetch vendor details", e);
+                                    } finally {
+                                        setLoadingVendor(false);
+                                    }
+                                }
+                            }}
                             style={{
                                 padding: "8px", borderRadius: 10, fontWeight: 600, fontSize: 12,
                                 cursor: "pointer", display: "flex", alignItems: "center",
@@ -404,7 +420,10 @@ function RecommendationCard({ vendor }) {
                 title="Vendor Details"
                 size="lg"
             >
-                <VendorDetails vendor={vendor} />
+                {loadingVendor
+                    ? <div style={{ padding: "40px", textAlign: "center", color: "#a78bfa" }}>Loading...</div>
+                    : <VendorDetails vendor={fullVendor || vendor} />
+                }
             </Modal>
         </>
     );

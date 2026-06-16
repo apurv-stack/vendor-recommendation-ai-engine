@@ -20,6 +20,7 @@ const DashboardPage = () => {
     const theme = useTheme();
 
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const [vendorName, setVendorName] = useState("");
     const [dashboard, setDashboard] = useState({
         views: 0,
@@ -83,6 +84,11 @@ const DashboardPage = () => {
             });
         } catch (error) {
             console.log("Dashboard failed", error);
+            setError(
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                "Failed to load dashboard"
+            );
         } finally {
             setLoading(false);
         }
@@ -96,19 +102,49 @@ const DashboardPage = () => {
         { title: "Pricing",    value: dashboard.avgPricing ? `₹${dashboard.avgPricing}` : "₹0", icon: <IndianRupee size={20} />, color: "#F59E0B" }
     ];
 
-    const profileActivityItems = [
-        { icon: <EyeIcon size={16} />,   color: "#60A5FA", label: "Profile viewed",           detail: "Someone viewed your profile",         time: "Today, 12:45 PM" },
-        { icon: <Zap size={16} />,       color: "#A78BFA", label: "Recommendation generated", detail: "AI generated recommendations",        time: "Today, 11:20 AM" },
-        { icon: <UserCheck size={16} />, color: "#10B981", label: "Profile updated",           detail: "You updated your profile information", time: "Yesterday, 4:30 PM" },
-        { icon: <Bookmark size={16} />,  color: "#F59E0B", label: "Vendor bookmarked",         detail: "You bookmarked a vendor",             time: "May 4, 2025" },
-    ];
+    const profileActivityItems =
 
-    const recentActivityItems = [
-        { icon: <EyeIcon size={15} />,   color: "#60A5FA", activity: "Profile viewed",           details: "Someone viewed your profile",         time: "Today, 12:45 PM" },
-        { icon: <Zap size={15} />,       color: "#A78BFA", activity: "Recommendation generated", details: "AI generated recommendations",        time: "Today, 11:20 AM" },
-        { icon: <UserCheck size={15} />, color: "#10B981", activity: "Profile updated",           details: "You updated your profile information", time: "Yesterday, 4:30 PM" },
-        { icon: <Bookmark size={15} />,  color: "#F59E0B", activity: "Vendor bookmarked",         details: "You bookmarked a vendor",             time: "May 4, 2025" },
-    ];
+        dashboard.notifications.length > 0
+
+            ? dashboard.notifications.slice(0,4).map(item => ({
+
+                label: item.title,
+
+                detail: item.message,
+
+                time: new Date(
+                    item.created_at
+                ).toLocaleString(),
+
+                icon: <Zap size={16} />,
+
+                color: "#7C5AF6"
+
+            }))
+
+            : [];
+
+    const recentActivityItems =
+
+    dashboard.notifications.length > 0
+
+    ? dashboard.notifications.slice(0,5).map(item => ({
+
+        activity: item.title,
+
+        details: item.message,
+
+        time: new Date(
+            item.created_at
+        ).toLocaleString(),
+
+        icon: <Zap size={15} />,
+
+        color: "#7C5AF6"
+
+    }))
+
+    : [];
 
     return (
         <MainLayout>
@@ -155,7 +191,20 @@ const DashboardPage = () => {
                         AI Insights
                     </button>
                 </div>
-
+                
+                {error && (
+                    <Card>
+                        <p
+                            style={{
+                                color: "#EF4444",
+                                fontWeight: 600,
+                                fontSize: "13px"
+                            }}
+                        >
+                            {error}
+                        </p>
+                    </Card>
+                )}
                 {/* KPI CARDS */}
                 <div
                     style={{
@@ -335,44 +384,60 @@ const DashboardPage = () => {
                         ))}
                     </div>
 
-                    {recentActivityItems.map((item, i) => (
+                    {recentActivityItems.length === 0
+
+                        ?
+
                         <div
-                            key={i}
                             style={{
-                                display: "grid",
-                                gridTemplateColumns: "2fr 2fr 1fr",
-                                padding: "10px 12px",
-                                borderBottom: i < recentActivityItems.length - 1 ? `1px solid ${theme.cardBorder}` : "none",
-                                alignItems: "center"
-                            }}
-                        >
-                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                <div
-                                    style={{
-                                        width: "24px", height: "24px",
-                                        borderRadius: "8px",
-                                        background: `${item.color}18`,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: item.color,
-                                        flexShrink: 0
-                                    }}
-                                >
-                                    {item.icon}
+                                padding:"20px",
+                                textAlign:"center",
+                                color:theme.textMuted
+                                }}
+                            >
+                                No recent activity found
+                            </div>
+
+                        :
+                    
+                        recentActivityItems.map((item, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "2fr 2fr 1fr",
+                                    padding: "10px 12px",
+                                    borderBottom: i < recentActivityItems.length - 1 ? `1px solid ${theme.cardBorder}` : "none",
+                                    alignItems: "center"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <div
+                                        style={{
+                                            width: "24px", height: "24px",
+                                            borderRadius: "8px",
+                                            background: `${item.color}18`,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            color: item.color,
+                                            flexShrink: 0
+                                        }}
+                                    >
+                                        {item.icon}
+                                    </div>
+                                    <span style={{ fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
+                                        {item.activity}
+                                    </span>
                                 </div>
-                                <span style={{ fontSize: "14px", fontWeight: 500, color: theme.textPrimary }}>
-                                    {item.activity}
+                                <span style={{ fontSize: "13px", color: theme.textMuted }}>
+                                    {item.details}
+                                </span>
+                                <span style={{ fontSize: "13px", color: theme.textFaint }}>
+                                    {item.time}
                                 </span>
                             </div>
-                            <span style={{ fontSize: "13px", color: theme.textMuted }}>
-                                {item.details}
-                            </span>
-                            <span style={{ fontSize: "13px", color: theme.textFaint }}>
-                                {item.time}
-                            </span>
-                        </div>
-                    ))}
+                        ))}
                 </Card>
 
             </div>

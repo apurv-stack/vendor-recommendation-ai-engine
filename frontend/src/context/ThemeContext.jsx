@@ -3,8 +3,15 @@ import { createContext, useContext, useState } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const [isDark, setIsDark] = useState(true);
-    const toggleTheme = () => setIsDark(prev => !prev);
+    const [isDark, setIsDark] = useState(() => {
+        const saved = localStorage.getItem("theme");
+        return saved ? saved === "dark" : true;
+    });
+    const toggleTheme = () => setIsDark(prev => {
+        const next = !prev;
+        localStorage.setItem("theme", next ? "dark" : "light");
+        return next;
+    });
 
     const t = isDark ? {
         // ── DARK TOKENS ──

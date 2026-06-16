@@ -82,6 +82,11 @@ visitors,
 setVisitors
 ]=useState([]);
 
+const[
+error,
+setError
+]=useState("");
+
 const fetchProfile=
 
 async()=>{
@@ -113,21 +118,14 @@ profile
 );
 
 const views=
+Number(profile.views)||0;
 
-Number(
+const analyticsData=
+    profile.analytics?.length
+        ? profile.analytics
+        : [];
 
-profile.views
-
-)||0;
-
-const analyticsData =
-    profile.analytics || [];
-
-setAnalytics(
-
-analyticsData
-
-);
+setAnalytics(analyticsData);
 
 setVisitors(
 
@@ -141,9 +139,15 @@ profile.recentVisitors||
 
 catch(error){
 
-console.log(
+console.log(error);
 
-error
+setError(
+
+error?.response?.data?.detail ||
+
+error?.response?.data?.message ||
+
+"Failed to load profile"
 
 );
 
@@ -319,6 +323,22 @@ Edit Profile
 }
 
 />
+
+{error && (
+    <div
+        style={{
+            padding: "10px 14px",
+            borderRadius: "12px",
+            background: "rgba(239,68,68,0.10)",
+            border: "1px solid rgba(239,68,68,0.25)",
+            color: "#EF4444",
+            fontSize: "13px",
+            fontWeight: 500
+        }}
+    >
+        {error}
+    </div>
+)}
 
 <Card>
 

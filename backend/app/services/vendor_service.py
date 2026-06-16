@@ -918,6 +918,8 @@ def get_single_vendor_service(
 
         "success": True,
 
+        "message": "Vendor fetched successfully",
+
         "vendor": vendor
 
     }

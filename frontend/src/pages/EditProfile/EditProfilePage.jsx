@@ -176,6 +176,10 @@ setErrors
 
 ]=useState({});
 
+const[
+apiError,
+setApiError
+]=useState("");
 
 const[
 
@@ -284,7 +288,13 @@ vendor.price_max||
 
 catch(error){
 
-console.log(error);
+setApiError(
+
+error?.response?.data?.detail ||
+
+"Failed to load profile"
+
+);
 
 }
 
@@ -534,7 +544,13 @@ navigate(
 
 catch(error){
 
-console.log(error);
+setApiError(
+
+error?.response?.data?.detail ||
+
+"Failed to update profile"
+
+);
 
 }
 
@@ -591,13 +607,28 @@ subtitle="Manage vendor information"
 />
 
 
+{apiError && (
+    <div
+        style={{
+            padding: "10px 14px",
+            borderRadius: "12px",
+            background: "rgba(239,68,68,0.10)",
+            border: "1px solid rgba(239,68,68,0.25)",
+            color: "#EF4444",
+            fontSize: "13px",
+            fontWeight: 500
+        }}
+    >
+        {apiError}
+    </div>
+)}
+
 <Card
     style={{
         background: theme.cardBg,
         border: `1px solid ${theme.cardBorder}`
     }}
 >
-
 <div
 className="
 flex

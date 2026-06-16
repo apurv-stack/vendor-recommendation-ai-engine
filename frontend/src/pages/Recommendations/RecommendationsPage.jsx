@@ -48,6 +48,11 @@ const RecommendationsPage = () => {
         setLoading
     ] = useState(true);
 
+    const[
+        error,
+        setError
+    ]=useState("");
+
     const scoreVendor = (vendor) => {
 
         const followers =
@@ -133,6 +138,7 @@ const RecommendationsPage = () => {
         async () => {
 
             try {
+                setError("");
 
                 setLoading(true);
 
@@ -157,6 +163,16 @@ const RecommendationsPage = () => {
                 console.log(
                     "Recommendation failed",
                     error
+                );
+
+                setError(
+
+                    error?.response?.data?.detail ||
+
+                    error?.response?.data?.message ||
+
+                    "Failed to load recommendations"
+
                 );
 
                 setRecommendations([]);
@@ -205,7 +221,18 @@ const RecommendationsPage = () => {
                 />
 
                 {
-                    recommendations.length === 0
+                    error
+                        ? (
+
+                            <EmptyState
+                                title="Unable to Load Recommendations"
+                                message={error}
+                                buttonText="Refresh"
+                                onClick={fetchRecommendations}
+                            />
+
+                        )
+                        : recommendations.length === 0
                         ? (
 
                             <EmptyState

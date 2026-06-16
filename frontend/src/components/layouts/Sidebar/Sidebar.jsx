@@ -9,9 +9,11 @@ import {
     ChevronLeft,
     ChevronRight,
     Sparkles,
-    X
+    X,
+    MessageSquare
 } from "lucide-react";
 
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
@@ -22,13 +24,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
     const { logout } = useAuth();
     const theme = useTheme();
 
+    const iconSize = collapsed ? 20 : 15;
+    const [hoveredItem, setHoveredItem] = useState(null);
+    const [tooltipY, setTooltipY] = useState(0);
     const menuItems = [
-        { label: "Dashboard",          icon: <LayoutDashboard size={14} />, path: "/dashboard" },
-        { label: "Vendor Marketplace", icon: <Building2 size={14} />,       path: "/vendors" },
-        { label: "Profile",            icon: <User size={14} />,            path: "/profile" },
-        { label: "Recommendations",    icon: <BrainCircuit size={14} />,    path: "/recommendations" },
-        { label: "Saved Vendors",      icon: <Bookmark size={14} />,        path: "/saved-vendors" },
-        { label: "Settings",           icon: <Settings size={14} />,        path: "/settings" },
+        { label: "Dashboard",          icon: <LayoutDashboard size={iconSize} />, path: "/dashboard" },
+        { label: "Vendor Marketplace", icon: <Building2 size={iconSize} />,       path: "/vendors" },
+        { label: "Profile",            icon: <User size={iconSize} />,            path: "/profile" },
+        { label: "Recommendations",    icon: <BrainCircuit size={iconSize} />,    path: "/recommendations" },
+        { label: "Saved Vendors",      icon: <Bookmark size={iconSize} />,        path: "/saved-vendors" },
+        { label: "Settings",           icon: <Settings size={iconSize} />,        path: "/settings" },
+        { label: "Chat",               icon: <MessageSquare size={iconSize} />,   path: "/chat" },
     ];
 
     const handleNavigate = (path) => {
@@ -42,10 +48,31 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
     };
 
     return (
+        <>
+        {collapsed && hoveredItem && (
+            <span style={{
+                position: "fixed",
+                left: "72px",
+                top: `${tooltipY}px`,
+                background: theme.cardBg,
+                border: `1px solid ${theme.cardBorder}`,
+                color: theme.textPrimary,
+                padding: "5px 10px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+                zIndex: 9999,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+            }}>
+                {hoveredItem}
+            </span>
+        )}
         <aside
             className={`
                 fixed top-0 left-0 h-screen z-50 overflow-hidden transition-all duration-300
-                ${collapsed ? "w-[64px]" : "w-[170px]"}
+                ${collapsed ? "w-[64px]" : "w-[200px]"}
                 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
             `}
             style={{
@@ -185,12 +212,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
                                 <button
                                     key={item.label}
                                     onClick={() => handleNavigate(item.path)}
+                                    onMouseEnter={e => { 
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        setTooltipY(rect.top + rect.height / 2 - 14);
+                                        setHoveredItem(item.label); 
+                                        if (!active) e.currentTarget.style.background = theme.menuHoverBg; 
+                                    }}
+                                    onMouseLeave={e => { setHoveredItem(null); if (!active) e.currentTarget.style.background = "transparent"; }}
                                     style={{
                                         width: "100%",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: collapsed ? "center" : "flex-start",
-                                        gap: collapsed ? "0" : "12px",
+                                        gap: collapsed ? "0" : "10px",
                                         padding: collapsed ? "8px 0" : "8px 10px",
                                         borderRadius: "12px",
                                         border: "none",
@@ -201,12 +235,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
                                         fontSize: "13px",
                                         transition: "all 0.2s",
                                         position: "relative"
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!active) e.currentTarget.style.background = theme.menuHoverBg;
-                                    }}
-                                    onMouseLeave={e => {
-                                        if (!active) e.currentTarget.style.background = "transparent";
                                     }}
                                 >
                                     {/* Active left bar */}
@@ -222,12 +250,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
                                         }} />
                                     )}
 
-                                    <span style={{ color: active ? "#7C5AF6" : theme.textMuted, flexShrink: 0 }}>
+                                    <span style={{ color: active ? "#7C5AF6" : theme.textMuted, flexShrink: 0, position: "relative" }}>
                                         {item.icon}
                                     </span>
 
                                     {!collapsed && (
-                                        <span>{item.label}</span>
+                                        <span style={{ lineHeight: 1.2, whiteSpace: "nowrap" }}>{item.label}</span>
                                     )}
                                 </button>
                             );
@@ -236,34 +264,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
                 </div>
 
                 {/* FOOTER */}
-                <div style={{ borderTop: `1px solid ${theme.cardBorder}`, padding: "10px 18px" }}>
+                <div style={{ borderTop: `1px solid ${theme.cardBorder}`, padding: collapsed ? "10px 8px" : "10px 12px" }}>
                     <button
                         onClick={handleLogout}
                         style={{
                             background: "rgba(239,68,68,0.10)",
                             color: "#EF4444",
                             width: "100%",
-                            padding: "10px",
+                            padding: collapsed ? "10px 0" : "10px 12px",
                             borderRadius: "10px",
                             border: "none",
                             cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: collapsed ? "center" : "flex-start",
-                            gap: "10px",
+                            justifyContent: "center",
+                            gap: collapsed ? "0" : "10px",
                             fontSize: "13px",
                             fontWeight: 500
                         }}
                         onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
                         onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.10)"}
                     >
-                        <LogOut size={14} />
+                        <LogOut size={collapsed ? 20 : 15} />
                         {!collapsed && "Logout"}
                     </button>
                 </div>
 
             </div>
         </aside>
+        </>
     );
 };
 

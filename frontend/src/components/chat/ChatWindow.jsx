@@ -16,7 +16,7 @@ const WELCOME_MESSAGE = {
     timestamp: new Date().toISOString()
 };
 
-const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
+const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hideHero = false, onToggleSidebar }) => {
     const [messages, setMessages] = useState([WELCOME_MESSAGE]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -132,7 +132,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
         }}>
 
             {/* ── HEADER ── */}
-            <div style={{
+            {!isDrawer && <div style={{
                 flexShrink: 0,
                 background: t.headerBg,
                 borderBottom: `1px solid ${t.headerBorder}`,
@@ -141,14 +141,19 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
                 transition: "background 0.3s"
             }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-                    <div style={{
-                        width: 36, height: 36, borderRadius: 10,
-                        background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        boxShadow: "0 0 16px rgba(124,90,246,0.4)"
-                    }}>
-                        <Sparkles size={16} color="#fff" />
-                    </div>
+                    <button
+                        onClick={onToggleSidebar}
+                        style={{
+                            width: 36, height: 36, borderRadius: 10,
+                            background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            boxShadow: "0 0 16px rgba(124,90,246,0.4)",
+                            border: "none", cursor: "pointer", flexShrink: 0
+                        }}
+                        title="Toggle chat history"
+                    >
+                        <span style={{ color: "#fff", fontSize: 20, lineHeight: 1 }}>☰</span>
+                    </button>
                     <div>
                         <div style={{ fontSize: 14, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: t.textPrimary, letterSpacing: "-0.3px" }}>
                             Vendor Discovery AI
@@ -195,7 +200,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated }) => {
                         </span>
                     </button>
                 </div>
-            </div>
+            </div>}
 
             {/* ── MESSAGES ── */}
             <div className="msg-scroll" style={{

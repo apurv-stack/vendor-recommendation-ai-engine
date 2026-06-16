@@ -36,6 +36,16 @@ const SettingsPage = () => {
         setSaving
     ] = useState(false);
 
+    const[
+        apiError,
+        setApiError
+    ]=useState("");
+
+    const[
+        successMessage,
+        setSuccessMessage
+    ]=useState("");
+
     const [
         settings,
         setSettings
@@ -54,6 +64,7 @@ const SettingsPage = () => {
     const fetchSettings = async () => {
 
         try {
+            setApiError("");
 
             setLoading(true);
 
@@ -91,11 +102,14 @@ const SettingsPage = () => {
                     saved.securityAlerts ?? true
             });
 
-        } catch (error) {
+        } catch(error){
 
-            console.log(
-                "Settings fetch failed",
-                error
+            setApiError(
+
+                error?.response?.data?.detail ||
+
+                "Failed to load settings"
+
             );
 
         } finally {
@@ -121,6 +135,8 @@ const SettingsPage = () => {
     const saveSettings = async () => {
 
         try {
+            setApiError("");
+            setSuccessMessage("");
 
             setSaving(true);
 
@@ -146,11 +162,16 @@ const SettingsPage = () => {
                 })
             );
 
+        setSuccessMessage("Settings saved successfully");
+
+            setTimeout(() => setSuccessMessage(""), 3000);
+
         } catch (error) {
 
-            console.log(
-                "Settings save failed",
-                error
+            setApiError(
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                "Failed to save settings"
             );
 
         } finally {
@@ -201,6 +222,38 @@ const SettingsPage = () => {
                     title="Settings"
                     subtitle="Manage vendor preferences and platform controls"
                 />
+
+                {apiError && (
+                    <div
+                        style={{
+                            padding: "10px 14px",
+                            borderRadius: "12px",
+                            background: "rgba(239,68,68,0.10)",
+                            border: "1px solid rgba(239,68,68,0.25)",
+                            color: "#EF4444",
+                            fontSize: "13px",
+                            fontWeight: 500
+                        }}
+                    >
+                        {apiError}
+                    </div>
+                )}
+
+                {successMessage && (
+                    <div
+                        style={{
+                            padding: "10px 14px",
+                            borderRadius: "12px",
+                            background: "rgba(34,197,94,0.10)",
+                            border: "1px solid rgba(34,197,94,0.25)",
+                            color: "#22C55E",
+                            fontSize: "13px",
+                            fontWeight: 500
+                        }}
+                    >
+                        {successMessage}
+                    </div>
+                )}
 
                 {/* Profile Settings */}
 

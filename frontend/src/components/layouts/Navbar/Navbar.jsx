@@ -1,11 +1,11 @@
-import { Menu, Bell, Search, ChevronDown, Users, Eye } from "lucide-react";
+import { Menu, Bell, Search, ChevronDown, Users, Eye, MessageSquare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axiosInstance";
 import useAuth from "../../../hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
 
-const Navbar = ({ toggleSidebar }) => {
+const Navbar = ({ toggleSidebar, onChatOpen }) => {
   const theme = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -195,6 +195,26 @@ const Navbar = ({ toggleSidebar }) => {
             <p style={{ fontSize: "10px", color: theme.textMuted }}>Views</p>
           </div>
         </div>
+
+        {/* Chat */}
+        <button
+            onClick={() => onChatOpen?.()}
+            style={{
+                height: "42px",
+                width: "42px",
+                borderRadius: "12px",
+                background: "rgba(124,90,246,0.12)",
+                border: "1px solid rgba(124,90,246,0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "#7C5AF6"
+            }}
+            title="Open AI Chat"
+        >
+            <MessageSquare size={16} color="#7C5AF6" />
+        </button>
 
         {/* Notifications */}
         <div ref={notificationRef} className="relative">
