@@ -37,14 +37,10 @@ def _set_cache(key: str, value):
 
 
 def _is_valid_for_cache(tool_input: dict) -> bool:
-    """
-    Only cache results when both category AND city are present.
-    Prevents invalid/incomplete queries from polluting the cache
-    or serving wrong cached results.
-    """
     return bool(
         tool_input.get("category")
         and tool_input.get("city")
+        and not tool_input.get("max_price")
     )
 
 
@@ -71,7 +67,7 @@ class ToolCallingAgent:
             # Vendor Search
             # ---------------------------------
 
-            if intent in ["vendor_recommendation", "service_query"]:
+            if intent in ["vendor_recommendation", "vendor_search", "service_query"]:
 
                 tool_name = "search_vendors"
 

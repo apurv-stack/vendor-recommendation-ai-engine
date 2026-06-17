@@ -280,29 +280,40 @@ class RecommendationEngine:
         vendor,
         filters
     ):
-
         try:
             budget = int(filters.get("budget")) if filters.get("budget") is not None else None
         except (ValueError, TypeError):
             budget = None
 
         if not budget:
-            return 30
+            return 50
 
         min_price = getattr(vendor, "price_min", None) or 0
         max_price = getattr(vendor, "price_max", None) or 0
 
         if not min_price or not max_price:
-            return 10
-
-        if min_price <= budget <= max_price:
             return 30
 
-        if budget > max_price:
+    # Perfect fit — vendor range contains the budget
+        if min_price <= budget <= max_price:
+            return 100
+
+    # Vendor is fully under budget (affordable)
+        if max_price < budget:
+            overshoot = (budget - max_price) / budget
+            if overshoot <= 0.2:
+                return 80
+            return 60
+
+    # Vendor starts above budget — how far over?
+        over_by = (min_price - budget) / budget
+        if over_by <= 0.10:
+            return 70   # just slightly above, still show
+        if over_by <= 0.25:
+            return 40
+        if over_by <= 0.50:
             return 20
-
         return 0
-
 
     @staticmethod
     def calculate_pricing_relevance(vendor, filters):
