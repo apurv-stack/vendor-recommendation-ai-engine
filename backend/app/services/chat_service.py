@@ -270,6 +270,13 @@ class ChatService:
                 filters
             )
 
+            if filters and intent != "session_query":
+                UserPreferenceService.learn_from_chat(
+                    db=self.db,
+                    user_id=current_user.user_id,
+                    filters=filters
+                )
+
             # -----------------------------------
             # REFINEMENT FLOW
             # -----------------------------------
@@ -372,12 +379,6 @@ class ChatService:
                 preference = None
 
                 if intent != "session_query":
-
-                    UserPreferenceService.learn_from_chat(
-                        db=self.db,
-                        user_id=current_user.user_id,
-                        filters=filters
-                    )
 
                     preference = (
                         UserPreferenceService.get_user_preferences(

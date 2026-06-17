@@ -538,38 +538,88 @@ class RecommendationEngine:
 
 
     @staticmethod
-    def calculate_final_score(
-        vendor,
-        filters,
-        context
-    ):
+    def calculate_location_score(vendor, context):
+        preference = context.get("user_preferences")
+        if not preference:
+            return 0
+        preferred_city = getattr(preference, "preferred_city", None)
+        vendor_city = getattr(vendor, "city", None)
+        if preferred_city and vendor_city:
+            if preferred_city.lower() == vendor_city.lower():
+                return 100
+        return 0
 
-        relevance_score = (
-            RecommendationEngine
-            .calculate_relevance_score(
-                vendor,
-                filters,
-                context
-            )
+    @staticmethod
+    def calculate_category_score(vendor, filters):
+        category = filters.get("category")
+        if not category:
+            return 50
+        teams = getattr(vendor, "managed_teams", []) or []
+        for team in teams:
+            team_name = getattr(team, "name", "") or ""
+            if category.lower() in team_name.lower():
+                return 100
+        return 0
+
+    @staticmethod
+    def calculate_rating_score(vendor):
+        rating = getattr(vendor, "avg_rating", 0) or 0
+        return (rating / 5) * 100
+
+    @staticmethod
+    def calculate_review_score(vendor):
+        reviews = getattr(vendor, "review_count", 0) or 0
+        if reviews >= 200:
+            return 100
+        elif reviews >= 100:
+            return 80
+        elif reviews >= 50:
+            return 60
+        elif reviews >= 20:
+            return 40
+        elif reviews > 0:
+            return 20
+        return 10
+
+    @staticmethod
+    def calculate_verification_score(vendor):
+        return 100 if getattr(vendor, "is_verified", False) else 0
+
+    @staticmethod
+    def calculate_availability_score(vendor):
+        available = getattr(vendor, "is_available", None)
+        if available is True:
+            return 100
+        if available is False:
+            return 0
+        return 50
+
+    @staticmethod
+    def calculate_final_score(vendor, filters, context):
+
+        category_score   = RecommendationEngine.calculate_category_score(vendor, filters)
+        budget_score     = RecommendationEngine.calculate_budget_relevance(vendor, filters)
+        location_score   = RecommendationEngine.calculate_location_score(vendor, context)
+        rating_score     = RecommendationEngine.calculate_rating_score(vendor)
+        review_score     = RecommendationEngine.calculate_review_score(vendor)
+        verify_score     = RecommendationEngine.calculate_verification_score(vendor)
+        avail_score      = RecommendationEngine.calculate_availability_score(vendor)
+
+    # Mentor's formula:
+    # Category = 35%, Budget = 20%, Location = 15%,
+    # Rating = 15%, Reviews = 10%, Verification = 3%, Availability = 2%
+
+        final = (
+            (category_score  * 0.35) +
+            (budget_score    * 0.20) +
+            (location_score  * 0.15) +
+            (rating_score    * 0.15) +
+            (review_score    * 0.10) +
+            (verify_score    * 0.03) +
+            (avail_score     * 0.02)
         )
 
-        vendor_score = (
-            RecommendationEngine
-            .calculate_vendor_score(
-                vendor,
-                filters
-            )
-        )
-
-        return (
-
-            relevance_score * 0.60
-
-        ) + (
-
-            vendor_score * 0.40
-
-        )
+        return round(final, 2)
 
     @staticmethod
     def get_recommendations(
@@ -670,15 +720,12 @@ class RecommendationEngine:
 
         def safe_score(vendor):
             try:
-                relevance = RecommendationEngine.calculate_relevance_score(vendor, filters, context)
-                vs = RecommendationEngine.calculate_vendor_score(vendor, filters)
-                final = (relevance * 0.60) + (vs * 0.40)
+                final = RecommendationEngine.calculate_final_score(vendor, filters, context)
                 vendor.match_score = round(final)
                 return final
             except Exception as e:
                 print(f"SCORING ERROR for vendor '{getattr(vendor, 'name', '?')}': {e}")
                 return 0
-
         ranked = sorted(rankable, key=safe_score, reverse=True)
 
         print("RANKED VENDORS:", [v.name for v in ranked])

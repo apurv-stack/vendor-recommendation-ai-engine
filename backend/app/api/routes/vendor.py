@@ -2382,7 +2382,13 @@ def get_recommendations_api(
         filtered = vendors
 
     context = {"vendors": filtered, "user_preferences": preference}
-    ranked = RecommendationEngine.rank_vendors(filtered, {"category": "vendor"}, context)
+    category_filter = str(preference.preferred_category) if preference and getattr(preference, "preferred_category", None) else ""
+
+    ranked = RecommendationEngine.rank_vendors(
+        filtered,
+        {"category": category_filter},
+        context
+    )
     final = ranked[:10]
 
     for vendor in final:

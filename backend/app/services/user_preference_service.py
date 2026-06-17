@@ -128,44 +128,32 @@ class UserPreferenceService:
         user_id,
         filters: dict
     ):
-
         if not filters:
-
             return None
 
+    # Handle multiple possible key names from AI filters
+        category = (
+            filters.get("category") or
+            filters.get("service_type") or
+            filters.get("vendor_type")
+        )
+
+        city = (
+            filters.get("city") or
+            filters.get("location") or
+            filters.get("preferred_city")
+        )
+
+        budget = filters.get("budget") or filters.get("price_range")
+
         return UserPreferenceService.create_or_update_preferences(
-
             db=db,
-
             user_id=user_id,
-
-            category=filters.get(
-                "category"
-            ),
-
-            city=filters.get(
-                "city"
-            ),
-
-            event_type=filters.get(
-                "event_type"
-            ),
-
-            price_range=(
-                str(
-                    filters.get(
-                        "budget"
-                    )
-                )
-                if filters.get(
-                    "budget"
-                )
-                else None
-            ),
-
-            min_rating=filters.get(
-                "rating"
-            )
+            category=category,
+            city=city,
+            event_type=filters.get("event_type"),
+            price_range=str(budget) if budget else None,
+            min_rating=filters.get("rating") or filters.get("min_rating")
         )
 
     @staticmethod
