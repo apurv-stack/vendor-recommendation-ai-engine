@@ -2603,6 +2603,38 @@ def get_all_categories_api(
         "categories": categories
     }
 
+@router.get("/suggestions")
+def get_suggestions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_role(["vendor"])
+    )
+):
+    preference = UserPreferenceService.get_user_preferences(
+        db=db,
+        user_id=current_user.user_id
+    )
+    suggestions = []
+    if preference:
+        cat = getattr(preference, "preferred_category", None)
+        city = getattr(preference, "preferred_city", None)
+        budget = getattr(preference, "preferred_price_range", None)
+        if cat and city:
+            suggestions.append(f"{cat.title()} vendors in {city.title()}")
+        if cat and budget:
+            suggestions.append(f"{cat.title()} under ₹{budget}")
+        if city:
+            suggestions.append(f"Top rated vendors in {city.title()}")
+        if cat:
+            suggestions.append(f"Best {cat.title()} vendors")
+    if not suggestions:
+        suggestions = [
+            "Wedding in Delhi under 5L",
+            "Caterers for 200 guests",
+            "Photographers in Mumbai"
+        ]
+    return {"suggestions": suggestions[:4]}
+
 # ==========================================
 # SINGLE
 # ==========================================

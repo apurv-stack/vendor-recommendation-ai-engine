@@ -1,3 +1,4 @@
+import axiosInstance from "../../api/axiosInstance";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Send, Sparkles, Paperclip, Sun, Moon } from "lucide-react";
 import { sendMessage } from "../../api/chatApi";
@@ -24,6 +25,11 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
     const [historyLoading, setHistoryLoading] = useState(false);
     const [sessionId, setSessionId] = useState(null);
     const [error, setError] = useState(null);
+    const [suggestions, setSuggestions] = useState([
+        "Wedding in Delhi under 5L",
+        "Caterers for 200 guests",
+        "Photographers in Mumbai"
+    ]);
 
     const t = useTheme();
     const bottomRef = useRef(null);
@@ -69,6 +75,16 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
         loadHistory();
     }, [selectedSessionId]);
 
+    useEffect(() => {
+        axiosInstance.get("/vendors/suggestions")
+            .then(res => {
+                if (res.data?.suggestions?.length) {
+                    setSuggestions(res.data.suggestions);
+                }
+            })
+            .catch(() => {}); // silently keep defaults on error
+    }, []);
+
     const appendMessage = useCallback((msg) => setMessages(prev => [...prev, msg]), []);
 
     const handleSend = async () => {
@@ -97,6 +113,21 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                     recommendations: result.recommendations || [],
                     responseType: result.response_type || "chat"
                 });
+
+                if (result.filters) {
+                    const f = result.filters;
+                    const contextChips = [];
+                    if (f.category && f.city)
+                        contextChips.push(`${f.category} vendors in ${f.city}`);
+                    if (f.category && f.budget)
+                        contextChips.push(`${f.category} under ₹${f.budget}`);
+                    if (f.city)
+                        contextChips.push(`Top rated vendors in ${f.city}`);
+                    if (f.category)
+                        contextChips.push(`Best ${f.category} vendors`);
+                    if (contextChips.length >= 2)
+                        setSuggestions(contextChips.slice(0, 4));
+                }
             } else {
                 appendMessage({ role: "assistant", text: result?.message || "Sorry, something went wrong.", recommendations: [] });
             }
@@ -255,7 +286,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                             Tell me your event requirements — budget, location, guest count — and I'll find the perfect vendors for you.
                         </p>
                         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-                            {["Wedding in Delhi under 5L", "Caterers for 200 guests", "Photographers in Mumbai"].map(s => (
+                            {suggestions.map(s => (
                                 <button key={s} onClick={() => setInput(s)}
                                     style={{
                                         padding: "8px 16px", borderRadius: 20,

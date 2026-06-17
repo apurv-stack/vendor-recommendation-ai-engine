@@ -158,63 +158,26 @@ const RecommendationsPage = () => {
 
         <MainLayout>
 
-            <div
-                className="
-                    space-y-6
-                    px-4
-                    sm:px-6
-                    lg:px-8
-                "
-            >
+            <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
 
-                <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "16px",
-                    background: "white",
-                    borderRadius: "16px",
-                    padding: "24px 28px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)"
-                }}>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                        <h1 style={{
-                            fontSize: "clamp(18px, 4vw, 24px)",
-                            fontWeight: 700,
-                            color: "#0f172a",
-                            margin: 0,
-                            wordBreak: "break-word"
-                        }}>
-                            Smart Recommendations
-                        </h1>
-                        <p style={{
-                            fontSize: "clamp(12px, 2vw, 14px)",
-                            color: "#64748b",
-                            marginTop: "4px",
-                            marginBottom: 0
-                        }}>
-                            AI vendor intelligence using pricing, category relevance and vendor quality.
-                        </p>
-                    </div>
-                    <button
-                        onClick={fetchRecommendations}
-                        style={{
-                            padding: "10px 20px",
-                            borderRadius: "12px",
-                            background: "linear-gradient(135deg,#7c5af6,#a78bfa)",
-                            color: "#fff",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                            border: "none",
-                            cursor: "pointer",
-                            flexShrink: 0,
-                            whiteSpace: "nowrap"
-                        }}
-                    >
-                        Refresh
-                    </button>
-                </div>
+                <PageHeader
+                    title="Smart Recommendations"
+                    subtitle="AI vendor intelligence using pricing, category relevance and vendor quality."
+                    action={
+                        <button
+                            onClick={fetchRecommendations}
+                            className="glass px-4 py-2 rounded-xl flex gap-2 items-center font-semibold text-sm"
+                            style={{
+                                background: "linear-gradient(135deg, #7c5af6, #a78bfa)",
+                                color: "#fff",
+                                border: "none",
+                                cursor: "pointer"
+                            }}
+                        >
+                            Refresh
+                        </button>
+                    }
+                />
 
                 {
                     error

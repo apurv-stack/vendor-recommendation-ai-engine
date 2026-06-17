@@ -46,174 +46,222 @@ class QueryParser:
     CATEGORY_PATTERNS = {
 
         "catering": [
-            "catering",
-            "caterer",
-            "food"
+            "catering", "caterer", "food", "buffet"
         ],
 
         "photography": [
-            "photography",
-            "photographer",
-            "photographers"
+            "photography", "photographer", "photographers",
+            "pre wedding", "pre-wedding",
+            "videography", "cinematography"
         ],
 
         "decoration": [
-            "decoration",
-            "decor",
-            "decorator"
+            "decoration", "decor", "decorator",
+            "floral decor", "stage decor"
         ],
 
         "venue": [
-            "venue",
-            "banquet",
-            "hall"
+            "venue", "banquet", "hall",
+            "farmhouse", "resort",
+            "lawn", "wedding venue"
         ],
 
         "music": [
-            "music",
-            "dj",
-            "band"
+            "music", "dj", "band",
+            "live music", "singer"
         ],
 
         "planner": [
             "planner",
             "event planner",
-            "wedding planner"
+            "wedding planner",
+            "event management"
         ],
 
         "makeup": [
             "makeup",
             "makeup artist",
-            "bridal makeup"
+            "bridal makeup",
+            "groom makeup"
+        ],
+
+        "entertainment": [
+            "entertainment",
+            "anchor",
+            "emcee",
+            "comedian",
+            "performer",
+            "magician"
+        ],
+
+        "transport": [
+            "transport",
+            "car rental",
+            "luxury car",
+            "bus service"
+        ],
+
+        "invitation": [
+            "invitation",
+            "wedding card",
+            "invite",
+            "invites"
+        ],
+
+        "cake": [
+            "cake",
+            "cakes",
+            "bakery",
+            "pastry"
+        ],
+
+        "security": [
+            "security",
+            "bouncer",
+            "guards"
         ]
     }
 
     CITY_MAP = {
-
         "delhi": "delhi",
-
         "new delhi": "delhi",
-
         "delhi ncr": "delhi",
-
         "ncr": "delhi",
-
         "mumbai": "mumbai",
-
         "bangalore": "bangalore",
-
         "bengaluru": "bangalore",
-
-        "noida": "noida",
-
+        "hyderabad": "hyderabad",
+        "chennai": "chennai",
+        "kolkata": "kolkata",
+        "pune": "pune",
+        "ahmedabad": "ahmedabad",
+        "jaipur": "jaipur",
+        "lucknow": "lucknow",
+        "indore": "indore",
+        "surat": "surat",
+        "chandigarh": "chandigarh",
+        "noida": "noida",  
         "greater noida": "greater noida",
-
         "gurgaon": "gurgaon",
-
         "gurugram": "gurgaon"
     }
 
     CUISINES = {
-
         "north indian",
-
         "south indian",
-
-        "continental",
-
         "chinese",
-
+        "thai",
+        "japanese",
+        "korean",
         "italian",
-
-        "mexican"
+        "mexican",
+        "continental",
+        "mediterranean",
+        "mughlai",
+        "bengali",
+        "gujarati",
+        "rajasthani",
+        "punjabi",
+        "hyderabadi",
+        "street food",
+        "desserts",
+        "live counters",
+        "bbq",
+        "seafood",
+        "vegan",
+        "jain"
     }
 
     EVENTS = {
-
         "wedding",
-
-        "birthday",
-
-        "corporate",
-
         "engagement",
-
-        "conference",
-
-        "party",
-
         "reception",
-
-        "anniversary",
-
-        "baby shower",
-
         "haldi",
-
         "mehendi",
-
-        "sangeet"
+        "sangeet",
+        "birthday",
+        "anniversary",
+        "baby shower",
+        "housewarming",
+        "naming ceremony",
+        "party",
+        "farewell",
+        "freshers",
+        "convocation",
+        "corporate",
+        "conference",
+        "seminar",
+        "workshop",
+        "annual meet",
+        "townhall",
+        "product launch",
+        "award ceremony",
+        "networking event",
+        "trade show",
+        "exhibition",
+        "inauguration",
+        "festival",
+        "cultural event",
+        "religious event",
+        "fashion show",
+        "roadshow",
+        "charity event", 
+        "fundraiser",   
+        "college fest",
+        "sports event",
+        "concert",
+        "music festival",
+        "brand activation"
     }
 
     CHEAPER_TERMS = {
-
         "cheap",
-
         "cheaper",
-
         "affordable",
-
         "budget",
-
         "economical",
-
         "budget friendly",
-
         "cost effective",
-
-        "low cost"
+        "low cost",
+        "low budget",
+        "reasonable",
+        "value for money",
+        "inexpensive",
+        "lowest price"
     }
 
     PREMIUM_TERMS = {
-
         "premium",
-
         "luxury",
-
         "elite",
-
         "exclusive",
-
         "high end",
-
-        "high-end"
+        "high-end",
+        "luxurious",
+        "vip",
+        "high profile"
     }
 
     QUALITY_TERMS = {
-
         "best",
-
         "top",
-
         "top rated",
-
         "highest rated",
-
         "highly rated",
-
         "high ratings",
-
         "high rating",
-
         "good ratings",
-
         "good rating",
-
         "trusted",
-
         "experienced",
-
-        "recommended"
+        "recommended",
+        "excellent",
+        "popular",
+        "famous",
+        "professional",
+        "top class",
+        "best reviewed",
+        "5 star"
     }
 
     SERVICE_TERMS = {

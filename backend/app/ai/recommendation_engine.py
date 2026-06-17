@@ -556,7 +556,7 @@ class RecommendationEngine:
             return 50
         teams = getattr(vendor, "managed_teams", []) or []
         for team in teams:
-            team_name = getattr(team, "name", "") or ""
+            team_name = team["name"] if isinstance(team, dict) else getattr(team, "name", "") or ""
             if category.lower() in team_name.lower():
                 return 100
         return 0
