@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { MessageSquare, Plus, Sparkles, MoreVertical, LogOut, Settings, User, Search, HelpCircle } from "lucide-react";
+import { MessageSquare, Plus, Sparkles, MoreVertical, LogOut, Settings, User, Search, HelpCircle, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { getSessions, renameSession, deleteSession } from "../../api/sessionApi";
@@ -266,6 +266,26 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
             </div>
 
             {/* ── PROFILE — fixed at bottom, dropdown opens ABOVE ── */}
+            {/* DASHBOARD BUTTON — mobile only */}
+            <style>{`
+                @media (min-width: 768px) { .dashboard-mobile-btn { display: none !important; } }
+            `}</style>
+            <div className="dashboard-mobile-btn" style={{ flexShrink: 0, padding: "6px 8px" }}>
+                <button
+                    onClick={() => navigate("/dashboard")}
+                    style={{
+                        width: "100%", display: "flex", alignItems: "center", gap: 10,
+                        padding: "10px 14px", borderRadius: 10,
+                        background: "rgba(124,90,246,0.08)",
+                        border: "1px solid rgba(124,90,246,0.2)",
+                        color: "#7c5af6", fontSize: 13, fontWeight: 600,
+                        cursor: "pointer", fontFamily: "inherit"
+                    }}
+                >
+                    <LayoutDashboard size={15} color="#7c5af6" />
+                    Go to Dashboard
+                </button>
+            </div>
             <div style={{
                 flexShrink: 0,
                 borderTop: `1px solid ${t.divider}`,

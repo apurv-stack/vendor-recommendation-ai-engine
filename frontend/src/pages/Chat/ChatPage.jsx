@@ -10,12 +10,11 @@ const ChatPageInner = () => {
     const [selectedSessionId, setSelectedSessionId] = useState(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const [sidebarRefresh, setSidebarRefresh] = useState(0);
-    const [chatSidebarCollapsed, setChatSidebarCollapsed] = useState(false);
     const [appSidebarCollapsed, setAppSidebarCollapsed] = useState(true);
     const [appSidebarOpen, setAppSidebarOpen] = useState(false);
-    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1400);
+    const [chatSidebarCollapsed, setChatSidebarCollapsed] = useState(window.innerWidth < 768);
     const [isNarrow, setIsNarrow] = useState(window.innerWidth < 768);
-
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1400);
     useEffect(() => {
         const handleResize = () => {
             const w = window.innerWidth;
@@ -64,22 +63,21 @@ const ChatPageInner = () => {
                     }}
                 />
             )}
-            {!isNarrow && (
-                <div style={{
-                    position: "fixed",
-                    top: 0, left: 0,
-                    height: "100vh",
-                    zIndex: 50,
-                    transform: "translateX(0)"
-                }}>
-                    <Sidebar
-                        sidebarOpen={true}
-                        setSidebarOpen={setAppSidebarOpen}
-                        collapsed={appSidebarCollapsed}
-                        setCollapsed={setAppSidebarCollapsed}
-                    />
-                </div>
-            )}
+            <div style={{
+                position: "fixed",
+                top: 0, left: 0,
+                height: "100vh",
+                zIndex: 50,
+                transform: isNarrow && !appSidebarOpen ? "translateX(-100%)" : "translateX(0)",
+                transition: "transform 0.3s ease"
+            }}>
+                <Sidebar
+                    sidebarOpen={isNarrow ? appSidebarOpen : true}
+                    setSidebarOpen={setAppSidebarOpen}
+                    collapsed={isNarrow ? false : appSidebarCollapsed}
+                    setCollapsed={setAppSidebarCollapsed}
+                />
+            </div>
 
             {/* MAIN CHAT AREA — offset by app sidebar width */}
             <div style={{
@@ -92,14 +90,34 @@ const ChatPageInner = () => {
             }}>
                 {/* CHAT HISTORY SIDEBAR */}
                 {!chatSidebarCollapsed && (
-                    <ChatHistorySidebar
-                        refreshTrigger={sidebarRefresh}
-                        onSessionSelect={handleSessionSelect}
-                        onNewChat={handleNewChat}
-                        selectedSessionId={selectedSessionId}
-                        onCollapse={() => setChatSidebarCollapsed(true)}
-                    />
-                )}
+                    <>
+                        {isNarrow && (
+                            <div
+                                onClick={() => setChatSidebarCollapsed(true)}
+                                style={{
+                                    position: "fixed", inset: 0,
+                                    background: "rgba(0,0,0,0.4)",
+                                    backdropFilter: "blur(4px)",
+                                    zIndex: 48
+                                }}
+                            />
+                        )}
+                        <div style={{
+                            position: isNarrow ? "fixed" : "relative",
+                            top: 0, left: 0,
+                            height: "100vh",
+                            zIndex: 49
+                        }}>
+                        <ChatHistorySidebar
+                            refreshTrigger={sidebarRefresh}
+                            onSessionSelect={handleSessionSelect}
+                            onNewChat={handleNewChat}
+                            selectedSessionId={selectedSessionId}
+                            onCollapse={() => setChatSidebarCollapsed(true)}
+                        />
+                    </div>
+                </>
+            )}
 
             {/* CENTER CHAT */}
                 <div style={{

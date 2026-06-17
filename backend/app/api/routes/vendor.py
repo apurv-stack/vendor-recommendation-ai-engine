@@ -48,6 +48,13 @@ from app.services.user_preference_service import (
     UserPreferenceService
 )
 
+from app.services.recommendation_history_service import (
+    RecommendationHistoryService
+)
+
+from app.ai.recommendation_engine import RecommendationEngine
+from app.ai.recommendation_formatter import RecommendationFormatter
+
 from app.api.dependencies.auth_dependency import (
 
     require_role
@@ -2319,36 +2326,79 @@ def get_recommendations_api(
 
 ):
 
-    vendors=(
-
-        db.query(
-            Vendor
+    preference = (
+        UserPreferenceService.get_user_preferences(
+            db=db,
+            user_id=current_user.user_id
         )
-
-        .filter(
-            Vendor.is_active==True
-        )
-
-        .order_by(
-            desc(
-                Vendor.avg_rating
-            )
-        )
-
-        .limit(
-            10
-        )
-
-        .all()
-
     )
 
+
+    query = (
+        db.query(Vendor)
+        .filter(Vendor.is_active == True)
+        .filter(Vendor.parent_vendor_id == None)
+    )
+
+    if preference:
+
+        if bool(preference.preferred_city):
+            city_test = query.filter(
+                Vendor.city.ilike(
+                    f"%{preference.preferred_city}%"
+                )
+            ).all()
+            if city_test:
+                query = query.filter(
+                    Vendor.city.ilike(
+                        f"%{preference.preferred_city}%"
+                    )
+                )
+
+        if bool(preference.preferred_min_rating):
+            query = query.filter(
+                Vendor.avg_rating >= preference.preferred_min_rating
+            )
+    # Step 4 — Order by rating and get top 20
+    vendors = (
+        query
+        .order_by(desc(Vendor.avg_rating))
+        .limit(20)
+        .all()
+    )
+
+    recent_ids = RecommendationHistoryService.get_recent_vendor_ids(
+        db=db,
+        user_id=current_user.user_id,
+        limit=50
+    )
+
+    filtered = [
+        v for v in vendors
+        if str(v.vendor_id) not in [str(r) for r in recent_ids]
+    ]
+
+    if not filtered:
+        filtered = vendors
+
+    context = {"vendors": filtered, "user_preferences": preference}
+    ranked = RecommendationEngine.rank_vendors(filtered, {"category": "vendor"}, context)
+    final = ranked[:10]
+
+    for vendor in final:
+        try:
+            RecommendationHistoryService.create_recommendation_record(
+                db=db,
+                user_id=current_user.user_id,
+                session_id=None,
+                vendor_id=vendor.vendor_id
+            )
+        except Exception:
+            db.rollback()
+
     return {
-
-        "vendors":
-
-        vendors
-
+        "success": True,
+        "recommendations": RecommendationFormatter.format_vendors(final)
     }
 # ==========================================
 # USER PREFERENCES
@@ -2412,7 +2462,7 @@ def get_my_preferences_api(
                     str(
                         preference.favorite_vendor_id
                     )
-                    if preference.favorite_vendor_id
+                    if preference.favorite_vendor_id is not None
                     else None
                 )
         }
@@ -2504,7 +2554,7 @@ def update_my_preferences_api(
                     str(
                         preference.favorite_vendor_id
                     )
-                    if preference.favorite_vendor_id
+                    if preference.favorite_vendor_id is not None
                     else None
                 )
         }

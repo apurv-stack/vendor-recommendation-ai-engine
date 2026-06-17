@@ -129,7 +129,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
             display: "flex", flexDirection: "column",
             height: "100%", minHeight: 0,
             background: t.chatBg,
-            borderRadius: 16,
+            borderRadius: isDrawer ? 0 : 16,
             border: `1px solid ${t.chatBorder}`,
             overflow: "hidden",
             transition: "background 0.3s, border-color 0.3s"

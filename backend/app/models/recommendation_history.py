@@ -55,7 +55,7 @@ class RecommendationHistory(Base):
             ondelete="CASCADE"
         ),
 
-        nullable=False,
+        nullable=True,
 
         index=True
     )

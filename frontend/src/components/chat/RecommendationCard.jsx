@@ -221,12 +221,18 @@ function RecommendationCard({ vendor }) {
                 }} />
 
                 {/* CATEGORY ILLUSTRATION */}
-                <div style={{
-                    position: "absolute", top: 6, right: 6,
+                {/* <div style={{
+                    position: "absolute", top: 16, right: 6,
                     width: 72, height: 72,
                     pointerEvents: "none", zIndex: 0,
-                    opacity: t.isDark ? 0.7 : 0.5
-                }}>
+                    opacity: t.isDark ? 0.7 : 0.5,
+                    display: "none"
+                }}
+                    className="illustration-hide"
+                >
+                <style>{`
+                    @media (min-width: 640px) { .illustration-hide { display: block !important; } }
+                `}</style>
                     <div style={{
                         position: "absolute", top: "50%", left: "50%",
                         transform: "translate(-50%, -50%)",
@@ -239,12 +245,12 @@ function RecommendationCard({ vendor }) {
                     <div style={{ position: "relative" }}>
                         <CategoryIllustration category={category} isDark={t.isDark} />
                     </div>
-                </div>
+                </div> */}
 
                 <div style={{ padding: "14px 14px 12px", paddingTop: 16 }}>
 
                     {/* TOP ROW */}
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, paddingRight: 80 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, paddingRight: 0, flexWrap: "wrap", position: "relative", zIndex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
                             <div style={{
                                 width: 40, height: 40, borderRadius: 12, flexShrink: 0,
