@@ -181,7 +181,8 @@ const RedirectRoot=()=>{
 const{
 
 loading,
-isAuthenticated
+isAuthenticated,
+user
 
 }=useAuth();
 
@@ -197,32 +198,53 @@ return null;
 }
 
 
+if(!isAuthenticated){
+
 return(
 
 <Navigate
 
 replace
 
-to={
+to="/login"
 
-isAuthenticated
+/>
 
-?
-
-"/dashboard"
-
-:
-
-"/login"
+);
 
 }
+
+
+if(user?.role==="admin"){
+
+return(
+
+<Navigate
+
+replace
+
+to="/admin"
+
+/>
+
+);
+
+}
+
+
+return(
+
+<Navigate
+
+replace
+
+to="/dashboard"
 
 />
 
 );
 
 };
-
 
 const AppRoutes=()=>{
 

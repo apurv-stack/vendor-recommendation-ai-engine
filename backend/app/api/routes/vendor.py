@@ -4,7 +4,10 @@ from fastapi import (
 
     APIRouter,
     Depends,
-    Query
+    Query,
+    UploadFile,
+    File,
+    HTTPException
 
 )
 
@@ -43,7 +46,8 @@ from app.services.vendor_service import (
     get_single_service_service,
     rename_service_service,
     delete_service_service,
-    import_vendors_service
+    import_vendors_service,
+    import_vendors_from_file_service
 
 )
 
@@ -2771,3 +2775,68 @@ def import_vendors_api(
         db=db,
         vendors_data=payload.vendors
     )
+
+# ==========================================
+# IMPORT VENDORS FROM CSV / EXCEL FILE
+# ==========================================
+
+@router.post(
+    "/import-file",
+    response_model=VendorImportResponse
+)
+async def import_vendors_file_api(
+
+    file: UploadFile = File(...),
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        require_role(["admin"])
+    )
+
+):
+
+    return await import_vendors_from_file_service(
+        db=db,
+        file=file
+    )
+
+# ==========================================
+# VERIFY / UNVERIFY VENDOR
+# ==========================================
+
+@router.patch(
+    "/{vendor_id}/verify"
+)
+def toggle_verify_vendor_api(
+
+    vendor_id: UUID,
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        require_role(["admin"])
+    )
+
+):
+
+    from app.repositories.vendor_repository import get_vendor_by_id
+
+    vendor = get_vendor_by_id(db, vendor_id)
+
+    if not vendor:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    vendor.is_verified = not vendor.is_verified
+
+    db.commit()
+
+    db.refresh(vendor)
+
+    return {
+        "success": True,
+        "is_verified": vendor.is_verified
+    }

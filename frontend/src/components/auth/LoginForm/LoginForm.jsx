@@ -36,7 +36,12 @@ const handleSubmit=async(event)=>{
     setError("");
     const response=await loginApi({ identifier:form.email, password:form.password });
     login({ access_token:response.access_token, user:response.user });
-    navigate("/dashboard",{ replace:true });
+    const role = response.user?.role;
+    if(role === "admin"){
+      navigate("/admin", { replace:true });
+    } else {
+      navigate("/dashboard", { replace:true });
+    }
   }catch(error){
     setError(error?.response?.data?.detail||"Invalid credentials");
   }finally{
