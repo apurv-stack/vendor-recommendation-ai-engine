@@ -509,38 +509,22 @@ def search_vendors(
 
     if category:
 
-        category_terms = [category]
+        CATEGORY_SEARCH_TERMS = {
+            "photography": ["photography", "photographer", "photo", "videography", "cinematography"],
+            "catering":    ["catering", "caterer", "caterers", "food", "chef"],
+            "decoration":  ["decoration", "decorator", "decorators", "decor", "floral", "styling"],
+            "venue":       ["venue", "banquet", "hall", "farmhouse", "resort", "lawn"],
+            "entertainment": ["entertainment", "entertainer", "anchor", "comedian", "performer"],
+            "dj":          ["dj", "disc jockey", "music", "sound"],
+            "music":       ["music", "musician", "band", "singer", "live music"],
+            "makeup":      ["makeup", "makeup artist", "bridal makeup"],
+            "planner":     ["planner", "event planner", "wedding planner"],
+        }
 
-        if category.lower() in [
-            "decoration",
-            "decorator",
-            "decorators",
-            "decor"
-        ]:
-            category_terms = [
-                "decoration",
-                "decorators"
-            ]
-
-        elif category.lower() in [
-            "photography",
-            "photographer",
-            "photographers",
-            "photoshoot"
-        ]:
-            category_terms = [
-                "photography"
-            ]
-
-        elif category.lower() in [
-            "catering",
-            "caterer",
-            "caterers",
-            "cater"
-        ]:
-            category_terms = [
-                "catering"
-            ]
+        category_terms = CATEGORY_SEARCH_TERMS.get(
+            category.lower(),
+            [category]  # fallback: use as-is if not in map
+        )
 
         search = search.filter(
 
@@ -550,7 +534,6 @@ def search_vendors(
                     CategoryVendor.name.ilike(
                         f"%{term}%"
                     )
-
                     for term in category_terms
                 ],
 
@@ -558,7 +541,6 @@ def search_vendors(
                     ServiceAlias.service_name.ilike(
                         f"%{term}%"
                     )
-
                     for term in category_terms
                 ]
 

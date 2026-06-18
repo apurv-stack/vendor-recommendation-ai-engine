@@ -560,16 +560,58 @@ class RecommendationEngine:
                 return 100
         return 0
 
+    CATEGORY_SYNONYMS = {
+        "photography": ["photography", "photographer", "photo", "wedding photography",
+                        "candid photography", "cinematography", "videography", "photos"],
+        "catering":    ["catering", "caterer", "caterers", "food", "meals",
+                        "buffet", "catered", "chef", "cuisine"],
+        "decoration":  ["decoration", "decorator", "decorators", "decor", "floral",
+                        "flowers", "theme decoration", "stage decoration", "styling"],
+        "venue":       ["venue", "venues", "hall", "banquet", "farmhouse", "resort",
+                        "location", "lawn", "garden venue", "banquet hall"],
+        "entertainment": ["entertainment", "entertainer", "anchor", "host", "comedian",
+                        "performer", "dance", "live entertainment"],
+        "dj":           ["dj", "disc jockey", "music", "sound", "audio", "beats"],
+        "music":        ["music", "musician", "band", "singer", "live music", "orchestra"],
+    }
+
+    @staticmethod
+    def normalize_category(raw: str) -> str:
+        if not raw:
+            return ""
+        raw_lower = raw.strip().lower()
+        for canonical, synonyms in RecommendationEngine.CATEGORY_SYNONYMS.items():
+            if raw_lower in synonyms:
+                return canonical
+        return raw_lower
+
     @staticmethod
     def calculate_category_score(vendor, filters):
         category = filters.get("category")
         if not category:
             return 50
+
+        query_norm = RecommendationEngine.normalize_category(category)
+
+    # Check vendor's direct category field first
+        vendor_category = getattr(vendor, "category", "") or ""
+        vendor_norm = RecommendationEngine.normalize_category(vendor_category)
+
+        if vendor_norm == query_norm:
+            return 100
+        if vendor_norm in query_norm or query_norm in vendor_norm:
+            return 75
+
+    # Fallback: check managed_teams name
         teams = getattr(vendor, "managed_teams", []) or []
         for team in teams:
             team_name = team["name"] if isinstance(team, dict) else getattr(team, "name", "") or ""
-            if category.lower() in team_name.lower():
+            team_norm = RecommendationEngine.normalize_category(team_name)
+            if team_norm == query_norm:
                 return 100
+            if team_norm in query_norm or query_norm in team_norm:
+                return 75
+
         return 0
 
     @staticmethod
@@ -605,29 +647,109 @@ class RecommendationEngine:
             return 0
         return 50
 
+    CATEGORY_WEIGHTS = {
+        "photography": {
+            "category": 0.25,
+            "budget":   0.10,
+            "location": 0.10,
+            "rating":   0.30,  # rating & portfolio matters most
+            "reviews":  0.20,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        "catering": {
+            "category": 0.25,
+            "budget":   0.30,  # budget & capacity matters most
+            "location": 0.10,
+            "rating":   0.15,
+            "reviews":  0.15,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        "venue": {
+            "category": 0.25,
+            "budget":   0.20,
+            "location": 0.30,  # location matters most for venue
+            "rating":   0.12,
+            "reviews":  0.08,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        "decoration": {
+            "category": 0.25,
+            "budget":   0.15,
+            "location": 0.10,
+            "rating":   0.28,  # visual quality = rating driven
+            "reviews":  0.17,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        "dj": {
+            "category": 0.25,
+            "budget":   0.15,
+            "location": 0.10,
+            "rating":   0.28,
+            "reviews":  0.17,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        "entertainment": {
+            "category": 0.25,
+            "budget":   0.12,
+            "location": 0.10,
+            "rating":   0.30,
+            "reviews":  0.18,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        "music": {
+            "category": 0.25,
+            "budget":   0.12,
+            "location": 0.10,
+            "rating":   0.30,
+            "reviews":  0.18,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+        # default — original mentor formula
+        "default": {
+            "category": 0.35,
+            "budget":   0.20,
+            "location": 0.15,
+            "rating":   0.15,
+            "reviews":  0.10,
+            "verified": 0.03,
+            "available": 0.02,
+        },
+    }
+
     @staticmethod
     def calculate_final_score(vendor, filters, context):
 
-        category_score   = RecommendationEngine.calculate_category_score(vendor, filters)
-        budget_score     = RecommendationEngine.calculate_budget_relevance(vendor, filters)
-        location_score   = RecommendationEngine.calculate_location_score(vendor, context)
-        rating_score     = RecommendationEngine.calculate_rating_score(vendor)
-        review_score     = RecommendationEngine.calculate_review_score(vendor)
-        verify_score     = RecommendationEngine.calculate_verification_score(vendor)
-        avail_score      = RecommendationEngine.calculate_availability_score(vendor)
+        category_score  = RecommendationEngine.calculate_category_score(vendor, filters)
+        budget_score    = RecommendationEngine.calculate_budget_relevance(vendor, filters)
+        location_score  = RecommendationEngine.calculate_location_score(vendor, context)
+        rating_score    = RecommendationEngine.calculate_rating_score(vendor)
+        review_score    = RecommendationEngine.calculate_review_score(vendor)
+        verify_score    = RecommendationEngine.calculate_verification_score(vendor)
+        avail_score     = RecommendationEngine.calculate_availability_score(vendor)
 
-    # Mentor's formula:
-    # Category = 35%, Budget = 20%, Location = 15%,
-    # Rating = 15%, Reviews = 10%, Verification = 3%, Availability = 2%
+        # Pick category-specific weights, fall back to default
+        category = filters.get("category", "")
+        category_norm = RecommendationEngine.normalize_category(category)
+        w = RecommendationEngine.CATEGORY_WEIGHTS.get(
+            category_norm,
+            RecommendationEngine.CATEGORY_WEIGHTS["default"]
+        )
 
         final = (
-            (category_score  * 0.35) +
-            (budget_score    * 0.20) +
-            (location_score  * 0.15) +
-            (rating_score    * 0.15) +
-            (review_score    * 0.10) +
-            (verify_score    * 0.03) +
-            (avail_score     * 0.02)
+            (category_score * w["category"]) +
+            (budget_score   * w["budget"])   +
+            (location_score * w["location"]) +
+            (rating_score   * w["rating"])   +
+            (review_score   * w["reviews"])  +
+            (verify_score   * w["verified"]) +
+            (avail_score    * w["available"])
         )
 
         return round(final, 2)

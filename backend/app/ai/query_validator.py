@@ -18,7 +18,9 @@ class QueryValidator:
 
     VALID_CATEGORIES = {
         "catering", "photography", "decoration",
-        "venue", "music", "planner", "makeup"
+        "venue", "music", "planner", "makeup",
+        "entertainment", "transport", "invitation",
+        "cake", "security", "dj"
     }
 
     VALID_CITIES = {
@@ -67,11 +69,25 @@ class QueryValidator:
         # Catches "dragon vendors", "xyz vendors"
         # ----------------------------------
 
-        if raw_category_attempt and raw_category_attempt not in cls.VALID_CATEGORIES:
+        CATEGORY_SYNONYMS = {
+            "photo", "photos", "photographer", "photographers",
+            "videography", "cinematography",
+            "caterer", "caterers", "chef", "food",
+            "decorator", "decorators", "decor",
+            "dj", "disc jockey", "band", "singer",
+            "anchor", "entertainer", "comedian",
+            "hall", "banquet", "farmhouse", "lawn",
+        }
+
+        if (
+            raw_category_attempt
+            and raw_category_attempt not in cls.VALID_CATEGORIES
+            and raw_category_attempt not in CATEGORY_SYNONYMS
+        ):
             errors.append(
                 f"'{raw_category_attempt}' is not a recognized vendor category. "
                 f"Available: catering, photography, decoration, venue, music, planner, makeup."
-            )
+            )   
 
         # ----------------------------------
         # INVALID CITY DETECTION

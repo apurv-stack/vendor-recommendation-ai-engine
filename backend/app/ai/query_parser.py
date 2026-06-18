@@ -46,7 +46,7 @@ class QueryParser:
     CATEGORY_PATTERNS = {
 
         "catering": [
-            "catering", "caterer", "food", "buffet"
+             "catering", "caterer", "caterers", "food", "buffet", "meals", "chef", "cuisine"
         ],
 
         "photography": [
@@ -56,8 +56,8 @@ class QueryParser:
         ],
 
         "decoration": [
-            "decoration", "decor", "decorator",
-            "floral decor", "stage decor"
+            "decoration", "decor", "decorator", "decorators"
+           "floral decor", "stage decor", "styling", "flowers", "floral"
         ],
 
         "venue": [
@@ -68,7 +68,7 @@ class QueryParser:
 
         "music": [
             "music", "dj", "band",
-            "live music", "singer"
+            "live music", "singer", "musician", "orchestra", "disc jockey"
         ],
 
         "planner": [

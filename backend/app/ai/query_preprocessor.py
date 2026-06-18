@@ -17,6 +17,8 @@ class QueryPreprocessor:
         "photography": [
             "photographer",
             "photographers",
+            "photo",
+            "photos",
             "wedding shoot",
             "camera crew",
             "photo team"

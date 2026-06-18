@@ -26,9 +26,10 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
     const [sessionId, setSessionId] = useState(null);
     const [error, setError] = useState(null);
     const [suggestions, setSuggestions] = useState([
-        "Wedding in Delhi under 5L",
-        "Caterers for 200 guests",
-        "Photographers in Mumbai"
+        "Best Photographers in Delhi",
+        "Caterers for 200 guests under ₹80000",
+        "Venues in Delhi for 500 guests",
+        "Decorators in Delhi under ₹40000"
     ]);
 
     const t = useTheme();
