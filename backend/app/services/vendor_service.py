@@ -1,6 +1,10 @@
 from uuid import UUID
 
-from fastapi import HTTPException
+import io
+
+import pandas as pd
+
+from fastapi import HTTPException, UploadFile
 
 from sqlalchemy.orm import Session
 
@@ -19,14 +23,18 @@ from app.repositories.vendor_repository import (
     create_service,
     service_exists,
     get_services_by_category,
-    get_service_by_id
+    get_service_by_id,
+
+    bulk_create_vendors,
+    email_exists
 
 )
 
 from app.schemas.vendor_schema import (
 
     VendorProfileUpdateRequest,
-    CreateVendorRequest
+    CreateVendorRequest,
+    VendorImportItem
 
 )
 
@@ -1358,3 +1366,124 @@ def delete_service_service(
         "Service deleted successfully"
 
     }
+
+# =====================================================
+# IMPORT VENDORS
+# =====================================================
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+def import_vendors_service(
+    db: Session,
+    vendors_data: list[VendorImportItem]
+):
+
+    logger.info(
+        f"Vendor import started — total records: {len(vendors_data)}"
+    )
+
+    valid_vendors = []
+    errors = []
+
+    for index, item in enumerate(vendors_data):
+
+        label = f"Record {index + 1} ({item.name})"
+
+        # --- Name check ---
+        if not item.name or not item.name.strip():
+            errors.append(f"{label}: Name is required")
+            continue
+
+        # --- City check ---
+        if not item.city or not item.city.strip():
+            errors.append(f"{label}: City is required")
+            continue
+
+        # --- Category check ---
+        if not item.category or not item.category.strip():
+            errors.append(f"{label}: Category is required")
+            continue
+
+        # --- Price check ---
+        if (
+            item.price_min is not None
+            and item.price_max is not None
+            and item.price_min > item.price_max
+        ):
+            errors.append(
+                f"{label}: price_min cannot exceed price_max"
+            )
+            continue
+
+        if item.price_min is not None and item.price_min < 0:
+            errors.append(f"{label}: price_min cannot be negative")
+            continue
+
+        if item.price_max is not None and item.price_max < 0:
+            errors.append(f"{label}: price_max cannot be negative")
+            continue
+
+        # --- Duplicate email check ---
+        if email_exists(db, item.business_email):
+            errors.append(
+                f"{label}: Email '{item.business_email}' already exists"
+            )
+            continue
+
+        # --- Build vendor dict ---
+        valid_vendors.append({
+            "name":           item.name.strip(),
+            "business_email": item.business_email,
+            "contact_phone":  item.contact_phone,
+            "city":           item.city.strip() if item.city else None,
+            "address":        item.address.strip() if item.address else None,
+            "description":    item.description.strip() if item.description else None,
+            "price_min":      item.price_min,
+            "price_max":      item.price_max,
+            "is_available":   item.is_available,
+            "is_active":      True,
+            "is_verified":    item.is_verified,
+            "avg_rating":     item.avg_rating,
+            "review_count":   item.review_count,
+            "parent_vendor_id": None,
+        })
+
+    # --- Bulk insert valid records ---
+    imported = 0
+
+    if valid_vendors:
+        try:
+            bulk_create_vendors(db, valid_vendors)
+            imported = len(valid_vendors)
+            logger.info(f"Vendor import success — imported: {imported}")
+        except Exception as e:
+            logger.error(f"Vendor import failed during DB insert: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Database error during import: {str(e)}"
+            )
+
+    failed = len(errors)
+
+    if failed:
+        logger.warning(
+            f"Vendor import — {failed} record(s) skipped: {errors}"
+        )
+
+    logger.info(
+        f"Vendor import complete — "
+        f"total: {len(vendors_data)}, "
+        f"imported: {imported}, "
+        f"failed: {failed}"
+    )
+
+    return {
+        "success": True,
+        "total":    len(vendors_data),
+        "imported": imported,
+        "failed":   failed,
+        "errors":   errors
+    }
+

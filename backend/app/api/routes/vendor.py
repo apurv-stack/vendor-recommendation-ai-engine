@@ -23,7 +23,9 @@ from app.schemas.vendor_schema import (
 
     VendorProfileUpdateRequest,
     VendorDetailResponse,
-    VendorListResponse
+    VendorListResponse,
+    VendorImportRequest,
+    VendorImportResponse
 
 )
 
@@ -40,7 +42,8 @@ from app.services.vendor_service import (
     rename_vendor_service,
     get_single_service_service,
     rename_service_service,
-    delete_service_service
+    delete_service_service,
+    import_vendors_service
 
 )
 
@@ -2742,4 +2745,29 @@ def deactivate_vendor_api(
 
         vendor_id=vendor_id
 
+    )
+
+# ==========================================
+# IMPORT VENDORS
+# ==========================================
+
+@router.post(
+    "/import",
+    response_model=VendorImportResponse
+)
+def import_vendors_api(
+
+    payload: VendorImportRequest,
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        require_role(["admin"])
+    )
+
+):
+
+    return import_vendors_service(
+        db=db,
+        vendors_data=payload.vendors
     )

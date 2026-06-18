@@ -598,3 +598,92 @@ class VendorListResponse(
     vendors:list[
         VendorResponse
     ]
+
+# ==========================================
+# IMPORT — SINGLE ITEM
+# ==========================================
+
+class VendorImportItem(BaseModel):
+
+    name: str = Field(min_length=2, max_length=255)
+
+    business_email: EmailStr
+
+    contact_phone: str = Field(min_length=10, max_length=15)
+
+    city: str | None = Field(default=None, max_length=255)
+
+    address: str | None = Field(default=None, max_length=500)
+
+    description: str | None = Field(default=None, max_length=1000)
+
+    category: str | None = Field(default=None, max_length=100)
+
+    price_min: int | None = Field(default=None, ge=0)
+
+    price_max: int | None = Field(default=None, ge=0)
+
+    is_available: bool = True
+
+    is_verified: bool = False
+
+    avg_rating: float = Field(default=0.0, ge=0.0, le=5.0)
+
+    review_count: int = Field(default=0, ge=0)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value):
+        value = value.strip()
+        if not value:
+            raise ValueError("Vendor name cannot be empty")
+        return value
+
+    @field_validator("contact_phone")
+    @classmethod
+    def validate_phone(cls, value):
+        cleaned = (
+            value.replace(" ", "").replace("-", "")
+            .replace("(", "").replace(")", "").replace("+", "")
+        )
+        if not cleaned.isdigit():
+            raise ValueError("Phone number must contain only digits")
+        if len(cleaned) != 10:
+            raise ValueError("Phone number must be exactly 10 digits")
+        return cleaned
+
+    @model_validator(mode="after")
+    def validate_price_range(self):
+        if (
+            self.price_min is not None
+            and self.price_max is not None
+            and self.price_min > self.price_max
+        ):
+            raise ValueError("price_min cannot exceed price_max")
+        return self
+
+
+# ==========================================
+# IMPORT — REQUEST
+# ==========================================
+
+class VendorImportRequest(BaseModel):
+
+    vendors: list[VendorImportItem] = Field(min_length=1)
+
+
+# ==========================================
+# IMPORT — RESPONSE
+# ==========================================
+
+class VendorImportResponse(BaseModel):
+
+    success: bool
+
+    total: int
+
+    imported: int
+
+    failed: int
+
+    errors: list[str] = []

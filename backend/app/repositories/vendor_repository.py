@@ -951,3 +951,50 @@ def deactivate_vendor(
     db.commit()
 
     return vendor
+
+# =====================================
+# BULK IMPORT
+# =====================================
+
+def bulk_create_vendors(
+
+    db: Session,
+
+    vendors_data: list[dict]
+
+) -> list[Vendor]:
+
+    vendors = [
+        Vendor(**data)
+        for data in vendors_data
+    ]
+
+    try:
+        db.add_all(vendors)
+        db.commit()
+        for vendor in vendors:
+            db.refresh(vendor)
+        return vendors
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+def email_exists(
+
+    db: Session,
+
+    email: str
+
+) -> bool:
+
+    return (
+        db.query(Vendor)
+        .filter(
+            func.lower(Vendor.business_email)
+            ==
+            email.strip().lower()
+        )
+        .first()
+    ) is not None
