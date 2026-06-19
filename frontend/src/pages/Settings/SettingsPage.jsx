@@ -19,12 +19,14 @@ import {
 } from "lucide-react";
 
 import { useTheme } from "../../context/ThemeContext";
+import useAuth from "../../hooks/useAuth";
 
 const STORAGE_KEY = "vendor_settings";
-
 const SettingsPage = () => {
 
     const theme = useTheme();
+    const { user } = useAuth();
+    const isAdmin = user?.role === "admin";
 
     const [
         loading,
@@ -58,8 +60,12 @@ const SettingsPage = () => {
     });
 
     useEffect(() => {
+        if (isAdmin) {
+            setLoading(false);
+            return;
+        }
         fetchSettings();
-    }, []);
+    }, [isAdmin]);
 
     const fetchSettings = async () => {
 
@@ -220,7 +226,7 @@ const SettingsPage = () => {
 
                 <PageHeader
                     title="Settings"
-                    subtitle="Manage vendor preferences and platform controls"
+                    subtitle={isAdmin ? "Manage platform controls and preferences" : "Manage vendor preferences and platform controls"}
                 />
 
                 {apiError && (
@@ -255,8 +261,9 @@ const SettingsPage = () => {
                     </div>
                 )}
 
-                {/* Profile Settings */}
+                {/* Profile Settings — hidden for admin */}
 
+                {!isAdmin && (
                 <Card>
 
                     <div
@@ -340,6 +347,7 @@ const SettingsPage = () => {
                     </div>
 
                 </Card>
+                )}
 
                 {/* Platform Controls */}
 

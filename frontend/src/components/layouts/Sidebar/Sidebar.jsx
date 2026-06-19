@@ -21,13 +21,24 @@ import { useTheme } from "../../../context/ThemeContext";
 const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const theme = useTheme();
 
     const iconSize = collapsed ? 20 : 15;
     const [hoveredItem, setHoveredItem] = useState(null);
     const [tooltipY, setTooltipY] = useState(0);
-    const menuItems = [
+
+    const isAdmin = user?.role === "admin" || location.pathname.startsWith("/admin");
+
+    const adminMenuItems = [
+        { label: "Dashboard",          icon: <LayoutDashboard size={iconSize} />, path: "/admin" },
+        { label: "Vendor Management",  icon: <Building2 size={iconSize} />,       path: "/admin/vendors" },
+        { label: "Verification Queue", icon: <BrainCircuit size={iconSize} />,    path: "/admin/verification" },
+        { label: "Import & Export",    icon: <Bookmark size={iconSize} />,        path: "/admin/import" },
+        { label: "Settings",           icon: <Settings size={iconSize} />,        path: "/settings" },
+    ];
+
+    const vendorMenuItems = [
         { label: "Dashboard",          icon: <LayoutDashboard size={iconSize} />, path: "/dashboard" },
         { label: "Vendor Marketplace", icon: <Building2 size={iconSize} />,       path: "/vendors" },
         { label: "Profile",            icon: <User size={iconSize} />,            path: "/profile" },
@@ -36,6 +47,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
         { label: "Settings",           icon: <Settings size={iconSize} />,        path: "/settings" },
         { label: "Chat",               icon: <MessageSquare size={iconSize} />,   path: "/chat" },
     ];
+
+    const menuItems = isAdmin ? adminMenuItems : vendorMenuItems;
 
     const handleNavigate = (path) => {
         navigate(path);

@@ -549,6 +549,8 @@ class VendorResponse(
 
     is_active:bool
 
+    is_rejected:bool=False
+
     managed_teams:list[
         ManagedTeamResponse
     ]=[]

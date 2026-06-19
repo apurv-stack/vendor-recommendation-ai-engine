@@ -5,6 +5,7 @@ import { sendMessage } from "../../api/chatApi";
 import { getSessionHistory } from "../../api/sessionApi";
 import RecommendationCard from "./RecommendationCard";
 import { useTheme } from "../../context/ThemeContext";
+import useAuth from "../../hooks/useAuth";
 import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
 
@@ -17,8 +18,9 @@ const WELCOME_MESSAGE = {
     recommendations: [],
     timestamp: new Date().toISOString()
 };
-
 const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hideHero = false, onToggleSidebar }) => {
+    const { user } = useAuth();
+    const isAdmin = user?.role === "admin";
     const [messages, setMessages] = useState([WELCOME_MESSAGE]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -77,6 +79,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
     }, [selectedSessionId]);
 
     useEffect(() => {
+        if (isAdmin) return;
         axiosInstance.get("/vendors/suggestions")
             .then(res => {
                 if (res.data?.suggestions?.length) {
@@ -84,7 +87,7 @@ const ChatWindow = ({ selectedSessionId, onSessionCreated, isDrawer = false, hid
                 }
             })
             .catch(() => {}); // silently keep defaults on error
-    }, []);
+    }, [isAdmin]);
 
     const appendMessage = useCallback((msg) => setMessages(prev => [...prev, msg]), []);
 

@@ -64,7 +64,7 @@ export default function VendorImportUpload() {
   };
 
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="space-y-6 w-full">
 
       {/* DROP ZONE */}
       <div
@@ -73,7 +73,7 @@ export default function VendorImportUpload() {
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
         className={`
-          relative cursor-pointer rounded-2xl border-2 border-dashed p-8
+          relative cursor-pointer rounded-2xl border-2 border-dashed p-12 min-h-[280px]
           flex flex-col items-center justify-center gap-3 transition-all
           ${dragOver
             ? "border-indigo-400 bg-indigo-50"

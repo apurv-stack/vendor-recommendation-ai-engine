@@ -50,6 +50,10 @@ from "../components/auth/ProtectedRoute/ProtectedRoute";
 import useAuth
 from "../hooks/useAuth";
 
+import VendorManagementPage from "../pages/Admin/VendorManagementPage";
+import VerificationQueuePage from "../pages/Admin/VerificationQueuePage";
+import ImportExportPage from "../pages/Admin/ImportExportPage";
+
 
 const UnauthorizedPage=()=>{
 
@@ -344,6 +348,32 @@ allowedRoles={[
 
 />
 
+<Route
+  path="/admin/vendors"
+  element={
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <VendorManagementPage/>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin/verification"
+  element={
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <VerificationQueuePage/>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin/import"
+  element={
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <ImportExportPage/>
+    </ProtectedRoute>
+  }
+/>
 
 <Route
 

@@ -2840,3 +2840,111 @@ def toggle_verify_vendor_api(
         "success": True,
         "is_verified": vendor.is_verified
     }
+
+# ==========================================
+# REJECT VENDOR
+# ==========================================
+
+@router.patch(
+    "/{vendor_id}/reject"
+)
+def reject_vendor_api(
+
+    vendor_id: UUID,
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        require_role(["admin"])
+    )
+
+):
+
+    from app.repositories.vendor_repository import get_vendor_by_id
+
+    vendor = get_vendor_by_id(db, vendor_id)
+
+    if not vendor:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    vendor.is_rejected = True
+    vendor.is_verified = False
+
+    db.commit()
+
+    db.refresh(vendor)
+
+    return {
+        "success": True,
+        "is_rejected": vendor.is_rejected,
+        "message": "Vendor rejected"
+    }
+
+# ==========================================
+# RESTORE REJECTED VENDOR
+# ==========================================
+
+@router.patch(
+    "/{vendor_id}/restore"
+)
+def restore_vendor_api(
+
+    vendor_id: UUID,
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        require_role(["admin"])
+    )
+
+):
+
+    from app.repositories.vendor_repository import get_vendor_by_id
+
+    vendor = get_vendor_by_id(db, vendor_id)
+
+    if not vendor:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    vendor.is_rejected = False
+
+    db.commit()
+
+    db.refresh(vendor)
+
+    return {
+        "success": True,
+        "is_rejected": vendor.is_rejected,
+        "message": "Vendor restored to pending review"
+    }
+
+@router.get("/admin/stats")
+def get_admin_stats_api(
+
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(
+        require_role(["admin"])
+    )
+
+):
+
+    total_users = db.query(User).count()
+
+    active_users = (
+        db.query(User)
+        .filter(User.is_active == True)
+        .count()
+    )
+
+    return {
+        "success": True,
+        "total_users": total_users,
+        "active_users": active_users
+    }

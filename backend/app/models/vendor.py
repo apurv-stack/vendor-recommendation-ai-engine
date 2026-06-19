@@ -272,6 +272,16 @@ class Vendor(Base):
 
     )
 
+    is_rejected: Mapped[
+        bool
+    ] = mapped_column(
+
+        Boolean,
+
+        default=False
+
+    )
+
     # ==========================
     # ANALYTICS
     # ==========================

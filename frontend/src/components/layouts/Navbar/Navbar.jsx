@@ -20,10 +20,13 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
 
+  const isAdmin = user?.role === "admin" || window.location.pathname.startsWith("/admin");
+
   useEffect(() => {
+    if (isAdmin) return;
     fetchNavbarData();
     fetchNotifications();
-  }, []);
+  }, [isAdmin]);
 
   const fetchNavbarData = async () => {
     try {
@@ -125,22 +128,25 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
               color: "#7C5AF6"
             }}
           >
-            Enterprise Suite
+            {isAdmin ? "ADMIN PANEL" : "ENTERPRISE SUITE"}
           </p>
+
           <h1
             style={{
-              fontSize: "13px",
+              fontSize: "18px",
               fontWeight: 700,
-              lineHeight: 1.2,
               color: theme.textPrimary
             }}
           >
-            AI Vendor<br />Discovery
+            {isAdmin
+              ? "Vendor Management System"
+              : "Vendor Discovery Platform"}
           </h1>
         </div>
       </div>
 
       {/* Center — Search */}
+      {!isAdmin && (
       <div className="hidden lg:flex flex-1 justify-center px-10">
         <div style={{ position: "relative", width: "100%", maxWidth: "520px" }}>
           <Search
@@ -168,138 +174,144 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
           />
         </div>
       </div>
+      )}
+      
+      {/* Right Section */}
+    <div className="flex items-center gap-4">
 
-      {/* Right — Stats + Notifications + Profile */}
-      <div className="flex items-center gap-4">
+      {!isAdmin && (
+        <>
 
-        {/* Followers */}
-        <div
-          className="hidden xl:flex items-center gap-2 px-3 py-2 rounded-xl"
-          style={{ background: "rgba(124,90,246,0.12)" }}
-        >
-          <Users size={14} color={theme.textPrimary} />
-          <div>
-            <p style={{ fontWeight: 700, color: theme.textPrimary }}>{followers}</p>
-            <p style={{ fontSize: "10px", color: theme.textMuted }}>Followers</p>
+          {/* Followers */}
+          <div
+            className="hidden xl:flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: "rgba(124,90,246,0.12)" }}
+          >
+            <Users size={14} color={theme.textPrimary} />
+            <div>
+              <p style={{ fontWeight: 700, color: theme.textPrimary }}>{followers}</p>
+              <p style={{ fontSize: "10px", color: theme.textMuted }}>Followers</p>
+            </div>
           </div>
-        </div>
 
-        {/* Views */}
-        <div
-          className="hidden xl:flex items-center gap-2 px-3 py-2 rounded-xl"
-          style={{ background: "rgba(34,197,94,0.12)" }}
-        >
-          <Eye size={14} color={theme.textPrimary} />
-          <div>
-            <p style={{ fontWeight: 700, color: theme.textPrimary }}>{views}</p>
-            <p style={{ fontSize: "10px", color: theme.textMuted }}>Views</p>
+          {/* Views */}
+          <div
+            className="hidden xl:flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: "rgba(34,197,94,0.12)" }}
+          >
+            <Eye size={14} color={theme.textPrimary} />
+            <div>
+              <p style={{ fontWeight: 700, color: theme.textPrimary }}>{views}</p>
+              <p style={{ fontSize: "10px", color: theme.textMuted }}>Views</p>
+            </div>
           </div>
-        </div>
 
-        {/* Chat */}
-        <button
-            onClick={() => onChatOpen?.()}
-            className="hidden sm:flex"
-            style={{
+          {/* Chat */}
+          <button
+              onClick={() => onChatOpen?.()}
+              className="hidden sm:flex"
+              style={{
+                  height: "42px",
+                  width: "42px",
+                  borderRadius: "12px",
+                  background: "rgba(124,90,246,0.12)",
+                  border: "1px solid rgba(124,90,246,0.3)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "#7C5AF6"
+              }}
+              title="Open AI Chat"
+          >
+            <MessageSquare size={16} color="#7C5AF6" />
+          </button>
+
+          {/* Notifications */}
+          <div ref={notificationRef} className="relative hidden sm:block">
+            <button
+              onClick={() => {
+                setNotificationOpen(previous => !previous);
+                setProfileOpen(false);
+              }}
+              style={{
+                position: "relative",
                 height: "42px",
                 width: "42px",
                 borderRadius: "12px",
-                background: "rgba(124,90,246,0.12)",
-                border: "1px solid rgba(124,90,246,0.3)",
+                background: theme.panelBg,
+                border: `1px solid ${theme.cardBorder}`,
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                cursor: "pointer",
-                color: "#7C5AF6"
-            }}
-            title="Open AI Chat"
-        >
-            <MessageSquare size={16} color="#7C5AF6" />
-        </button>
-
-        {/* Notifications */}
-        <div ref={notificationRef} className="relative hidden sm:block">
-          <button
-            onClick={() => {
-              setNotificationOpen(previous => !previous);
-              setProfileOpen(false);
-            }}
-            style={{
-              position: "relative",
-              height: "42px",
-              width: "42px",
-              borderRadius: "12px",
-              background: theme.panelBg,
-              border: `1px solid ${theme.cardBorder}`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer"
-            }}
-          >
-            <Bell size={14} color={theme.textPrimary} />
-            {unreadCount > 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "8px",
-                  right: "8px",
-                  height: "16px",
-                  width: "16px",
-                  borderRadius: "50%",
-                  background: "#EF4444",
-                  color: "#fff",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                {unreadCount}
-              </div>
-            )}
-          </button>
-
-          {notificationOpen && (
-            <div
-              className="absolute right-0 top-16 rounded-3xl shadow-xl p-5 z-50"
-              style={{
-                background: theme.cardBg,
-                border: `1px solid ${theme.cardBorder}`,
-                width: "min(320px, 90vw)"
+                cursor: "pointer"
               }}
             >
-              <h3
-                style={{ fontWeight: 700, fontSize: "14px", marginBottom: "12px", color: theme.textPrimary }}
-              >
-                Notifications
-              </h3>
-              {loadingNotifications ? (
-                <p style={{ color: theme.textMuted }}>Loading...</p>
-              ) : notifications.length ? (
-                notifications.map(item => (
-                  <div
-                    key={item.notification_id}
-                    onClick={() => markRead(item.notification_id)}
-                    style={{
-                      padding: "12px",
-                      borderBottom: `1px solid ${theme.cardBorder}`,
-                      cursor: "pointer",
-                      borderRadius: "8px"
-                    }}
-                  >
-                    <p style={{ color: theme.textPrimary }}>{item.title}</p>
-                    <p style={{ fontSize: "12px", color: theme.textMuted }}>{item.message}</p>
-                  </div>
-                ))
-              ) : (
-                <p style={{ color: theme.textMuted }}>No notifications</p>
+              <Bell size={14} color={theme.textPrimary} />
+              {unreadCount > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "8px",
+                    right: "8px",
+                    height: "16px",
+                    width: "16px",
+                    borderRadius: "50%",
+                    background: "#EF4444",
+                    color: "#fff",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  {unreadCount}
+                </div>
               )}
-            </div>
-          )}
-        </div>
+            </button>
 
-        {/* Profile */}
+            {notificationOpen && (
+              <div
+                className="absolute right-0 top-16 rounded-3xl shadow-xl p-5 z-50"
+                style={{
+                  background: theme.cardBg,
+                  border: `1px solid ${theme.cardBorder}`,
+                  width: "min(320px, 90vw)"
+                }}
+              >
+                <h3
+                  style={{ fontWeight: 700, fontSize: "14px", marginBottom: "12px", color: theme.textPrimary }}
+                >
+                  Notifications
+                </h3>
+                {loadingNotifications ? (
+                  <p style={{ color: theme.textMuted }}>Loading...</p>
+                ) : notifications.length ? (
+                  notifications.map(item => (
+                    <div
+                      key={item.notification_id}
+                      onClick={() => markRead(item.notification_id)}
+                      style={{
+                        padding: "12px",
+                        borderBottom: `1px solid ${theme.cardBorder}`,
+                        cursor: "pointer",
+                        borderRadius: "8px"
+                      }}
+                    >
+                      <p style={{ color: theme.textPrimary }}>{item.title}</p>
+                      <p style={{ fontSize: "12px", color: theme.textMuted }}>{item.message}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ color: theme.textMuted }}>No notifications</p>
+                )}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Profile */}
         <div ref={profileRef} className="relative">
           <button
             onClick={() => {
