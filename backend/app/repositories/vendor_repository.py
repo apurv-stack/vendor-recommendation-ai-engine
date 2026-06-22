@@ -523,7 +523,7 @@ def search_vendors(
 
         category_terms = CATEGORY_SEARCH_TERMS.get(
             category.lower(),
-            [category]  # fallback: use as-is if not in map
+            [category]
         )
 
         search = search.filter(
@@ -531,16 +531,22 @@ def search_vendors(
             or_(
 
                 *[
-                    CategoryVendor.name.ilike(
-                        f"%{term}%"
-                    )
+                    CategoryVendor.name.ilike(f"%{term}%")
                     for term in category_terms
                 ],
 
                 *[
-                    ServiceAlias.service_name.ilike(
-                        f"%{term}%"
-                    )
+                    ServiceAlias.service_name.ilike(f"%{term}%")
+                    for term in category_terms
+                ],
+
+                *[
+                    Vendor.name.ilike(f"%{term}%")
+                    for term in category_terms
+                ],
+
+                *[
+                    Vendor.description.ilike(f"%{term}%")
                     for term in category_terms
                 ]
 
@@ -679,7 +685,7 @@ def search_vendors_ai(
 
             page=1,
 
-            limit=10
+            limit=50
 
         )
 

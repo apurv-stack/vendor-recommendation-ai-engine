@@ -144,6 +144,28 @@ Base.metadata.create_all(
 
 )
 
+# =====================================
+# STARTUP — OLLAMA WARMUP
+# =====================================
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # STARTUP
+    try:
+        import asyncio
+        from app.ai.ai_service import AIService
+        ai = AIService()
+        if ai.provider == "ollama":
+            await asyncio.to_thread(ai._generate, "hi")
+            print("✅ Ollama warmed up successfully")
+    except Exception as e:
+        print(f"⚠️ Ollama warmup failed (non-fatal): {e}")
+    yield
+    # SHUTDOWN (nothing needed)
+
+
 
 # =====================================
 # APP
@@ -153,7 +175,9 @@ app = FastAPI(
 
     title="AI Vendor Discovery Agent API",
 
-    version="1.0.0"
+    version="1.0.0",
+
+    lifespan=lifespan
 
 )
 
@@ -247,8 +271,6 @@ app.exception_handler(
     internal_exception_handler
 
 )
-
-
 # =====================================
 # ROOT
 # =====================================

@@ -47,7 +47,7 @@ class ChatService:
         "affordable"
     }
 
-    MAX_VENDOR_CARDS = 3
+    MAX_VENDOR_CARDS = 5
 
     def __init__(self, db: Session):
         self.db = db

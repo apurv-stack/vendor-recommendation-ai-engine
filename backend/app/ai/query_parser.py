@@ -56,7 +56,7 @@ class QueryParser:
         ],
 
         "decoration": [
-            "decoration", "decor", "decorator", "decorators"
+            "decoration", "decor", "decorator", "decorators",
            "floral decor", "stage decor", "styling", "flowers", "floral"
         ],
 

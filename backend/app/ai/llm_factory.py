@@ -89,6 +89,28 @@ class LLMFactory:
             f"Unsupported provider: {provider}"
 
         )
+    
+    @staticmethod
+    def get_response_client():
+        """Fast Groq client specifically for human-toned response generation."""
+        provider = settings.RESPONSE_AI_PROVIDER.lower()
+
+        if provider == "groq":
+            return Groq(api_key=settings.GROQ_API_KEY)
+
+        if provider == "ollama":
+            return OpenAI(
+                base_url=settings.OLLAMA_BASE_URL,
+                api_key="ollama"
+            )
+
+        # fallback to main client
+        return LLMFactory.get_client()
+
+    @staticmethod
+    def get_response_model():
+        """Model for human-toned response generation."""
+        return settings.RESPONSE_AI_MODEL
 
     @staticmethod
     def get_model():

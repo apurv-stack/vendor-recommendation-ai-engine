@@ -72,6 +72,14 @@ class Settings(
     AI_TIMEOUT: int = 45
 
     # -----------------------------
+    # RESPONSE LLM (Groq for fast human-toned responses)
+    # -----------------------------
+
+    RESPONSE_AI_PROVIDER: str = "groq"
+
+    RESPONSE_AI_MODEL: str = "llama3-8b-8192"
+
+    # -----------------------------
     # INTERNAL API
     # -----------------------------
 

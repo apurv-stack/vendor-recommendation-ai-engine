@@ -5,7 +5,7 @@ from sqlalchemy.orm import (
 
 class RecommendationEngine:
 
-    MAX_RESULTS = 5
+    MAX_RESULTS = 10
 
     @staticmethod
     def calculate_budget_fit_score(
@@ -612,6 +612,14 @@ class RecommendationEngine:
             if team_norm in query_norm or query_norm in team_norm:
                 return 75
 
+        # Fallback: check vendor name for category terms
+        vendor_name = getattr(vendor, "name", "") or ""
+        vendor_desc = getattr(vendor, "description", "") or ""
+        synonyms = RecommendationEngine.CATEGORY_SYNONYMS.get(query_norm, [query_norm])
+        combined = (vendor_name + " " + vendor_desc).lower()
+        for syn in synonyms:
+            if syn in combined:
+                return 60
         return 0
 
     @staticmethod

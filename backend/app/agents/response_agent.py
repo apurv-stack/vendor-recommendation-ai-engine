@@ -1,6 +1,8 @@
+import asyncio
 import logging
 from app.graphs.graph_state import AgentState
 from app.ai.ai_service import AIService
+from app.ai.llm_factory import LLMFactory
 
 logger = logging.getLogger(__name__)
 
@@ -143,12 +145,15 @@ class ResponseAgent:
                     reviews = getattr(v, "review_count", None) or 0
                     return f"⭐ {rating} ({reviews} reviews)"
 
-                def fmt_score(v):
-                    score = getattr(v, "match_score", None)
-                    return f"{score}%" if score else "N/A"
-
                 def fmt_verified(v):
                     return "✅ Verified" if getattr(v, "is_verified", False) else "Not verified"
+
+                def comparison_score(v):
+                    rating = getattr(v, "avg_rating", 0) or 0
+                    reviews = getattr(v, "review_count", 0) or 0
+                    verified_bonus = 10 if getattr(v, "is_verified", False) else 0
+
+                    return (rating * 10) + min(reviews, 500) / 10 + verified_bonus
 
                 table = (
                     f"Here's a comparison of both vendors:\n\n"
@@ -157,37 +162,35 @@ class ResponseAgent:
                     f"{'Price':<20} {fmt_price(getattr(v1, 'price_min', None), getattr(v1, 'price_max', None)):<25} "
                     f"{fmt_price(getattr(v2, 'price_min', None), getattr(v2, 'price_max', None)):<25}\n"
                     f"{'Rating':<20} {fmt_rating(v1):<25} {fmt_rating(v2):<25}\n"
-                    f"{'Match Score':<20} {fmt_score(v1):<25} {fmt_score(v2):<25}\n"
                     f"{'Trust':<20} {fmt_verified(v1):<25} {fmt_verified(v2):<25}\n"
                     f"{'City':<20} {getattr(v1, 'city', 'N/A') or 'N/A':<25} {getattr(v2, 'city', 'N/A') or 'N/A':<25}\n"
                 )
 
-                score1 = getattr(v1, "match_score", 0) or 0
-                score2 = getattr(v2, "match_score", 0) or 0
+                score1 = comparison_score(v1)
+                score2 = comparison_score(v2)
+
                 winner = v1 if score1 >= score2 else v2
                 loser = v2 if score1 >= score2 else v1
 
                 verdict = (
                     f"\n🏆 {getattr(winner, 'name', 'Vendor')} is the "
-                    f"better match based on your requirements.\n"
+                    f"better overall choice based on ratings, reviews, and trust.\n"
                 )
 
-                # OPTIMIZATION: Trimmed prompt — same output, fewer tokens
                 explanation_prompt = (
                     f"Compare these two vendors for a user query: {user_message}\n\n"
                     f"{getattr(v1, 'name', 'Vendor 1')}: "
                     f"Price={fmt_price(getattr(v1, 'price_min', None), getattr(v1, 'price_max', None))}, "
                     f"Rating={getattr(v1, 'avg_rating', 0)} ({getattr(v1, 'review_count', 0)} reviews), "
-                    f"Score={fmt_score(v1)}, Verified={getattr(v1, 'is_verified', False)}\n"
+                    f"Verified={getattr(v1, 'is_verified', False)}\n"
                     f"{getattr(v2, 'name', 'Vendor 2')}: "
                     f"Price={fmt_price(getattr(v2, 'price_min', None), getattr(v2, 'price_max', None))}, "
                     f"Rating={getattr(v2, 'avg_rating', 0)} ({getattr(v2, 'review_count', 0)} reviews), "
-                    f"Score={fmt_score(v2)}, Verified={getattr(v2, 'is_verified', False)}\n\n"
+                    f"Verified={getattr(v2, 'is_verified', False)}\n\n"
                     f"Winner: {getattr(winner, 'name', 'Vendor')}\n\n"
-                    f"Explain why {getattr(winner, 'name', 'Vendor')} wins in 2-3 sentences. "
-                    f"When to prefer {getattr(loser, 'name', 'Vendor')} in 1-2 sentences. "
-                    f"End with two bullet Recommendations. "
-                    f"Plain text only, no markdown headers."
+                    f"Explain why the winner is stronger in 2-3 sentences. "
+                    f"Mention when the other vendor may still be a better choice. "
+                    f"End with two recommendation bullet points."
                 )
 
                 ai_result = await ai_service.execute_prompt(explanation_prompt)
@@ -197,12 +200,13 @@ class ResponseAgent:
                 else:
                     ai_explanation = (
                         f"\nWhy?\n\n"
-                        f"{getattr(winner, 'name', 'Vendor')} stands out with a higher match score, "
-                        f"better ratings, and more reviews.\n\n"
-                        f"{getattr(loser, 'name', 'Vendor')} remains a solid choice if budget is your top priority.\n\n"
+                        f"{getattr(winner, 'name', 'Vendor')} has stronger ratings, review history, "
+                        f"and overall marketplace credibility.\n\n"
+                        f"{getattr(loser, 'name', 'Vendor')} may still be a good choice depending on "
+                        f"budget and personal preference.\n\n"
                         f"Recommendation:\n"
-                        f"• Choose {getattr(winner, 'name', 'Vendor')} for quality and reliability.\n"
-                        f"• Choose {getattr(loser, 'name', 'Vendor')} for cost optimization."
+                        f"• Choose {getattr(winner, 'name', 'Vendor')} for overall reliability.\n"
+                        f"• Consider {getattr(loser, 'name', 'Vendor')} if its pricing or style suits you better."
                     )
 
                 response = table + verdict + ai_explanation
@@ -236,30 +240,60 @@ class ResponseAgent:
 
             else:
 
-                # OPTIMIZATION: trimmed prompt — fewer tokens, same quality
                 vendor_names = ", ".join(
                     getattr(v, "name", "Unknown")
                     for v in vendors[:3]
                 )
 
+                category = filters.get("category", "vendors")
+                city = filters.get("city", "")
+                city_part = f" in {city}" if city else ""
+
                 rec_prompt = (
                     f"A user asked: {user_message}\n"
-                    f"Filters: {filters}\n"
+                    f"Category: {category}, City: {city}\n"
                     f"Top vendors found: {vendor_names}\n\n"
-                    f"Write a short, friendly 2-3 sentence response "
+                    f"Write a short, warm, friendly 2-3 sentence response "
                     f"confirming you found matching vendors. "
-                    f"Do not list vendors. Plain text only."
+                    f"Sound like a helpful human assistant. "
+                    f"Do not list vendors. Plain text only. No markdown."
                 )
 
-                ai_result = await ai_service.execute_prompt(rec_prompt)
+                try:
+                    response_client = LLMFactory.get_response_client()
+                    response_model = LLMFactory.get_response_model()
 
-                if ai_result.get("success"):
-                    response = ai_result.get("response", "").strip()
-                else:
+                    completion = await asyncio.to_thread(
+                        response_client.chat.completions.create,
+                        model=response_model,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You are an enthusiastic event planning assistant. "
+                                    "Be warm, friendly and conversational. "
+                                    "Show excitement when strong vendor matches are found. "
+                                    "Use relevant emojis naturally (📸 🍽️ 🎉 💍 🎶 🌸). "
+                                    "Keep responses concise but engaging. "
+                                    "Make users feel excited about planning their event. "
+                                    "Avoid sounding robotic or generic."
+                                )
+                            },
+                            {
+                                "role": "user",
+                                "content": rec_prompt
+                            }
+                        ],
+                        temperature=0.7,
+                        max_tokens=120
+                    )
+                    response = (completion.choices[0].message.content or "").strip()
+
+                except Exception as e:
+                    logger.warning(f"[ResponseAgent] Groq response failed, using fallback: {e}")
                     response = (
-                        f"Great news! I found {len(vendors)} vendor(s) "
-                        f"matching your requirements. "
-                        f"Check the recommendations below."
+                        f"Great news! I found {len(vendors)} {category} vendor(s){city_part} "
+                        f"matching your requirements. Check the recommendations below. 🎉"
                     )
 
             state["ai_response"] = response

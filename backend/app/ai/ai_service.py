@@ -443,7 +443,16 @@ class AIService:
 
         llm_filters = {}
 
-        if not (has_category and has_city) and intent != "comparison_query":
+        needs_llm_extraction = (
+            intent != "comparison_query"
+            and not (
+                has_category
+                or parser_filters.get("vendor_names")
+                or parser_filters.get("comparison_request")
+            )
+        )
+
+        if needs_llm_extraction:
             for step in chain:
                 if step["stage"] == "filter_extraction":
                     llm_filters = await (

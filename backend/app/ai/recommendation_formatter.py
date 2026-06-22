@@ -10,9 +10,11 @@ class RecommendationFormatter:
 
     # Get category from vendor's teams
         teams = getattr(vendor, "managed_teams", []) or []
-        team = teams[0]
-        category = team["name"] if isinstance(team, dict) else team.name
-        category = category if category else "Vendor"
+        team = teams[0] if teams else None
+        if team:
+            category = team["name"] if isinstance(team, dict) else getattr(team, "name", "Vendor")
+        else:
+            category = filters.get("category", "Vendor").title() if filters.get("category") else "Vendor"
 
         if pricing == "premium":
             return "Premium vendor matching your requirements"

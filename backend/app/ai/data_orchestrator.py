@@ -19,7 +19,7 @@ from app.ai.recommendation_engine import (
 
 class DataOrchestrator:
 
-    MAX_VENDORS = 5
+    MAX_VENDORS = 20
 
     MAX_CATEGORIES = 10
 
