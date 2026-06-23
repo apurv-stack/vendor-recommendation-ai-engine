@@ -750,6 +750,22 @@ class RecommendationEngine:
             RecommendationEngine.CATEGORY_WEIGHTS["default"]
         )
 
+        # Admin config override — if ranking_config present in context, apply it
+        ranking_config = context.get("ranking_config", {}) if context else {}
+        if ranking_config:
+            w = dict(w)  # copy so we don't mutate the class-level dict
+            if "rating_weight" in ranking_config:
+                w["rating"] = ranking_config["rating_weight"] / 100
+            if "review_weight" in ranking_config:
+                w["reviews"] = ranking_config["review_weight"] / 100
+            if "budget_weight" in ranking_config:
+                w["budget"] = ranking_config["budget_weight"] / 100
+            if "availability_weight" in ranking_config:
+                w["available"] = ranking_config["availability_weight"] / 100
+            if ranking_config.get("availability_priority"):
+                w["available"] = 0.40
+                w["rating"] = max(w.get("rating", 0.15) - 0.20, 0.05)
+
         final = (
             (category_score * w["category"]) +
             (budget_score   * w["budget"])   +
@@ -856,19 +872,21 @@ class RecommendationEngine:
         }
 
     @staticmethod
-    def rank_vendors(vendors, filters, context):
-        rankable = vendors 
+    def rank_vendors(vendors, filters, context, max_results=None):
+        rankable = vendors
 
         def safe_score(vendor):
             try:
                 final = RecommendationEngine.calculate_final_score(vendor, filters, context)
-                vendor.match_score = round(final)
+                vendor.match_score = min(100, round(final))
                 return final
             except Exception as e:
                 print(f"SCORING ERROR for vendor '{getattr(vendor, 'name', '?')}': {e}")
                 return 0
+
         ranked = sorted(rankable, key=safe_score, reverse=True)
 
         print("RANKED VENDORS:", [v.name for v in ranked])
 
-        return ranked[:RecommendationEngine.MAX_RESULTS]
+        limit = max_results if max_results is not None else RecommendationEngine.MAX_RESULTS
+        return ranked[:limit]

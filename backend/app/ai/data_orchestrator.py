@@ -277,43 +277,34 @@ class DataOrchestrator:
 
     @staticmethod
     def vendor_context(
-
         db,
-
         filters
-
     ):
+        from app.services.agent_configuration_service import AgentConfigurationService
+        try:
+            cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "discovery_agent"
+            )
+            max_vendors = cfg.configuration.get("max_results", DataOrchestrator.MAX_VENDORS) if cfg else DataOrchestrator.MAX_VENDORS
+        except Exception:
+            max_vendors = DataOrchestrator.MAX_VENDORS
 
         result=(
-
             vendor_repository
-
             .search_vendors_ai(
-
                 db,
-
                 filters
-
             )
-
         )
 
         return {
-
             "vendors":
-
             result.get(
-
                 "vendors",
-
                 []
-
             )[
-
-                :DataOrchestrator.MAX_VENDORS
-
+                :max_vendors
             ]
-
         }
 
     @staticmethod
@@ -324,6 +315,14 @@ class DataOrchestrator:
         filters
 
     ):
+        from app.services.agent_configuration_service import AgentConfigurationService
+        try:
+            cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "discovery_agent"
+            )
+            max_vendors = cfg.configuration.get("max_results", DataOrchestrator.MAX_VENDORS) if cfg else DataOrchestrator.MAX_VENDORS
+        except Exception:
+            max_vendors = DataOrchestrator.MAX_VENDORS
 
         result=(
 
@@ -351,12 +350,12 @@ class DataOrchestrator:
 
             )[
 
-                :DataOrchestrator.MAX_VENDORS
+                :max_vendors
 
             ]
 
         }
-
+    
     @staticmethod
     def pricing_context(
 
@@ -365,6 +364,14 @@ class DataOrchestrator:
         filters
 
     ):
+        from app.services.agent_configuration_service import AgentConfigurationService
+        try:
+            cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "discovery_agent"
+            )
+            max_vendors = cfg.configuration.get("max_results", DataOrchestrator.MAX_VENDORS) if cfg else DataOrchestrator.MAX_VENDORS
+        except Exception:
+            max_vendors = DataOrchestrator.MAX_VENDORS
 
         budget=(
 
@@ -400,7 +407,7 @@ class DataOrchestrator:
 
             vendors[
 
-                :DataOrchestrator.MAX_VENDORS
+                :max_vendors
 
             ]
 
@@ -455,6 +462,14 @@ class DataOrchestrator:
         filters
 
     ):
+        from app.services.agent_configuration_service import AgentConfigurationService
+        try:
+            cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "discovery_agent"
+            )
+            max_vendors = cfg.configuration.get("max_results", DataOrchestrator.MAX_VENDORS) if cfg else DataOrchestrator.MAX_VENDORS
+        except Exception:
+            max_vendors = DataOrchestrator.MAX_VENDORS
 
         vendors=(
 
@@ -474,7 +489,7 @@ class DataOrchestrator:
 
             vendors[
 
-                :DataOrchestrator.MAX_VENDORS
+                :max_vendors
 
             ]
 

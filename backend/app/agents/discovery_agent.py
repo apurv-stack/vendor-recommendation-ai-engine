@@ -42,13 +42,24 @@ class DiscoveryAgent:
             )
             
 
+            from app.services.agent_configuration_service import AgentConfigurationService
+
+            discovery_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "discovery_agent"
+            )
+            discovery_config = discovery_cfg.configuration if discovery_cfg else {}
+            max_results = discovery_config.get("max_results", 20)
+            allow_out_of_budget = discovery_config.get("allow_out_of_budget", True)
+
+            if allow_out_of_budget:
+                filters = {**filters, "strict_budget": False}
+
             result = (
                 DataOrchestrator.fetch_context(
                     db=db,
                     intent=intent,
                     filters=filters,
-                    user_preferences=
-                    user_preferences
+                    user_preferences=user_preferences
                 )
             )
 
@@ -57,6 +68,9 @@ class DiscoveryAgent:
                 or
                 result.get("context", {}).get("vendors", [])
             )
+
+            vendors = vendors[:max_results]
+            
 
             print(
                 "DISCOVERY AGENT VENDORS:",

@@ -55,6 +55,8 @@ from app.api.routes.reasoning_test import (
     router as reasoning_router
 )
 
+from app.api.routes.admin_agent_routes import router as admin_agent_router
+
 # =====================================
 # EXCEPTION HANDLERS
 # =====================================
@@ -377,4 +379,8 @@ app.include_router(
 
 app.include_router(
     reasoning_router
+)
+
+app.include_router(
+    admin_agent_router
 )

@@ -53,7 +53,22 @@ class SupervisorAgent:
 
             result = IntentExtractor.extract(query)
 
-            intent = result.get("intent", "generic_platform_query")
+            db = state.get("db")
+            default_intent = "generic_platform_query"
+            if db:
+                try:
+                    from app.services.agent_configuration_service import AgentConfigurationService
+                    sup_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                        db, "supervisor_agent"
+                    )
+                    if sup_cfg and sup_cfg.configuration:
+                        default_intent = sup_cfg.configuration.get(
+                            "default_intent", "generic_platform_query"
+                        )
+                except Exception:
+                    pass
+
+            intent = result.get("intent", default_intent)
             filters = result.get("filters", {})
 
             # Merge — don't overwrite existing filters from state

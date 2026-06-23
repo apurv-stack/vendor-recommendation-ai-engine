@@ -68,6 +68,9 @@ class AgentState(TypedDict, total=False):
     # COMPARISON
     # -----------------------------------
     comparison_result: Dict[str, Any]
+    comparison_config: Dict[str, Any]
+    qa_config: Dict[str, Any]
+    context_config: Dict[str, Any]
 
     # -----------------------------------
     # RESPONSE

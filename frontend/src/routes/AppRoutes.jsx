@@ -53,7 +53,9 @@ from "../hooks/useAuth";
 import VendorManagementPage from "../pages/Admin/VendorManagementPage";
 import VerificationQueuePage from "../pages/Admin/VerificationQueuePage";
 import ImportExportPage from "../pages/Admin/ImportExportPage";
-
+import AIAgentsPage from "../pages/Admin/AIAgentsPage";
+import AgentConfigPage from "../pages/Admin/AgentConfigPage";
+import AgentTestSandbox from "../pages/Admin/AgentTestSandbox";
 
 const UnauthorizedPage=()=>{
 
@@ -373,6 +375,33 @@ allowedRoles={[
       <ImportExportPage/>
     </ProtectedRoute>
   }
+/>
+
+<Route
+    path="/admin/ai-agents"
+    element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+            <AIAgentsPage />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/admin/ai-agents/:agentId"
+    element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+            <AgentConfigPage />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/admin/ai-agents/test"
+    element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+            <AgentTestSandbox />
+        </ProtectedRoute>
+    }
 />
 
 <Route

@@ -20,6 +20,20 @@ class QueryAnalysisAgent:
         try:
 
             intent = state.get("intent", "")
+            # Load query_analysis_agent config into state
+            # so validator, parser, followup all get it
+            db = state.get("db")
+            if db:
+                try:
+                    from app.services.agent_configuration_service import AgentConfigurationService
+                    qa_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                        db, "query_analysis_agent"
+                    )
+                    state["qa_config"] = qa_cfg.configuration if qa_cfg else {}
+                except Exception:
+                    state["qa_config"] = {}
+            else:
+                state["qa_config"] = {}
 
             # ---------------------------------
             # OPTIMIZATION 1
@@ -79,14 +93,29 @@ class QueryAnalysisAgent:
                 f"[QueryAnalysisAgent] Running full LLM analysis — intent={intent}"
             )
 
+            from app.services.prompt_service import PromptService
+
+            agent_prompt = PromptService.get_prompt("query_analysis_agent")
+
+            override_system_prompt = None
+
+            if agent_prompt:
+                override_system_prompt = "\n\n".join(filter(None, [
+                agent_prompt.base_prompt,
+                agent_prompt.role_instructions,
+                agent_prompt.behavior_guidelines,
+                agent_prompt.formatting_rules,
+                agent_prompt.business_rules,
+            ]))
+
             ai_service = AIService()
 
             structured = await ai_service.build_structured_response(
                 user_message=state.get("query", ""),
                 previous=None,
-                conversation_context=state.get("conversation_context", "")
+                conversation_context=state.get("conversation_context", ""),
+                override_system_prompt=override_system_prompt
             )
-
             new_filters = structured.get("filters", {})
 
             merged_filters = {

@@ -337,16 +337,17 @@ class ContextBuilder:
 
     @staticmethod
     def build(
-
         context:dict,
-
         history=None,
-
         filters=None,
-
-        vendor_memory=None
-
+        vendor_memory=None,
+        config=None
     ):
+        cfg = config or {}
+        MAX_VENDORS   = cfg.get("max_vendors", ContextBuilder.MAX_VENDORS)
+        MAX_HISTORY   = cfg.get("max_history", ContextBuilder.MAX_HISTORY)
+        MAX_VENDOR_MEMORY = cfg.get("max_vendor_memory", ContextBuilder.MAX_VENDOR_MEMORY)
+        MAX_CATEGORIES = cfg.get("max_categories", ContextBuilder.MAX_CATEGORIES)
 
         recommendations=(
 
@@ -372,7 +373,7 @@ class ContextBuilder:
 
         )[
 
-            :ContextBuilder.MAX_VENDORS
+            :MAX_VENDORS
 
         ]
 
@@ -410,7 +411,7 @@ class ContextBuilder:
 
         )[
 
-            :ContextBuilder.MAX_CATEGORIES
+            :MAX_CATEGORIES
 
         ]
 
@@ -470,22 +471,16 @@ class ContextBuilder:
 
             active_filters,
 
-            "RECENT_HISTORY":
-
-            ContextBuilder._trim_history(
-
-                history
-
+            "RECENT_HISTORY": (
+                history[-MAX_HISTORY:] if history else []
             ),
 
-            "VENDOR_MEMORY":
-
-            ContextBuilder._vendor_memory(
-
-                vendor_memory
-
+            "VENDOR_MEMORY": (
+                [
+                    ContextBuilder._safe(getattr(v, "name", None))
+                    for v in (vendor_memory or [])[:MAX_VENDOR_MEMORY]
+                ]
             ),
-
             "RULES":[
 
                 "ONLY recommend STRICT_DB_RESULTS",

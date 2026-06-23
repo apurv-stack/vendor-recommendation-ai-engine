@@ -63,7 +63,6 @@ class QueryPreprocessor:
         "premium": [
             "luxury",
             "premium",
-            "elite",
             "high end",
             "high-end",
             "exclusive"

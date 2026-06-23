@@ -53,6 +53,17 @@ class ChatService:
         self.db = db
         self.ai_service = AIService()
         self.graph_service = GraphService()
+        try:
+            from app.services.agent_configuration_service import AgentConfigurationService
+            disc_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "discovery_agent"
+            )
+            self.MAX_VENDOR_CARDS = (
+                disc_cfg.configuration.get("max_vendor_cards", 5)
+                if disc_cfg else 5
+            )
+        except Exception:
+            self.MAX_VENDOR_CARDS = 5
 
     async def process_message(
         self,
@@ -196,10 +207,21 @@ class ChatService:
                     f"USER HISTORY:\n{user_history_trimmed}"
                 ).strip()
 
+                qa_config = {}
+                try:
+                    from app.services.agent_configuration_service import AgentConfigurationService
+                    qa_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                        self.db, "query_analysis_agent"
+                    )
+                    qa_config = qa_cfg.configuration if qa_cfg else {}
+                except Exception:
+                    qa_config = {}
+
                 structured = await self.ai_service.build_structured_response(
                     user_message,
                     previous,
-                    combined_context
+                    combined_context,
+                    qa_config=qa_config
                 )
 
                 # Early validation error — return immediately, no Ollama, no graph
@@ -325,7 +347,8 @@ class ChatService:
                     ConversationOrchestrator.build_session_state(
                         filters=filters,
                         missing_fields=missing_fields,
-                        intent=intent
+                        intent=intent,
+                        config=qa_config
                     )
                 )
 
@@ -425,6 +448,19 @@ class ChatService:
                 USE_REASONING_GRAPH = True
 
                 if USE_REASONING_GRAPH:
+
+    # For comparison queries, always re-extract vendor_names
+    # from the raw query using rule-based extractor.
+    # LLM extraction is unreliable for proper vendor names.
+                    if intent == "comparison_query":
+                        from app.ai.intent_extractor import IntentExtractor
+                        rule_based_names = IntentExtractor._extract_vendor_names(user_message)
+                        if rule_based_names and len(rule_based_names) >= 2:
+                            filters["vendor_names"] = rule_based_names
+                            logger.info(
+                                f"[ChatService] Overriding vendor_names from rule-based extractor: "
+                                f"{rule_based_names}"
+                            )
 
                     graph_result = await self.graph_service.process(
                         query=user_message,

@@ -36,6 +36,13 @@ class ContextAgent:
             conversation_context = ""
             user_preferences = {}
 
+            from app.services.agent_configuration_service import AgentConfigurationService
+            context_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                db, "context_agent"
+            ) if db else None
+            context_config = context_cfg.configuration if context_cfg else {}
+            state["context_config"] = context_config
+
             # -----------------------------------
             # OPTIMIZATION: Skip both DB calls
             # for intents that never use them

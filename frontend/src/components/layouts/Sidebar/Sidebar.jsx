@@ -1,16 +1,7 @@
 import {
-    LayoutDashboard,
-    Building2,
-    User,
-    Bookmark,
-    Settings,
-    LogOut,
-    BrainCircuit,
-    ChevronLeft,
-    ChevronRight,
-    Sparkles,
-    X,
-    MessageSquare
+    LayoutDashboard, Building2, User, Bookmark, Settings,
+    LogOut, BrainCircuit, ChevronLeft, ChevronRight,
+    Sparkles, X, MessageSquare, ShieldCheck
 } from "lucide-react";
 
 import { useState } from "react";
@@ -33,8 +24,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
     const adminMenuItems = [
         { label: "Dashboard",          icon: <LayoutDashboard size={iconSize} />, path: "/admin" },
         { label: "Vendor Management",  icon: <Building2 size={iconSize} />,       path: "/admin/vendors" },
-        { label: "Verification Queue", icon: <BrainCircuit size={iconSize} />,    path: "/admin/verification" },
+        { label: "Verification Queue", icon: <ShieldCheck size={iconSize} />,     path: "/admin/verification" },
         { label: "Import & Export",    icon: <Bookmark size={iconSize} />,        path: "/admin/import" },
+        { label: "AI Agents",          icon: <BrainCircuit size={iconSize} />,    path: "/admin/ai-agents" },
         { label: "Settings",           icon: <Settings size={iconSize} />,        path: "/settings" },
     ];
 

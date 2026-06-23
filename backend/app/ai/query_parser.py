@@ -299,8 +299,22 @@ class QueryParser:
     @staticmethod
     def extract_filters(
         query: str,
-        previous: Optional[dict] = None
+        previous: Optional[dict] = None,
+        config: dict = None
     ) -> QueryFilters:
+        cfg = config or {}
+
+        extra_cities = {
+            k.lower(): v.lower()
+            for k, v in cfg.get("extra_cities", {}).items()
+        }
+        extra_categories = cfg.get("extra_categories", {})
+        extra_cuisines = set(cfg.get("extra_cuisines", []))
+        extra_events = set(cfg.get("extra_events", []))
+
+        dynamic_city_map = {**QueryParser.CITY_MAP, **extra_cities}
+        dynamic_cuisines = QueryParser.CUISINES | extra_cuisines
+        dynamic_events = QueryParser.EVENTS | extra_events
 
         filters = dict(
             previous or {}
@@ -326,6 +340,17 @@ class QueryParser:
             )
         )
 
+        if not category and extra_categories:
+            for cat_name, terms in extra_categories.items():
+                if isinstance(terms, list) and any(t in query_lower for t in terms):
+                    category = cat_name
+                    break
+                elif isinstance(terms, str) and any(
+                    t.strip() in query_lower for t in terms.split(",")
+                ):
+                    category = cat_name
+                    break
+
         if category:
             filters["category"] = category
 
@@ -345,11 +370,8 @@ class QueryParser:
                 if word not in skip:
                     filters["raw_category_attempt"] = word
 
-        city = (
-            QueryParser
-            ._extract_city(
-                query_lower
-            )
+        city = QueryParser._extract_city_dynamic(
+            query_lower, dynamic_city_map
         )
 
         if city:
@@ -380,7 +402,7 @@ class QueryParser:
             (
                 item
                 for item
-                in QueryParser.CUISINES
+                in dynamic_cuisines
                 if item in query_lower
             ),
             None
@@ -393,7 +415,7 @@ class QueryParser:
             (
                 item
                 for item
-                in QueryParser.EVENTS
+                in dynamic_events
                 if item in query_lower
             ),
             None
@@ -465,6 +487,13 @@ class QueryParser:
             if city in query:
                 return value
 
+        return None
+    
+    @staticmethod
+    def _extract_city_dynamic(query: str, city_map: dict):
+        for city, value in city_map.items():
+            if city in query:
+                return value
         return None
 
     @staticmethod

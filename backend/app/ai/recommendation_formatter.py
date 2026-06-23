@@ -73,7 +73,7 @@ class RecommendationFormatter:
 
             "category": category,
 
-            "city": vendor.city,
+            "city": vendor.city or "",
 
             "rating": float(
                 getattr(

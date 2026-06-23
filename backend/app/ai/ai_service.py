@@ -117,6 +117,11 @@ class AIService:
 
         )
 
+        self._system_prompt = None
+
+    def set_system_prompt(self, prompt: str):
+        self._system_prompt = prompt
+
     async def execute_prompt(
 
         self,
@@ -349,8 +354,11 @@ class AIService:
         self,
         user_message: str,
         previous: Optional[Dict] = None,
-        conversation_context: str = ""
+        conversation_context: str = "",
+        override_system_prompt: Optional[str] = None,
+        qa_config: Optional[Dict] = None
     ):
+        qa_config = qa_config or {}
 
         # -----------------------------------
         # PREPROCESS QUERY
@@ -369,7 +377,8 @@ class AIService:
         parser_filters = dict(
             QueryParser.extract_filters(
                 normalized_query,
-                previous
+                previous,
+                qa_config
             )
         )
 
@@ -395,6 +404,12 @@ class AIService:
         intent_data = IntentExtractor.extract(normalized_query)
         intent = intent_data.get("intent", "vendor_recommendation")
         intent_filters = intent_data.get("filters", {})
+        if intent == "comparison_query":
+            from app.ai.query_parser import QueryParser as QP
+            raw_vendor_names = QP._extract_vendor_names(user_message)  # raw, not normalized
+            if raw_vendor_names:
+                intent_filters["vendor_names"] = raw_vendor_names
+                intent_filters["comparison_request"] = True
 
         # -----------------------------------
         # EARLY VALIDATION
@@ -406,7 +421,8 @@ class AIService:
 
         early_validation = QueryValidator.validate(
             intent,
-            parser_filters
+            parser_filters,
+            qa_config
         )
 
         if early_validation.get("errors"):
@@ -455,6 +471,9 @@ class AIService:
         if needs_llm_extraction:
             for step in chain:
                 if step["stage"] == "filter_extraction":
+                    if override_system_prompt and override_system_prompt.strip():
+                        self.set_system_prompt(override_system_prompt)
+
                     llm_filters = await (
                         self._extract_llm_filters(
                             normalized_query
@@ -510,7 +529,8 @@ class AIService:
         validation = (
             QueryValidator.validate(
                 intent,
-                final_filters
+                final_filters,
+                qa_config
             )
         )
 
@@ -841,17 +861,7 @@ class AIService:
 
                             "role": "system",
 
-                            "content":
-
-                            (
-                                "You are a warm, friendly, and emotionally intelligent "
-                                "event planning assistant. "
-                                "Adapt your tone based on the user's event type, budget, "
-                                "preferences, and context. "
-                                "Be conversational, natural, and engaging. "
-                                "Use occasional emojis when appropriate. "
-                                "Avoid robotic responses."
-                            )
+                            "content": self._system_prompt or PromptLoader.get_prompt("ai_service_system")
 
                         },
 

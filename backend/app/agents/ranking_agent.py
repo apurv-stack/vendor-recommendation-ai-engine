@@ -44,25 +44,41 @@ class RankingAgent:
                 {}
             )
 
-            context = {
-                "user_preferences":
-                state.get(
-                    "user_preferences"
+            from app.services.agent_configuration_service import AgentConfigurationService
+
+            db = state.get("db")
+            _close_db = False
+            if db is None:
+                from app.db.session import SessionLocal
+                db = SessionLocal()
+                _close_db = True
+            try:
+                ranking_config = AgentConfigurationService.get_configuration_by_agent_name(
+                    db, "ranking_agent"
                 )
+                config_values = ranking_config.configuration if ranking_config else {}
+            finally:
+                if _close_db:
+                    db.close()
+
+            context = {
+                "user_preferences": state.get("user_preferences"),
+                "ranking_config": config_values
             }
+
+            max_results = config_values.get("max_results", 10)
 
             ranked = (
                 RecommendationEngine
                 .rank_vendors(
                     vendors,
                     filters,
-                    context
+                    context,
+                    max_results=max_results
                 )
             )
 
-            state["ranked_vendors"] = (
-                ranked
-            )
+            state["ranked_vendors"] = ranked
 
             state["current_agent"] = (
                 "ranking_agent"

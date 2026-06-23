@@ -3,6 +3,7 @@ import logging
 from app.graphs.graph_state import AgentState
 from app.ai.ai_service import AIService
 from app.ai.llm_factory import LLMFactory
+from app.ai.prompt_loader import PromptLoader
 
 logger = logging.getLogger(__name__)
 
@@ -155,16 +156,52 @@ class ResponseAgent:
 
                     return (rating * 10) + min(reviews, 500) / 10 + verified_bonus
 
-                table = (
-                    f"Here's a comparison of both vendors:\n\n"
+                comparison_config = state.get("comparison_config", {})
+                print(f"RESPONSE AGENT - COMPARISON CONFIG FROM STATE: {comparison_config}")
+
+# Safety net: if state transfer dropped it, load directly from DB
+                if not comparison_config:
+                    try:
+                        from app.services.agent_configuration_service import AgentConfigurationService
+                        db = state.get("db")
+                        if db:
+                            comp_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                                db, "comparison_agent"
+                            )
+                            comparison_config = comp_cfg.configuration if comp_cfg else {}
+                            print(f"RESPONSE AGENT - COMPARISON CONFIG FROM DB: {comparison_config}")
+                    except Exception as e:
+                        logger.error(f"[ResponseAgent] Failed to load comparison_config from DB: {e}")
+                        comparison_config = {}
+
+                show_price    = comparison_config.get("show_price", True)
+                show_rating   = comparison_config.get("show_rating", True)
+                show_reviews  = comparison_config.get("show_reviews", True)
+                show_verified = comparison_config.get("show_verified", True)
+                show_city     = comparison_config.get("show_city", True)
+
+                rows = (
                     f"{'Attribute':<20} {getattr(v1, 'name', 'Vendor 1'):<25} {getattr(v2, 'name', 'Vendor 2'):<25}\n"
                     f"{'-'*70}\n"
-                    f"{'Price':<20} {fmt_price(getattr(v1, 'price_min', None), getattr(v1, 'price_max', None)):<25} "
-                    f"{fmt_price(getattr(v2, 'price_min', None), getattr(v2, 'price_max', None)):<25}\n"
-                    f"{'Rating':<20} {fmt_rating(v1):<25} {fmt_rating(v2):<25}\n"
-                    f"{'Trust':<20} {fmt_verified(v1):<25} {fmt_verified(v2):<25}\n"
-                    f"{'City':<20} {getattr(v1, 'city', 'N/A') or 'N/A':<25} {getattr(v2, 'city', 'N/A') or 'N/A':<25}\n"
                 )
+                if show_price:
+                    rows += (
+                        f"{'Price':<20} "
+                        f"{fmt_price(getattr(v1, 'price_min', None), getattr(v1, 'price_max', None)):<25} "
+                        f"{fmt_price(getattr(v2, 'price_min', None), getattr(v2, 'price_max', None)):<25}\n"
+                    )
+                if show_rating:
+                    rows += f"{'Rating':<20} {fmt_rating(v1):<25} {fmt_rating(v2):<25}\n"
+                if show_verified:
+                    rows += f"{'Trust':<20} {fmt_verified(v1):<25} {fmt_verified(v2):<25}\n"
+                if show_city:
+                    rows += (
+                        f"{'City':<20} "
+                        f"{getattr(v1, 'city', 'N/A') or 'N/A':<25} "
+                        f"{getattr(v2, 'city', 'N/A') or 'N/A':<25}\n"
+                    )
+
+                table = f"Here's a comparison of both vendors:\n\n{rows}"
 
                 score1 = comparison_score(v1)
                 score2 = comparison_score(v2)
@@ -260,6 +297,27 @@ class ResponseAgent:
                 )
 
                 try:
+                    from app.services.prompt_service import PromptService
+
+                    agent_prompt = PromptService.get_prompt("response_agent")
+
+                    if agent_prompt:
+                        print("[ResponseAgent] USING DB PROMPT from agent_prompts table")
+                        system_prompt = "\n\n".join([
+                            x for x in [
+                                agent_prompt.base_prompt,
+                                agent_prompt.role_instructions,
+                                agent_prompt.behavior_guidelines,
+                                agent_prompt.formatting_rules,
+                                agent_prompt.business_rules,
+                            ] if x
+                        ])
+                    else:
+                        system_prompt = PromptLoader.get_prompt("ai_service_system")
+
+                    if not system_prompt or not system_prompt.strip():
+                        system_prompt = PromptLoader.get_prompt("ai_service_system")
+
                     response_client = LLMFactory.get_response_client()
                     response_model = LLMFactory.get_response_model()
 
@@ -269,15 +327,7 @@ class ResponseAgent:
                         messages=[
                             {
                                 "role": "system",
-                                "content": (
-                                    "You are an enthusiastic event planning assistant. "
-                                    "Be warm, friendly and conversational. "
-                                    "Show excitement when strong vendor matches are found. "
-                                    "Use relevant emojis naturally (📸 🍽️ 🎉 💍 🎶 🌸). "
-                                    "Keep responses concise but engaging. "
-                                    "Make users feel excited about planning their event. "
-                                    "Avoid sounding robotic or generic."
-                                )
+                                "content": system_prompt
                             },
                             {
                                 "role": "user",

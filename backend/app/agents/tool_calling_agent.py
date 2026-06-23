@@ -57,6 +57,21 @@ class ToolCallingAgent:
             token = state.get("access_token")
             intent = state.get("intent")
 
+            db = state.get("db")
+            if db:
+                try:
+                    from app.services.agent_configuration_service import AgentConfigurationService
+                    tool_cfg = AgentConfigurationService.get_configuration_by_agent_name(
+                        db, "tool_calling_agent"
+                    )
+                    if tool_cfg and tool_cfg.configuration:
+                        global _CACHE_TTL_SECONDS
+                        _CACHE_TTL_SECONDS = tool_cfg.configuration.get(
+                            "cache_ttl_seconds", 0
+                        )
+                except Exception:
+                    pass
+
             registry = ToolRegistry(token=token)
 
             tool_name = ""

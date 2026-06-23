@@ -44,8 +44,14 @@ class QueryValidator:
     def validate(
         cls,
         intent: str,
-        filters: Dict[str, Any]
+        filters: Dict[str, Any],
+        config: Dict[str, Any] = None
     ) -> Dict[str, Any]:
+        cfg = config or {}
+        valid_cities = set(cfg.get("valid_cities", [])) or cls.VALID_CITIES
+        valid_categories = set(cfg.get("valid_categories", [])) or cls.VALID_CATEGORIES
+        required_fields_override = cfg.get("required_fields", {})
+        required_fields = {**cls.REQUIRED_FIELDS, **required_fields_override}
 
         if intent in cls.SKIP_VALIDATION_INTENTS:
             return {
@@ -81,7 +87,7 @@ class QueryValidator:
 
         if (
             raw_category_attempt
-            and raw_category_attempt not in cls.VALID_CATEGORIES
+            and raw_category_attempt not in valid_categories
             and raw_category_attempt not in CATEGORY_SYNONYMS
         ):
             errors.append(
@@ -94,7 +100,7 @@ class QueryValidator:
         # Catches "catering in Mars"
         # ----------------------------------
 
-        if city and city.lower() not in cls.VALID_CITIES:
+        if city and city.lower() not in valid_cities:
             errors.append(
                 f"'{city}' is not a supported city. "
                 f"We currently serve Delhi, Mumbai, Bangalore, Noida, Gurgaon and more."
@@ -158,7 +164,7 @@ class QueryValidator:
         # ----------------------------------
 
         if intent == "vendor_recommendation":
-            for field in cls.REQUIRED_FIELDS["vendor_recommendation"]:
+            for field in required_fields.get("vendor_recommendation", cls.REQUIRED_FIELDS.get("vendor_recommendation", [])):
                 if not filters.get(field):
                     missing_fields.append(field)
 
@@ -166,8 +172,8 @@ class QueryValidator:
         # CATEGORY SPECIFIC VALIDATION
         # ----------------------------------
 
-        if category and category in cls.REQUIRED_FIELDS:
-            for field in cls.REQUIRED_FIELDS[category]:
+        if category and category in required_fields:
+            for field in required_fields[category]:
                 if not filters.get(field):
                     missing_fields.append(field)
 

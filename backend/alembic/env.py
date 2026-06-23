@@ -39,7 +39,11 @@ from app.models.saved_vendor import SavedVendor
 from app.models.vendor_follow import VendorFollow
 from app.models.notification import Notification
 from app.models.service import Service
-
+from app.models.ai_agent import AIAgent
+from app.models.agent_prompt import AgentPrompt
+from app.models.prompt_version import PromptVersion
+from app.models.agent_audit_log import AgentAuditLog
+from app.models.agent_configuration import AgentConfiguration
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

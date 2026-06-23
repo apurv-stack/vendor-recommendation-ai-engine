@@ -7,20 +7,16 @@ class ConversationOrchestrator:
 
     @staticmethod
     def build_session_state(
-
         filters,
-
         missing_fields,
-
-        intent=None
-
+        intent=None,
+        config=None
     ):
-
         next_question = (
-
             FollowUpGenerator
             .get_next_question(
-                missing_fields
+                missing_fields,
+                config=config
             )
         )
 

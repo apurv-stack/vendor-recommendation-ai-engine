@@ -59,34 +59,27 @@ class FollowUpGenerator:
     @classmethod
     def get_next_question(
         cls,
-        missing_fields
+        missing_fields,
+        config: dict = None
     ):
-
         if not missing_fields:
             return None
 
+        cfg = config or {}
+        custom_questions = cfg.get("followup_questions", {})
+        merged_questions = {**cls.FIELD_QUESTION_MAP, **custom_questions}
+
         for field in cls.FIELD_PRIORITY:
-
             if field in missing_fields:
-
                 return {
-
                     "field": field,
-
-                    "question":
-                    cls.FIELD_QUESTION_MAP.get(
-                        field
-                    )
+                    "question": merged_questions.get(field)
                 }
 
         field = missing_fields[0]
-
         return {
-
             "field": field,
-
-            "question":
-            cls.FIELD_QUESTION_MAP.get(
+            "question": merged_questions.get(
                 field,
                 "Could you provide more details?"
             )
