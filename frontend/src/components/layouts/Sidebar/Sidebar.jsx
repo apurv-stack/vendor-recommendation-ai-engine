@@ -1,7 +1,7 @@
 import {
     LayoutDashboard, Building2, User, Bookmark, Settings,
     LogOut, BrainCircuit, ChevronLeft, ChevronRight,
-    Sparkles, X, MessageSquare, ShieldCheck
+    Sparkles, X, MessageSquare, ShieldCheck, Trash2
 } from "lucide-react";
 
 import { useState } from "react";
@@ -27,6 +27,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }) => {
         { label: "Verification Queue", icon: <ShieldCheck size={iconSize} />,     path: "/admin/verification" },
         { label: "Import & Export",    icon: <Bookmark size={iconSize} />,        path: "/admin/import" },
         { label: "AI Agents",          icon: <BrainCircuit size={iconSize} />,    path: "/admin/ai-agents" },
+        { label: "Vendor Cleanup",     icon: <Trash2 size={iconSize} />,          path: "/admin/vendor-cleanup" },
         { label: "Settings",           icon: <Settings size={iconSize} />,        path: "/settings" },
     ];
 

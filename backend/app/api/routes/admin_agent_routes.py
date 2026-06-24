@@ -150,7 +150,7 @@ async def test_agent_workflow_api(
         graph_result = await asyncio.wait_for(
             graph_service.process(
                 query=test_query,
-                session_id=f"sandbox-{uuid.uuid4()}",
+                session_id=str(uuid.uuid4()),
                 user_id=str(current_user.user_id),
                 access_token=getattr(current_user, "access_token", None),
                 db=db,

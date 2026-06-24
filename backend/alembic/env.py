@@ -44,6 +44,8 @@ from app.models.agent_prompt import AgentPrompt
 from app.models.prompt_version import PromptVersion
 from app.models.agent_audit_log import AgentAuditLog
 from app.models.agent_configuration import AgentConfiguration
+from app.models.vendor_cleanup_log import VendorCleanupLog
+from app.models.vendor_cleanup_report import VendorCleanupReport
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

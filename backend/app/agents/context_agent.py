@@ -88,7 +88,12 @@ class ContextAgent:
                         f"| length={len(conversation_context)}"
                     )
                 except Exception as ce:
-                    logger.warning(f"[ContextAgent] Failed to fetch conversation context: {ce}")
+                    if db:
+                        db.rollback()
+                    logger.warning(
+                        f"[ContextAgent] Failed to fetch conversation context: {ce}"
+                    )
+
                     conversation_context = ""
 
             # -----------------------------------
@@ -110,7 +115,12 @@ class ContextAgent:
                         f"[ContextAgent] user_preferences fetched for user_id={user_id}"
                     )
                 except Exception as pe:
-                    logger.warning(f"[ContextAgent] Failed to fetch user preferences: {pe}")
+                    if db:
+                        db.rollback()
+                    logger.warning(
+                        f"[ContextAgent] Failed to fetch user preferences: {pe}"
+                    )
+
                     user_preferences = {}
 
             state["conversation_context"] = conversation_context

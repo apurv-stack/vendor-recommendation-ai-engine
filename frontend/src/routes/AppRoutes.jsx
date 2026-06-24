@@ -56,6 +56,7 @@ import ImportExportPage from "../pages/Admin/ImportExportPage";
 import AIAgentsPage from "../pages/Admin/AIAgentsPage";
 import AgentConfigPage from "../pages/Admin/AgentConfigPage";
 import AgentTestSandbox from "../pages/Admin/AgentTestSandbox";
+import VendorCleanupPage from "../pages/Admin/VendorCleanupPage";
 
 const UnauthorizedPage=()=>{
 
@@ -400,6 +401,15 @@ allowedRoles={[
     element={
         <ProtectedRoute allowedRoles={["admin"]}>
             <AgentTestSandbox />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/admin/vendor-cleanup"
+    element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+            <VendorCleanupPage />
         </ProtectedRoute>
     }
 />
