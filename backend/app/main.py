@@ -154,20 +154,31 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # STARTUP
-    try:
-        import asyncio
-        from app.ai.ai_service import AIService
-        ai = AIService()
-        if ai.provider == "ollama":
-            await asyncio.to_thread(ai._generate, "hi")
-            print("✅ Ollama warmed up successfully")
-    except Exception as e:
-        print(f"⚠️ Ollama warmup failed (non-fatal): {e}")
+    # STARTUP — warm up Ollama in background
+    async def _warm_up():
+        try:
+            import httpx
+            from app.core.config import settings
+            if settings.AI_PROVIDER.lower() != "ollama":
+                return
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                r = await client.post(
+                    "http://localhost:11434/api/generate",
+                    json={
+                        "model": settings.AI_MODEL,
+                        "prompt": "hi",
+                        "stream": False,
+                        "keep_alive": "10m"
+                    }
+                )
+            print(f"✅ Ollama '{settings.AI_MODEL}' warmed up successfully")
+        except Exception as e:
+            print(f"⚠️ Ollama warmup failed (non-fatal): {e}")
+
+    import asyncio
+    asyncio.ensure_future(_warm_up())
     yield
-    # SHUTDOWN (nothing needed)
-
-
+    # SHUTDOWN — nothing needed
 
 # =====================================
 # APP

@@ -51,10 +51,24 @@ export const getAuditLogs = async (agentId) => {
 };
 
 export const testAgent = async (agentId, testQuery, context = "") => {
-    const response = await axiosInstance.post("/admin/agents/test", {
-        agent_id: agentId,
-        test_query: testQuery,
-        context
-    });
+    const response = await axiosInstance.post(
+        "/admin/agents/test",
+        {
+            agent_id: agentId,
+            test_query: testQuery,
+            context
+        },
+        {
+            timeout: 180000
+        }
+    );
+
     return response.data;
+};
+
+export const testAgentWorkflow = async (query) => {
+    const res = await axiosInstance.post("/admin/agents/test-workflow", {
+        test_query: query
+    });
+    return res.data;
 };

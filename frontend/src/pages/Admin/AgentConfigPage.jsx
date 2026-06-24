@@ -309,7 +309,7 @@ const AgentConfigForm = ({ agentName, configJson, setConfigJson, theme, card }) 
 
     // ── Prompt-only agents ────────────────────────────────────────────────
     const promptOnlyAgents = [
-        "response_agent", "supervisor_agent", "tool_calling_agent", "error_agent"
+        "response_agent", "error_agent"
     ];
     if (promptOnlyAgents.includes(agentKey)) {
         return (
@@ -586,18 +586,22 @@ const AgentConfigForm = ({ agentName, configJson, setConfigJson, theme, card }) 
         );
     }
 
-    // ── Supervisor Agent — configurable default_intent ────────────────────
+    // ── Supervisor Agent ──────────────────────────────────────────────────
     if (agentKey === "supervisor_agent") {
         return (
             <div style={card}>
                 <SectionHeader title="Supervisor Settings" theme={theme} />
-                <FieldRow label="Default Intent Fallback"
+                <p style={{ fontSize: "12px", color: theme.textMuted, margin: "8px 0 16px" }}>
+                    Controls how the supervisor routes ambiguous or unrecognised queries.
+                </p>
+                <FieldRow
+                    label="Default Intent Fallback"
                     sub="Intent used when the system cannot classify a user query">
                     <input
                         value={cfg.default_intent || "generic_platform_query"}
                         onChange={e => update("default_intent", e.target.value)}
                         style={{
-                            width: "200px", padding: "7px 10px", borderRadius: "8px",
+                            width: "220px", padding: "7px 10px", borderRadius: "8px",
                             border: `1px solid rgba(124,90,246,0.25)`,
                             background: theme.isDark ? "#0d0d1a" : "#F9FAFB",
                             color: theme.textPrimary, fontSize: "13px", outline: "none"
@@ -608,15 +612,23 @@ const AgentConfigForm = ({ agentName, configJson, setConfigJson, theme, card }) 
         );
     }
 
-    // ── Tool Calling Agent — cache TTL ────────────────────────────────────
+    // ── Tool Calling Agent ────────────────────────────────────────────────
     if (agentKey === "tool_calling_agent") {
         return (
             <div style={card}>
-                <SectionHeader title="Tool Calling Settings" theme={theme} />
-                <NumberField label="Cache TTL (seconds)"
-                    sub="How long vendor search results are cached. 300 = 5 minutes."
-                    value={cfg.cache_ttl_seconds ?? 300} min={0} max={3600} theme={theme}
-                    onChange={v => update("cache_ttl_seconds", v)} />
+                <SectionHeader title="Cache Settings" theme={theme} />
+                <p style={{ fontSize: "12px", color: theme.textMuted, margin: "8px 0 16px" }}>
+                    Controls how long tool call results are cached. Set to 0 to disable caching entirely.
+                </p>
+                <NumberField
+                    label="Cache TTL (seconds)"
+                    sub="How long vendor search results are cached. 0 = no cache, 300 = 5 minutes."
+                    value={cfg.cache_ttl_seconds ?? 300}
+                    min={0}
+                    max={86400}
+                    theme={theme}
+                    onChange={v => update("cache_ttl_seconds", v)}
+                />
             </div>
         );
     }
@@ -650,6 +662,8 @@ const AgentConfigPage = () => {
     const [configError, setConfigError] = useState("");
     const [versions,    setVersions]    = useState([]);
     const [auditLogs,   setAuditLogs]   = useState([]);
+    const [expandedLog, setExpandedLog] = useState(null);
+    const [expandedVersion, setExpandedVersion] = useState(null);
     const [loading,     setLoading]     = useState(true);
     const [saving,      setSaving]      = useState(false);
     const [toast,       setToast]       = useState(null);
@@ -985,7 +999,47 @@ const AgentConfigPage = () => {
                                                             v.modified_by || "Admin",
                                                             formatDate(v.created_at),
                                                             <span style={{ color: theme.textMuted, fontSize: "12px" }}>
-                                                                {v.change_notes || "—"}
+                                                                {(() => {
+                                                                    const notes = v.change_notes || "";
+                                                                    if (!notes || notes === "—") return "—";
+                                                                    // Strip [CONFIG] prefix and JSON — show clean label
+                                                                    if (notes.startsWith("[CONFIG]")) {
+                                                                        try {
+                                                                            const json = JSON.parse(notes.replace("[CONFIG]", "").trim());
+                                                                            const keys = Object.keys(json);
+                                                                            if (keys.length === 0) return "Configuration updated";
+                                                                            const formatKey = k => k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                                                                            return (
+                                                                                <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                                                                                    <span style={{ fontWeight: 600, color: "#10B981", fontSize: "11px" }}>Configuration Updated</span>
+                                                                                    {(expandedVersion === (v.version_id || i) ? keys : keys.slice(0, 3)).map(k => (
+                                                                        <span key={k} style={{ fontSize: "11px" }}>
+                                                                            {formatKey(k)}: <strong>{String(json[k])}</strong>
+                                                                        </span>
+                                                                    ))}
+                                                                    {keys.length > 3 && (
+                                                                        <span
+                                                                            onClick={() => setExpandedVersion(
+                                                                                expandedVersion === (v.version_id || i) ? null : (v.version_id || i)
+                                                                            )}
+                                                                            style={{
+                                                                                fontSize: "11px", color: "#7C5AF6",
+                                                                                cursor: "pointer", fontWeight: 600,
+                                                                                textDecoration: "underline"
+                                                                            }}>
+                                                                            {expandedVersion === (v.version_id || i)
+                                                                                ? "▲ Show less"
+                                                                                : `+${keys.length - 3} more`}
+                                                                        </span>
+                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        } catch {
+                                                                            return "Configuration updated";
+                                                                        }
+                                                                    }
+                                                                    return notes;
+                                                                })()}
                                                             </span>,
                                                             <button onClick={() => handleRollback(v.version_id)}
                                                                 style={{
@@ -1040,42 +1094,170 @@ const AgentConfigPage = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {auditLogs.map((log, i) => (
-                                                    <tr key={log.log_id || i}>
-                                                        {[
-                                                            <span style={{
-                                                                padding: "3px 8px", borderRadius: "6px",
-                                                                background: "#6366F118", color: "#6366F1",
-                                                                fontSize: "11px", fontWeight: 700
-                                                            }}>{log.action}</span>,
-                                                            log.modified_by || "Admin",
-                                                            formatDate(log.modified_at || log.created_at),
-                                                            <span style={{ color: theme.textMuted, fontSize: "12px" }}>
-                                                                {(() => {
-                                                                    if (log.action === "prompt_rollback") return "Rolled back to previous version";
-                                                                    const o = log.old_value;
-                                                                    const n = log.new_value;
-                                                                    if (o && n) {
-                                                                        const trim = (val) => String(
-                                                                            typeof val === "object"
-                                                                                ? (val.base_prompt || Object.values(val)[0] || "")
-                                                                                : val || ""
-                                                                        ).slice(0, 50);
-                                                                        return `${trim(o)} → ${trim(n)}`;
-                                                                    }
-                                                                    return log.action || "—";
-                                                                })()}
-                                                            </span>
-                                                        ].map((cell, ci) => (
-                                                            <td key={ci} style={{
-                                                                padding: "12px",
-                                                                borderBottom: `1px solid ${theme.cardBorder}`,
-                                                                fontSize: "13px", color: theme.textPrimary,
-                                                                verticalAlign: "middle"
-                                                            }}>{cell}</td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
+                                                {auditLogs.map((log, i) => {
+                                                    const isExpanded = expandedLog === (log.log_id || i);
+                                                    const o = log.old_value;
+                                                    const n = log.new_value;
+
+                                                    const ACTION_META = {
+                                                        prompt_updated:        { label: "Prompt Updated",    bg: "#3B82F618", color: "#3B82F6" },
+                                                        prompt_rollback:       { label: "Prompt Rollback",   bg: "#F59E0B18", color: "#F59E0B" },
+                                                        configuration_updated: { label: "Config Updated",    bg: "#10B98118", color: "#10B981" },
+                                                        config_updated:        { label: "Config Updated",    bg: "#10B98118", color: "#10B981" },
+                                                        status_changed:        { label: "Status Changed",    bg: "#8B5CF618", color: "#8B5CF6" },
+                                                    };
+                                                    const meta = ACTION_META[log.action] || { label: log.action, bg: "#6366F118", color: "#6366F1" };
+
+                                                    const formatFieldName = (k) => k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                                                    const formatFieldVal = (v) => {
+                                                        if (v === true)  return <span style={{ color: "#10B981", fontWeight: 700, fontSize: "11px" }}>Enabled</span>;
+                                                        if (v === false) return <span style={{ color: "#EF4444", fontWeight: 700, fontSize: "11px" }}>Disabled</span>;
+                                                        if (v === null || v === undefined) return <span style={{ color: "#9CA3AF", fontSize: "11px" }}>—</span>;
+                                                        return <span style={{ fontWeight: 600, fontSize: "11px" }}>{String(v)}</span>;
+                                                    };
+
+                                                    const renderDetails = () => {
+                                                        // Prompt rollback
+                                                        if (log.action === "prompt_rollback") {
+                                                            const ver = n?.rolled_back_to_version;
+                                                            return (
+                                                                <span style={{ fontSize: "12px", color: "#F59E0B", fontWeight: 600 }}>
+                                                                    Rolled back{ver ? ` to Version ${ver}` : " to previous version"}
+                                                                </span>
+                                                            );
+                                                        }
+
+                                                        // Prompt updated
+                                                        if (log.action === "prompt_updated") {
+                                                            const oldText = typeof o === "object" ? (o?.base_prompt || "") : String(o || "");
+                                                            const newText = typeof n === "object" ? (n?.base_prompt || "") : String(n || "");
+                                                            return (
+                                                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                                                    <span style={{ fontSize: "12px", color: theme.textMuted }}>
+                                                                        Base Prompt changed
+                                                                    </span>
+                                                                    <button
+                                                                        onClick={() => setExpandedLog(isExpanded ? null : (log.log_id || i))}
+                                                                        style={{
+                                                                            display: "inline-flex", alignItems: "center", gap: "4px",
+                                                                            padding: "3px 10px", borderRadius: "6px", border: "none",
+                                                                            background: "#3B82F618", color: "#3B82F6",
+                                                                            fontSize: "11px", fontWeight: 600, cursor: "pointer",
+                                                                            width: "fit-content"
+                                                                        }}>
+                                                                        {isExpanded ? "▲ Hide" : "▼ View Changes"}
+                                                                    </button>
+                                                                    {isExpanded && (
+                                                                        <div style={{
+                                                                            marginTop: "8px", borderRadius: "10px",
+                                                                            overflow: "hidden",
+                                                                            border: `1px solid ${theme.isDark ? "#1e2235" : "#E5E7EB"}`,
+                                                                        }}>
+                                                                            <div style={{
+                                                                                padding: "10px 14px",
+                                                                                background: theme.isDark ? "#1a0d0d" : "#FEF2F2",
+                                                                                borderBottom: `1px solid ${theme.isDark ? "#2a1a1a" : "#FECACA"}`
+                                                                            }}>
+                                                                                <div style={{ fontSize: "10px", fontWeight: 800, color: "#EF4444", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                                                                    ✕ Before
+                                                                                </div>
+                                                                                <div style={{
+                                                                                    fontSize: "11px", color: theme.isDark ? "#FCA5A5" : "#7F1D1D",
+                                                                                    lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word",
+                                                                                    maxHeight: "160px", overflowY: "auto",
+                                                                                    paddingRight: "4px"
+                                                                                }}>
+                                                                                    {String(oldText || "—")}
+                                                                                </div>
+                                                                            </div>
+                                                                            <div style={{
+                                                                                padding: "10px 14px",
+                                                                                background: theme.isDark ? "#0d1a0d" : "#F0FDF4",
+                                                                            }}>
+                                                                                <div style={{ fontSize: "10px", fontWeight: 800, color: "#10B981", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                                                                    ✓ After
+                                                                                </div>
+                                                                                <div style={{
+                                                                                    fontSize: "11px", color: theme.isDark ? "#6EE7B7" : "#064E3B",
+                                                                                    lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word",
+                                                                                    maxHeight: "160px", overflowY: "auto",
+                                                                                    paddingRight: "4px"
+                                                                                }}>
+                                                                                    {String(newText || "—")}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        // Configuration updated
+                                                        if (log.action === "configuration_updated" || log.action === "config_updated" || log.action === "configuration_changed") {
+                                                            // Unwrap nested configuration key if present
+                                                            const unwrap = (val) => {
+                                                                if (!val || typeof val !== "object") return {};
+                                                                if (val.configuration && typeof val.configuration === "object") return val.configuration;
+                                                                return val;
+                                                            };
+                                                            const oldCfg = unwrap(o);
+                                                            const newCfg = unwrap(n);
+                                                            const allKeys = new Set([...Object.keys(oldCfg), ...Object.keys(newCfg)]);
+                                                            const changed = [...allKeys].filter(k => JSON.stringify(oldCfg[k]) !== JSON.stringify(newCfg[k]));
+                                                            return (
+                                                                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                                                                    {changed.length === 0 && <span style={{ fontSize: "11px", color: theme.textMuted }}>No changes detected</span>}
+                                                                    {changed.map(k => (
+                                                                        <div key={k} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
+                                                                            <span style={{ color: theme.textMuted, minWidth: "110px" }}>{formatFieldName(k)}</span>
+                                                                            {formatFieldVal(oldCfg[k])}
+                                                                            <span style={{ color: theme.textMuted }}>→</span>
+                                                                            {formatFieldVal(newCfg[k])}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        // Status changed
+                                                        if (log.action === "status_changed") {
+                                                            const os = o?.status; const ns = n?.status;
+                                                            return (
+                                                                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
+                                                                    <span style={{ color: theme.textMuted }}>Status</span>
+                                                                    <span style={{ fontWeight: 700, color: os === "active" ? "#10B981" : "#EF4444" }}>{os}</span>
+                                                                    <span style={{ color: theme.textMuted }}>→</span>
+                                                                    <span style={{ fontWeight: 700, color: ns === "active" ? "#10B981" : "#EF4444" }}>{ns}</span>
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        return <span style={{ color: theme.textMuted, fontSize: "12px" }}>—</span>;
+                                                    };
+
+                                                    return (
+                                                        <tr key={log.log_id || i}>
+                                                            {[
+                                                                <span style={{
+                                                                    padding: "4px 10px", borderRadius: "20px",
+                                                                    background: meta.bg, color: meta.color,
+                                                                    fontSize: "11px", fontWeight: 700,
+                                                                    whiteSpace: "nowrap"
+                                                                }}>{meta.label}</span>,
+                                                                <span style={{ fontSize: "12px" }}>{log.modified_by || "Admin"}</span>,
+                                                                <span style={{ fontSize: "12px", whiteSpace: "nowrap" }}>{formatDate(log.modified_at || log.created_at)}</span>,
+                                                                renderDetails()
+                                                            ].map((cell, ci) => (
+                                                                <td key={ci} style={{
+                                                                    padding: "12px 14px",
+                                                                    borderBottom: `1px solid ${theme.cardBorder}`,
+                                                                    fontSize: "13px", color: theme.textPrimary,
+                                                                    verticalAlign: "top"
+                                                                }}>{cell}</td>
+                                                            ))}
+                                                        </tr>
+                                                    );
+                                                })}
                                             </tbody>
                                         </table>
                                     )}

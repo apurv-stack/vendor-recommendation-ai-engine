@@ -50,6 +50,9 @@ class AgentConfigurationService:
         if existing:
             return existing
 
+        while isinstance(configuration, dict) and "configuration" in configuration:
+            configuration = configuration["configuration"]
+
         config = AgentConfiguration(
             agent_id=agent_uuid,
             configuration=configuration,
@@ -69,42 +72,57 @@ class AgentConfigurationService:
         configuration: dict,
         updated_by: str = "admin"
     ):
-
         import uuid as _uuid
+        from sqlalchemy.orm.attributes import flag_modified
+        from app.models.prompt_version import PromptVersion
+
         try:
             agent_uuid = _uuid.UUID(str(agent_id))
         except (ValueError, AttributeError):
             agent_uuid = agent_id
 
-        import uuid as _uuid
-        try:
-            agent_uuid = _uuid.UUID(str(agent_id))
-        except (ValueError, AttributeError):
-            agent_uuid = agent_id
+    # Unwrap nested {"configuration": {...}} if sent by frontend
+        while isinstance(configuration, dict) and "configuration" in configuration:
+            configuration = configuration["configuration"]
 
         config = (
             db.query(AgentConfiguration)
-            .filter(
-                AgentConfiguration.agent_id == agent_uuid
-            )
+            .filter(AgentConfiguration.agent_id == agent_uuid)
             .first()
         )
 
         if not config:
-
             config = AgentConfiguration(
                 agent_id=agent_uuid,
                 configuration=configuration,
                 updated_by=updated_by
             )
-
             db.add(config)
-            db.flush()
-
         else:
-
             config.configuration = configuration
             config.updated_by = updated_by
+            flag_modified(config, "configuration")
+
+    # Save a config version snapshot into prompt_versions table
+    # using change_notes to mark it as a config version
+        existing_versions = (
+            db.query(PromptVersion)
+            .filter(PromptVersion.agent_id == agent_uuid)
+            .count()
+        )
+        import json
+        version_snapshot = PromptVersion(
+            agent_id=agent_uuid,
+            version_number=existing_versions + 1,
+            base_prompt=None,
+            role_instructions=None,
+            behavior_guidelines=None,
+            formatting_rules=None,
+            business_rules=None,
+            change_notes=f"[CONFIG] {json.dumps(configuration, ensure_ascii=False)[:500]}",
+            created_by=updated_by
+        )
+        db.add(version_snapshot)
 
         db.commit()
         db.refresh(config)

@@ -200,7 +200,8 @@ class QueryValidator:
     @classmethod
     def get_clarification_question(
         cls,
-        missing_fields: List[str]
+        missing_fields: List[str],
+        config: Dict[str, Any] = None
     ) -> str:
 
         if not missing_fields:
@@ -208,6 +209,7 @@ class QueryValidator:
 
         field = missing_fields[0]
 
+    # Default built-in questions
         questions = {
             "category": (
                 "Which vendor category are you looking for? "
@@ -221,5 +223,11 @@ class QueryValidator:
                 "(Wedding, Birthday, Corporate, etc.)"
             )
         }
+
+    # Admin-configured overrides take priority
+        if config:
+            followup_overrides = config.get("followup_questions", {})
+            if followup_overrides and field in followup_overrides:
+                return followup_overrides[field]
 
         return questions.get(field, "Could you provide more details?")

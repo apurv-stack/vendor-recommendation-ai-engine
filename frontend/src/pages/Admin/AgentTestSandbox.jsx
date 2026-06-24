@@ -6,7 +6,7 @@ import {
     ArrowLeft, Play, Copy, Download,
     CheckCircle2, AlertCircle, Clock, Cpu, Hash
 } from "lucide-react";
-import { getAllAgents, getVersionHistory, testAgent } from "../../services/agentService";
+import { getAllAgents, getVersionHistory, testAgent, testAgentWorkflow } from "../../services/agentService";
 
 const AgentTestSandbox = () => {
     const theme    = useTheme();
@@ -23,6 +23,8 @@ const AgentTestSandbox = () => {
     const [running,      setRunning]      = useState(false);
     const [copied,       setCopied]       = useState(false);
     const [toast,        setToast]        = useState(null);
+    const [testMode,     setTestMode]     = useState("prompt"); // "prompt" | "workflow"
+    const [workflowResult, setWorkflowResult] = useState(null);
 
     const showToast = (message, type = "success") => {
         setToast({ message, type });
@@ -30,7 +32,13 @@ const AgentTestSandbox = () => {
     };
 
     useEffect(() => {
-        getAllAgents().then(r => setAgents(r?.agents || [])).catch(() => {});
+        getAllAgents().then(r => {
+            const list = r?.agents || [];
+            setAgents(list);
+            if (!selectedAgent && list.length > 0) {
+                setSelectedAgent(list[0].agent_id);
+            }
+        }).catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -43,10 +51,21 @@ const AgentTestSandbox = () => {
     const handleRun = async () => {
         if (!selectedAgent) { showToast("Please select an agent", "error"); return; }
         if (!query.trim())  { showToast("Please enter a test query", "error"); return; }
+        if (agents.length === 0) { showToast("Agents still loading, please wait", "error"); return; }
+        const agentExists = agents.find(a => a.agent_id === selectedAgent);
+        if (!agentExists) { showToast("Selected agent not found, please reselect", "error"); return; }
+        setRunning(true);
         try {
-            setRunning(true);
             setResponse(null);
+            setWorkflowResult(null);
             const start = Date.now();
+
+            if (testMode === "workflow") {
+                const res = await testAgentWorkflow(query);
+                setWorkflowResult({ ...res, latency: Date.now() - start });
+                return;
+            }
+
             const res = await testAgent(selectedAgent, query, context);
             const elapsed = ((Date.now() - start) / 1000).toFixed(2);
             setResponse({ ...res, elapsed });
@@ -152,45 +171,70 @@ const AgentTestSandbox = () => {
                             </div>
                         </div>
 
-                        {/* Agent + Version selectors + Run */}
-                        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-                            <div>
-                                <label style={{ fontSize: "10px", fontWeight: 700, color: theme.textMuted,
-                                               textTransform: "uppercase", letterSpacing: "0.08em",
-                                               display: "block", marginBottom: "4px" }}>
-                                    Select Agent
-                                </label>
-                                <select value={selectedAgent}
-                                    onChange={e => setSelectedAgent(e.target.value)}
-                                    style={{ ...selectStyle, width: "200px" }}>
-                                    <option value="">Choose agent...</option>
-                                    {agents.map(a => (
-                                        <option key={a.agent_id} value={a.agent_id}>
-                                            {a.display_name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                        {/* Mode Toggle Row */}
+                        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+                            {[
+                                { id: "prompt",   label: "🧪 Prompt Test",   sub: "Tests prompt in isolation" },
+                                { id: "workflow", label: "⚡ Full Workflow",  sub: "Runs real agent pipeline" }
+                            ].map(m => (
+                                <button key={m.id} onClick={() => setTestMode(m.id)} style={{
+                                    padding: "10px 20px", borderRadius: "10px", cursor: "pointer",
+                                    border: `2px solid ${testMode === m.id ? "#7C5AF6" : theme.cardBorder}`,
+                                    background: testMode === m.id
+                                        ? (theme.isDark ? "#7C5AF615" : "#F3F0FF")
+                                        : (theme.isDark ? "#13131f" : "#F9FAFB"),
+                                    textAlign: "left", transition: "all 0.2s"
+                                }}>
+                                    <div style={{ fontSize: "12px", fontWeight: 700,
+                                        color: testMode === m.id ? "#7C5AF6" : theme.textPrimary }}>
+                                        {m.label}
+                                    </div>
+                                    <div style={{ fontSize: "10px", color: theme.textMuted, marginTop: "2px" }}>
+                                        {m.sub}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
 
-                            <div>
-                                <label style={{ fontSize: "10px", fontWeight: 700, color: theme.textMuted,
-                                               textTransform: "uppercase", letterSpacing: "0.08em",
-                                               display: "block", marginBottom: "4px" }}>
-                                    Select Version
-                                </label>
-                                <select value={selectedVer}
-                                    onChange={e => setSelectedVer(e.target.value)}
-                                    style={{ ...selectStyle, width: "180px" }}>
-                                    <option value="latest">Latest</option>
-                                    {versions.map(v => (
-                                        <option key={v.version_id} value={v.version_id}>
-                                            v{v.version_number} — {new Date(v.created_at).toLocaleDateString()}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                        {/* Agent + Version selectors + Run — only show in prompt mode */}
+                        {testMode === "prompt" && (
+                            <div style={{ display: "flex", gap: "12px", alignItems: "flex-end", flexWrap: "wrap" }}>
+                                <div>
+                                    <label style={{ fontSize: "10px", fontWeight: 700, color: theme.textMuted,
+                                                   textTransform: "uppercase", letterSpacing: "0.08em",
+                                                   display: "block", marginBottom: "4px" }}>
+                                        Select Agent
+                                    </label>
+                                    <select value={selectedAgent}
+                                        onChange={e => setSelectedAgent(e.target.value)}
+                                        style={{ ...selectStyle, width: "200px" }}>
+                                        <option value="">Choose agent...</option>
+                                        {agents.map(a => (
+                                            <option key={a.agent_id} value={a.agent_id}>
+                                                {a.display_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <div style={{ marginTop: "18px" }}>
+                                <div>
+                                    <label style={{ fontSize: "10px", fontWeight: 700, color: theme.textMuted,
+                                                   textTransform: "uppercase", letterSpacing: "0.08em",
+                                                   display: "block", marginBottom: "4px" }}>
+                                        Select Version
+                                    </label>
+                                    <select value={selectedVer}
+                                        onChange={e => setSelectedVer(e.target.value)}
+                                        style={{ ...selectStyle, width: "180px" }}>
+                                        <option value="latest">Latest</option>
+                                        {versions.map(v => (
+                                            <option key={v.version_id} value={v.version_id}>
+                                                v{v.version_number} — {new Date(v.created_at).toLocaleDateString()}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <button onClick={handleRun} disabled={running} style={{
                                     display: "flex", alignItems: "center", gap: "8px",
                                     padding: "10px 22px", borderRadius: "12px", border: "none",
@@ -203,7 +247,27 @@ const AgentTestSandbox = () => {
                                     {running ? "Running..." : "Run Test"}
                                 </button>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Workflow mode — just show run button, no agent selector needed */}
+                        {testMode === "workflow" && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ fontSize: "12px", color: theme.textMuted }}>
+                                    Runs the full agent pipeline with your query — no agent selection needed.
+                                </div>
+                                <button onClick={handleRun} disabled={running} style={{
+                                    display: "flex", alignItems: "center", gap: "8px",
+                                    padding: "10px 22px", borderRadius: "12px", border: "none",
+                                    background: "linear-gradient(135deg,#10B981,#059669)",
+                                    color: "#fff", cursor: running ? "not-allowed" : "pointer",
+                                    fontSize: "13px", fontWeight: 700, flexShrink: 0,
+                                    opacity: running ? 0.7 : 1
+                                }}>
+                                    <Play size={14} />
+                                    {running ? "Running Pipeline..." : "Run Pipeline"}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* ── SPLIT PANEL ── */}
@@ -268,6 +332,135 @@ const AgentTestSandbox = () => {
                             <p style={{ fontSize: "12px", color: theme.textMuted, marginBottom: "14px" }}>
                                 Response generated by the agent
                             </p>
+
+                            {/* Workflow Result */}
+                            {workflowResult && (
+                                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+
+                                    {/* Intent + Filters */}
+                                    <div style={{ padding: "14px", borderRadius: "10px",
+                                        background: theme?.isDark ? "#0d0d1a" : "#F9FAFB",
+                                        border: "1px solid rgba(124,90,246,0.12)" }}>
+                                        <div style={{ fontSize: "11px", fontWeight: 700, color: "#7C5AF6",
+                                            textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                                            Query Analysis
+                                        </div>
+                                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                                            <span style={{ padding: "4px 10px", borderRadius: "20px",
+                                                background: "#7C5AF618", color: "#7C5AF6",
+                                                fontSize: "11px", fontWeight: 600 }}>
+                                                Intent: {workflowResult.intent || "—"}
+                                            </span>
+                                            {Object.entries(workflowResult.filters || {}).map(([k, v]) => v && (
+                                                <span key={k} style={{ padding: "4px 10px", borderRadius: "20px",
+                                                    background: "#10B98118", color: "#10B981",
+                                                    fontSize: "11px", fontWeight: 600 }}>
+                                                    {k}: {String(v)}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        {workflowResult.current_question && (
+                                            <div style={{ marginTop: "10px", padding: "8px 12px", borderRadius: "8px",
+                                                background: "#F59E0B18", color: "#F59E0B",
+                                                fontSize: "12px", fontWeight: 600 }}>
+                                                💬 Follow-up: {workflowResult.current_question}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* AI Response */}
+                                    {workflowResult.ai_response && (
+                                        <div style={{ padding: "14px", borderRadius: "10px",
+                                            background: theme?.isDark ? "#0d0d1a" : "#F9FAFB",
+                                            border: "1px solid rgba(124,90,246,0.12)" }}>
+                                            <div style={{ fontSize: "11px", fontWeight: 700, color: "#3B82F6",
+                                                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                                                AI Response
+                                            </div>
+                                            <div style={{ fontSize: "13px", color: theme?.textPrimary, lineHeight: 1.7 }}>
+                                                {workflowResult.ai_response}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Vendors */}
+                                    {workflowResult.vendors?.length > 0 && (
+                                        <div style={{ padding: "14px", borderRadius: "10px",
+                                            background: theme?.isDark ? "#0d0d1a" : "#F9FAFB",
+                                            border: "1px solid rgba(124,90,246,0.12)" }}>
+                                            <div style={{ fontSize: "11px", fontWeight: 700, color: "#10B981",
+                                                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                                                Vendors Found ({workflowResult.vendor_count})
+                                            </div>
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                {workflowResult.vendors.map((v, i) => (
+                                                    <div key={i} style={{ padding: "10px 12px", borderRadius: "8px",
+                                                        background: theme?.isDark ? "#13131f" : "#fff",
+                                                        border: "1px solid rgba(124,90,246,0.1)",
+                                                        display: "flex", justifyContent: "space-between",
+                                                        alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
+                                                        <div>
+                                                            <div style={{ fontSize: "13px", fontWeight: 700,
+                                                                color: theme?.textPrimary }}>{v.name}</div>
+                                                            <div style={{ fontSize: "11px", color: theme?.textMuted, marginTop: "2px" }}>
+                                                                {v.category} · {v.city}
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                                                            {v.rating && (
+                                                                <span style={{ padding: "3px 8px", borderRadius: "20px",
+                                                                    background: "#F59E0B18", color: "#F59E0B",
+                                                                    fontSize: "11px", fontWeight: 600 }}>
+                                                                    ★ {v.rating}
+                                                                </span>
+                                                            )}
+                                                            {v.price_min && (
+                                                                <span style={{ padding: "3px 8px", borderRadius: "20px",
+                                                                    background: "#10B98118", color: "#10B981",
+                                                                    fontSize: "11px", fontWeight: 600 }}>
+                                                                    ₹{Number(v.price_min).toLocaleString()}
+                                                                    {v.price_max ? `–₹${Number(v.price_max).toLocaleString()}` : ""}
+                                                                </span>
+                                                            )}
+                                                            {v.is_available === true && (
+                                                                <span style={{ padding: "3px 8px", borderRadius: "20px",
+                                                                    background: "#10B98118", color: "#10B981",
+                                                                    fontSize: "11px", fontWeight: 600 }}>Available</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Workflow Trace */}
+                                    <div style={{ padding: "14px", borderRadius: "10px",
+                                        background: theme?.isDark ? "#0d0d1a" : "#F9FAFB",
+                                        border: "1px solid rgba(124,90,246,0.12)" }}>
+                                        <div style={{ fontSize: "11px", fontWeight: 700, color: theme?.textMuted,
+                                            textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                                            Agent Pipeline · {workflowResult.latency}ms
+                                        </div>
+                                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                                            {(workflowResult.workflow_trace || []).map((t, i) => (
+                                                <span key={i} style={{
+                                                    padding: "3px 10px", borderRadius: "20px", fontSize: "11px",
+                                                    fontWeight: 600,
+                                                    background: t.status === "success" ? "#10B98118"
+                                                        : t.status === "skipped" ? "#F59E0B18" : "#EF444418",
+                                                    color: t.status === "success" ? "#10B981"
+                                                        : t.status === "skipped" ? "#F59E0B" : "#EF4444"
+                                                }}>
+                                                    {t.agent?.replace(/_agent$/, "").replace(/_/g, " ")}
+                                                    {t.status === "skipped" ? " (skipped)" : ""}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            )}
 
                             {/* Status bar */}
                             {response && (

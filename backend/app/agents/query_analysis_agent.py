@@ -110,11 +110,18 @@ class QueryAnalysisAgent:
 
             ai_service = AIService()
 
+            from app.ai.query_preprocessor import QueryPreprocessor
+
+            qa_config = state.get("qa_config", {})
+            raw_query = state.get("query", "")
+            preprocessed_query = QueryPreprocessor.preprocess_with_config(raw_query, qa_config)
+
             structured = await ai_service.build_structured_response(
-                user_message=state.get("query", ""),
+                user_message=preprocessed_query,
                 previous=None,
                 conversation_context=state.get("conversation_context", ""),
-                override_system_prompt=override_system_prompt
+                override_system_prompt=override_system_prompt,
+                qa_config=qa_config
             )
             new_filters = structured.get("filters", {})
 

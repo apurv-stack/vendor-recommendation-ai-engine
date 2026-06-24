@@ -213,7 +213,11 @@ class ChatService:
                     qa_cfg = AgentConfigurationService.get_configuration_by_agent_name(
                         self.db, "query_analysis_agent"
                     )
-                    qa_config = qa_cfg.configuration if qa_cfg else {}
+                    raw_qa = qa_cfg.configuration if qa_cfg else {}
+                    # Flatten nested configuration if present
+                    while isinstance(raw_qa, dict) and "configuration" in raw_qa:
+                        raw_qa = raw_qa["configuration"]
+                    qa_config = raw_qa
                 except Exception:
                     qa_config = {}
 
@@ -249,6 +253,11 @@ class ChatService:
                 }
 
             filters = structured.get("filters", {})
+            extra_cities = qa_config.get("extra_cities", {})
+            if extra_cities and filters.get("city"):
+                city_raw = str(filters["city"]).lower().strip()
+                if city_raw in extra_cities:
+                    filters = {**filters, "city": extra_cities[city_raw].lower()}
             intent = structured.get("intent")
             validation = structured.get("validation", {})
 

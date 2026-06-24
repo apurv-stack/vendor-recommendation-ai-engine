@@ -77,13 +77,13 @@ class AIService:
     # OLLAMA SAFE SETTINGS
     # -----------------------------------
 
-    MAX_RETRIES = 1
+    MAX_RETRIES = 3
 
-    REQUEST_TIMEOUT = 180
+    REQUEST_TIMEOUT = 180  
 
     TEMPERATURE = 0.7
 
-    MAX_OUTPUT_TOKENS = 250
+    MAX_OUTPUT_TOKENS = 200
 
     def __init__(
 
@@ -214,36 +214,19 @@ class AIService:
 
                     )
 
-                    break
-
                     print("== AI CALL END ==")
+                    break
 
                 except Exception as e:
 
-                    logger.warning(
-
-                        f"AI retry {attempt + 1} failed"
-
+                    logger.exception(
+                        f"AI retry {attempt + 1} failed: {repr(e)}"
                     )
 
-                    if (
-
-                        attempt
-
-                        >=
-
-                        self.MAX_RETRIES
-
-                    ):
-
+                    if attempt >= self.MAX_RETRIES:
                         raise
 
-                    await asyncio.sleep(
-
-                        1
-
-                    )
-
+                    await asyncio.sleep(5)
             if not response:
 
                 raise RuntimeError(

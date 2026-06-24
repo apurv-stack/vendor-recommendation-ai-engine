@@ -1,4 +1,5 @@
 from uuid import UUID
+import asyncio 
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -60,7 +61,6 @@ def create_agent_api(
 # ==========================================
 # TEST SANDBOX
 # ==========================================
-
 @router.post("/test")
 async def test_agent_api(
     payload: dict,
@@ -82,8 +82,36 @@ async def test_agent_api(
     from app.ai.ai_service import AIService
     ai_service = AIService()
 
-    test_prompt = f"{prompt.base_prompt if prompt else ''}\n\nTest Query: {test_query}"
-    result = await ai_service.execute_prompt(test_prompt)
+    full_prompt = "\n\n".join(
+        filter(None, [
+            prompt.base_prompt if prompt else "",
+            prompt.role_instructions if prompt else "",
+            prompt.behavior_guidelines if prompt else "",
+            prompt.formatting_rules if prompt else "",
+            prompt.business_rules if prompt else "",
+        ])
+    )
+
+    # Keep sandbox prompt short — long prompts cause Ollama timeouts
+    combined_prompt = f"{full_prompt}\n\nUser Query:\n{test_query}"
+    combined_prompt = combined_prompt[:3000]  # hard cap — Ollama slows badly on long prompts
+
+    try:
+        result = await asyncio.wait_for(
+            ai_service.execute_prompt(combined_prompt),
+            timeout=200.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=503,
+            detail="The model is taking too long to respond. Try a shorter prompt or simpler query."
+        )
+
+    if not result.get("success"):
+        raise HTTPException(
+            status_code=503,
+            detail=result.get("error") or "Model failed to respond. Please try again."
+        )
 
     return {
         "success": True,
@@ -91,6 +119,79 @@ async def test_agent_api(
         "test_query": test_query,
         "response": result.get("response", ""),
         "prompt_version": "live"
+    }
+
+# ==========================================
+# FULL WORKFLOW SANDBOX TEST
+# ==========================================
+
+@router.post("/test-workflow")
+async def test_agent_workflow_api(
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(["admin"]))
+):
+    test_query = payload.get("test_query")
+    if not test_query:
+        raise HTTPException(status_code=400, detail="test_query is required")
+
+    from app.graphs.graph_service import GraphService
+    from app.models.user import User as UserModel
+    import uuid
+
+    # Build a fake admin user context for the graph
+    class AdminContext:
+        user_id = current_user.user_id
+        access_token = getattr(current_user, "access_token", None)
+
+    graph_service = GraphService()
+
+    try:
+        graph_result = await asyncio.wait_for(
+            graph_service.process(
+                query=test_query,
+                session_id=f"sandbox-{uuid.uuid4()}",
+                user_id=str(current_user.user_id),
+                access_token=getattr(current_user, "access_token", None),
+                db=db,
+                intent=None,
+                filters={},
+            ),
+            timeout=120.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=503, detail="Workflow timed out. Try a simpler query.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Workflow error: {str(e)}")
+
+    # Extract vendors
+    vendors = graph_result.get("ranked_vendors", []) or graph_result.get("vendors", [])
+    vendor_list = []
+    for v in vendors[:10]:
+        if hasattr(v, "__dict__"):
+            vendor_list.append({
+                "name": getattr(v, "name", ""),
+                "category": getattr(v, "category", ""),
+                "city": getattr(v, "city", ""),
+                "rating": getattr(v, "rating", None),
+                "price_min": getattr(v, "price_min", None),
+                "price_max": getattr(v, "price_max", None),
+                "is_available": getattr(v, "is_available", None),
+            })
+        elif isinstance(v, dict):
+            vendor_list.append(v)
+
+    return {
+        "success": True,
+        "test_query": test_query,
+        "intent": graph_result.get("intent", ""),
+        "filters": graph_result.get("filters", {}),
+        "ai_response": graph_result.get("ai_response", ""),
+        "vendors": vendor_list,
+        "vendor_count": len(vendor_list),
+        "workflow_trace": graph_result.get("workflow_trace", []),
+        "current_question": graph_result.get("current_question", None),
+        "missing_fields": graph_result.get("missing_fields", []),
     }
 
 # ==========================================
@@ -228,15 +329,11 @@ def get_agent_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role(["admin"]))
 ):
-
-    config = AgentConfigurationService.get_configuration(
-        db,
-        str(agent_id)
-    )
+    config = AgentConfigurationService.get_configuration(db, str(agent_id))
 
     return {
         "success": True,
-        "configuration": config
+        "configuration": config.configuration if config else {}  # <-- return the DICT, not the ORM object
     }
 
 
@@ -247,6 +344,12 @@ def update_agent_configuration(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role(["admin"]))
 ):
+    # Capture old value BEFORE update for audit log
+    existing = AgentConfigurationService.get_configuration(db, str(agent_id))
+    old_value = existing.configuration if existing else {}
+
+    # Increment config version number
+    old_version_number = existing.config_version if existing and hasattr(existing, 'config_version') else 0
 
     config = AgentConfigurationService.update_configuration(
         db=db,
@@ -255,12 +358,22 @@ def update_agent_configuration(
         updated_by=current_user.email
     )
 
+    # Write audit log for config change
+    log = AgentAuditLog(
+        agent_id=agent_id,
+        action="configuration_updated",
+        old_value={"configuration": old_value},
+        new_value={"configuration": payload.configuration},
+        modified_by=current_user.email
+    )
+    db.add(log)
+    db.commit()
+
     return {
         "success": True,
         "message": "Configuration updated successfully",
-        "configuration": config
+        "configuration": config.configuration if config else {}
     }
-
 # ==========================================
 # GET VERSION HISTORY
 # ==========================================

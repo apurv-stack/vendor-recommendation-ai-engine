@@ -117,6 +117,37 @@ class QueryPreprocessor:
 
         return query
 
+    @classmethod
+    def preprocess_with_config(
+        cls,
+        query: str,
+        config: dict = None
+    ) -> str:
+        """Preprocess with admin-configured extra city aliases applied first."""
+        if not query:
+            return ""
+
+        query = query.lower().strip()
+
+        # Apply admin-configured city aliases BEFORE standard normalization
+        if config:
+            extra_cities = config.get("extra_cities", {})
+            for alias, canonical in extra_cities.items():
+                query = re.sub(
+                    rf"\b{re.escape(alias.lower())}\b",
+                    canonical.lower(),
+                    query
+                )
+
+        # Then run standard preprocessing
+        query = cls._normalize_budget(query)
+        query = cls._normalize_locations(query)
+        query = cls._normalize_categories(query)
+        query = cls._normalize_preferences(query)
+        query = cls._clean_text(query)
+
+        return query
+
     @staticmethod
     def _clean_text(query: str) -> str:
     # Preserve minus sign before numbers for negative value detection
