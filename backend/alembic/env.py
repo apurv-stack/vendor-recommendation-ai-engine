@@ -46,6 +46,8 @@ from app.models.agent_audit_log import AgentAuditLog
 from app.models.agent_configuration import AgentConfiguration
 from app.models.vendor_cleanup_log import VendorCleanupLog
 from app.models.vendor_cleanup_report import VendorCleanupReport
+from app.models.sync_job_run import SyncJobRun
+from app.models.sync_activity_log import SyncActivityLog
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

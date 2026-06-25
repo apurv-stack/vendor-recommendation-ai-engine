@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" width="100%" height="100%">
+  <defs>
+    <!-- Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#DC2626"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#F8FAFC"/>
+
+  <!-- Title -->
+  <text x="30" y="45" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Chat Session Lifecycle</text>
+  <text x="30" y="68" font-family="system-ui, sans-serif" font-size="13" fill="#64748B">States, caching layers, database transactions, and background expiration jobs (Light Mode)</text>
+
+  <!-- Flow Steps -->
+  <!-- 1. HTTP Message Input -->
+  <g transform="translate(40, 180)" filter="url(#shadow)">
+    <rect width="150" height="70" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="75" y="30" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#1E40AF" text-anchor="middle">1. Request Input</text>
+    <text x="75" y="48" font-family="system-ui, sans-serif" font-size="10" fill="#2563EB" text-anchor="middle">POST /chat/message</text>
+  </g>
+
+  <!-- Decision: DB Session check -->
+  <g transform="translate(290, 215)">
+    <polygon points="0,-35 45,0 0,35 -45,0" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+    <text x="0" y="5" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">Session Exists?</text>
+  </g>
+
+  <!-- Create new Session -->
+  <g transform="translate(215, 340)" filter="url(#shadow)">
+    <rect width="150" height="75" rx="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+    <text x="75" y="28" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#0F172A" text-anchor="middle">Create new Session</text>
+    <text x="75" y="45" font-family="system-ui, sans-serif" font-size="9" fill="#64748B" text-anchor="middle">• Set status: ACTIVE</text>
+    <text x="75" y="58" font-family="system-ui, sans-serif" font-size="9" fill="#64748B" text-anchor="middle">• Expire active user ones</text>
+  </g>
+
+  <!-- 3. In-memory SessionManager Cache -->
+  <g transform="translate(420, 180)" filter="url(#shadow)">
+    <rect width="180" height="110" rx="8" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="90" y="28" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#78350F" text-anchor="middle">Session Cache (TTL 2h)</text>
+    <text x="15" y="50" font-family="system-ui, sans-serif" font-size="10" fill="#B45309">• In-Memory Lock touch</text>
+    <text x="15" y="70" font-family="system-ui, sans-serif" font-size="10" fill="#B45309">• Deque: add message (max 12)</text>
+    <text x="15" y="90" font-family="system-ui, sans-serif" font-size="10" fill="#B45309">• Merge query filters</text>
+  </g>
+
+  <!-- Decision: Requirements complete? -->
+  <g transform="translate(700, 215)">
+    <polygon points="0,-35 45,0 0,35 -45,0" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+    <text x="0" y="5" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">Complete?</text>
+  </g>
+
+  <!-- Follow-up Question State -->
+  <g transform="translate(625, 340)" filter="url(#shadow)">
+    <rect width="150" height="75" rx="8" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.5"/>
+    <text x="75" y="28" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#991B1B" text-anchor="middle">Followup Required</text>
+    <text x="75" y="45" font-family="system-ui, sans-serif" font-size="9" fill="#EF4444" text-anchor="middle">• Update DB: ACTIVE</text>
+    <text x="75" y="58" font-family="system-ui, sans-serif" font-size="9" fill="#EF4444" text-anchor="middle">• Return followup text</text>
+  </g>
+
+  <!-- Completed State -->
+  <g transform="translate(820, 180)" filter="url(#shadow)">
+    <rect width="150" height="85" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+    <text x="75" y="30" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#065F46" text-anchor="middle">COMPLETED State</text>
+    <text x="15" y="50" font-family="system-ui, sans-serif" font-size="9" fill="#047857">• Runs LangGraph workflow</text>
+    <text x="15" y="65" font-family="system-ui, sans-serif" font-size="9" fill="#047857">• Saves recommendations history</text>
+    <text x="15" y="80" font-family="system-ui, sans-serif" font-size="9" fill="#047857">• Updates user preferences</text>
+  </g>
+
+  <!-- Expiration Background Jobs -->
+  <!-- DB Expiry Job -->
+  <g transform="translate(420, 460)" filter="url(#shadow)">
+    <rect width="180" height="60" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1"/>
+    <text x="90" y="25" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">24h Database Expiry</text>
+    <text x="90" y="45" font-family="system-ui, sans-serif" font-size="9" fill="#64748B" text-anchor="middle">Sets inactive sessions to EXPIRED</text>
+  </g>
+
+  <!-- Cache Expiry Job -->
+  <g transform="translate(680, 460)" filter="url(#shadow)">
+    <rect width="180" height="60" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1"/>
+    <text x="90" y="25" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">2h Cache Expiry (TTL)</text>
+    <text x="90" y="45" font-family="system-ui, sans-serif" font-size="9" fill="#64748B" text-anchor="middle">Pops inactive sessions from memory</text>
+  </g>
+
+  <!-- Connectors -->
+  <!-- Input -> Exists Diamond -->
+  <path d="M 190 215 L 245 215" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <!-- Exists -> No (Create new) -->
+  <path d="M 290 250 L 290 340" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="300" y="300" font-family="system-ui, sans-serif" font-size="9" fill="#64748B">No</text>
+
+  <!-- Exists -> Yes (Go to cache) -->
+  <path d="M 335 215 L 420 215" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="370" y="205" font-family="system-ui, sans-serif" font-size="9" fill="#64748B">Yes</text>
+
+  <!-- Create new -> Go to cache -->
+  <path d="M 365 375 L 420 375 L 420 270" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <!-- Cache -> Complete Diamond -->
+  <path d="M 600 215 L 655 215" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <!-- Complete -> Yes (Completed) -->
+  <path d="M 745 215 L 820 215" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="780" y="205" font-family="system-ui, sans-serif" font-size="9" font-weight="bold" fill="#2563EB">Yes</text>
+
+  <!-- Complete -> No (Followup) -->
+  <path d="M 700 250 L 700 340" fill="none" stroke="#DC2626" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="710" y="300" font-family="system-ui, sans-serif" font-size="9" font-weight="bold" fill="#DC2626">No</text>
+
+  <!-- Expiry triggers -->
+  <path d="M 510 290 L 510 460" fill="none" stroke="#64748B" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-gray)"/>
+  <path d="M 570 290 C 650 310, 720 340, 730 460" fill="none" stroke="#64748B" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-gray)"/>
+</svg>

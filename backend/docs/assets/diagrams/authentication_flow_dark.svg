@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" width="100%" height="100%">
+  <defs>
+    <!-- Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#60A5FA"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0B0F19"/>
+
+  <!-- Title -->
+  <text x="30" y="45" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#F8FAFC">Authentication &amp; Token Rotation Flow</text>
+  <text x="30" y="68" font-family="system-ui, sans-serif" font-size="13" fill="#94A3B8">OAuth2 security architecture, JWT verification, role-based checks, and token rotation (Dark Mode)</text>
+
+  <!-- Group Boundaries -->
+  <!-- 1. Authentication / Login Flow -->
+  <g transform="translate(50, 150)">
+    <rect width="900" height="205" rx="8" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+    <rect width="160" height="22" rx="4" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="10" y="15" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">1. Authenticate / Login</text>
+  </g>
+
+  <!-- 2. Protected API Call -->
+  <g transform="translate(50, 365)">
+    <rect width="900" height="105" rx="8" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+    <rect width="160" height="22" rx="4" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="10" y="15" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">2. Protected Route Access</text>
+  </g>
+
+  <!-- 3. Token Rotation -->
+  <g transform="translate(50, 480)">
+    <rect width="900" height="135" rx="8" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+    <rect width="190" height="22" rx="4" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="10" y="15" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">3. Token Rotation &amp; Refresh</text>
+  </g>
+
+  <!-- Lifelines -->
+  <!-- Dashed vertical lines -->
+  <line x1="150" y1="140" x2="150" y2="615" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="500" y1="140" x2="500" y2="615" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="850" y1="140" x2="850" y2="615" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+  <!-- Activation Bars -->
+  <!-- Client (Browser) -->
+  <rect x="145" y="175" width="10" height="165" rx="2" fill="#1E3A8A" stroke="#3B82F6" stroke-width="1"/>
+  <rect x="145" y="380" width="10" height="75" rx="2" fill="#1E3A8A" stroke="#3B82F6" stroke-width="1"/>
+  <rect x="145" y="495" width="10" height="105" rx="2" fill="#1E3A8A" stroke="#3B82F6" stroke-width="1"/>
+
+  <!-- FastAPI Backend -->
+  <rect x="495" y="180" width="10" height="155" rx="2" fill="#334155" stroke="#64748B" stroke-width="1"/>
+  <rect x="495" y="385" width="10" height="65" rx="2" fill="#334155" stroke="#64748B" stroke-width="1"/>
+  <rect x="495" y="500" width="10" height="95" rx="2" fill="#334155" stroke="#64748B" stroke-width="1"/>
+
+  <!-- DB & JWT Engine -->
+  <rect x="845" y="195" width="10" height="115" rx="2" fill="#78350F" stroke="#F59E0B" stroke-width="1"/>
+  <rect x="845" y="515" width="10" height="60" rx="2" fill="#78350F" stroke="#F59E0B" stroke-width="1"/>
+
+  <!-- Lifeline Headers (Top) -->
+  <g transform="translate(80, 95)" filter="url(#shadow)">
+    <rect width="140" height="40" rx="6" fill="#1E293B" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="70" y="24" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#60A5FA" text-anchor="middle">Client (Browser)</text>
+  </g>
+
+  <g transform="translate(420, 95)" filter="url(#shadow)">
+    <rect width="160" height="40" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="1.5"/>
+    <text x="80" y="24" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC" text-anchor="middle">FastAPI Auth Router</text>
+  </g>
+
+  <g transform="translate(770, 95)" filter="url(#shadow)">
+    <rect width="160" height="40" rx="6" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="80" y="24" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#FBBF24" text-anchor="middle">PostgreSQL &amp; JWT</text>
+  </g>
+
+  <!-- Flow 1: Login -->
+  <!-- Client -> FastAPI (POST /auth/login) -->
+  <path d="M 155 190 L 495 190" fill="none" stroke="#E2E8F0" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="170" y="184" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">POST /auth/login (LoginRequest)</text>
+  <text x="170" y="198" font-family="system-ui, sans-serif" font-size="8" fill="#94A3B8">Payload: {username, password}</text>
+
+  <!-- FastAPI -> DB (Query User & Hash) -->
+  <path d="M 505 210 L 845 210" fill="none" stroke="#E2E8F0" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="520" y="204" font-family="system-ui, sans-serif" font-size="10" fill="#E2E8F0">1. Query User &amp; Retrieve Password Hash</text>
+
+  <!-- DB -> FastAPI (Return User details) -->
+  <path d="M 845 235 L 505 235" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-gray)"/>
+  <text x="520" y="230" font-family="system-ui, sans-serif" font-size="10" fill="#94A3B8">2. User Record (role, password_hash)</text>
+
+  <!-- FastAPI -> JWT (Create Tokens) -->
+  <path d="M 505 265 L 845 265" fill="none" stroke="#60A5FA" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <text x="520" y="259" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#60A5FA">3. Sign JWT Tokens (HS256)</text>
+  <text x="520" y="271" font-family="system-ui, sans-serif" font-size="8.5" fill="#93C5FD">Access Token (15m validity) &amp; Refresh Token (7d validity)</text>
+
+  <!-- JWT -> FastAPI (Return Tokens) -->
+  <path d="M 845 295 L 505 295" fill="none" stroke="#60A5FA" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-blue)"/>
+  <text x="520" y="290" font-family="system-ui, sans-serif" font-size="10" fill="#60A5FA">4. Token Strings Generated</text>
+
+  <!-- FastAPI -> Client (Response) -->
+  <path d="M 495 320 L 155 320" fill="none" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-gray)"/>
+  <text x="170" y="314" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#F8FAFC">Response 200 OK (Access Token + Cookie)</text>
+  <text x="170" y="326" font-family="system-ui, sans-serif" font-size="8" fill="#94A3B8">Body: {access_token, role}. Cookie: refresh_token (HttpOnly, Secure, SameSite=Lax)</text>
+
+
+  <!-- Flow 2: Protected Request -->
+  <!-- Client -> FastAPI (Authorized Request) -->
+  <path d="M 155 395 L 495 395" fill="none" stroke="#E2E8F0" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="170" y="389" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">POST /chat/message</text>
+  <text x="170" y="401" font-family="system-ui, sans-serif" font-size="8.5" fill="#94A3B8">Headers: Authorization: Bearer &lt;access_token&gt;</text>
+
+  <!-- FastAPI self check (Role Check) -->
+  <path d="M 505 405 L 530 405 L 530 425 L 505 425" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="536" y="415" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">require_role(["user"])</text>
+  <text x="536" y="425" font-family="system-ui, sans-serif" font-size="8" fill="#94A3B8">Extracts &amp; checks role from JWT claims</text>
+
+  <!-- FastAPI -> Client (Response) -->
+  <path d="M 495 440 L 155 440" fill="none" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-gray)"/>
+  <text x="170" y="435" font-family="system-ui, sans-serif" font-size="10" fill="#F8FAFC">Response 200 OK (ChatResponse JSON)</text>
+
+
+  <!-- Flow 3: Token Rotation -->
+  <!-- Client -> FastAPI (POST /auth/refresh) -->
+  <path d="M 155 510 L 495 510" fill="none" stroke="#E2E8F0" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="170" y="504" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">POST /auth/refresh</text>
+  <text x="170" y="516" font-family="system-ui, sans-serif" font-size="8" fill="#94A3B8">HttpOnly Cookie: refresh_token automatically attached by browser</text>
+
+  <!-- FastAPI -> JWT (Verify & Reissue) -->
+  <path d="M 505 530 L 845 530" fill="none" stroke="#60A5FA" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <text x="520" y="524" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#60A5FA">1. Verify Refresh Token Signature &amp; Expiry</text>
+
+  <!-- JWT -> FastAPI (New access token) -->
+  <path d="M 845 560 L 505 560" fill="none" stroke="#60A5FA" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-blue)"/>
+  <text x="520" y="554" font-family="system-ui, sans-serif" font-size="10" fill="#60A5FA">2. Generate New Access Token (15m)</text>
+
+  <!-- FastAPI -> Client (Response) -->
+  <path d="M 495 585 L 155 585" fill="none" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-gray)"/>
+  <text x="170" y="579" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#F8FAFC">Response 200 OK</text>
+  <text x="170" y="591" font-family="system-ui, sans-serif" font-size="8.5" fill="#94A3B8">Body: {success: true, access_token: "new_token"}</text>
+
+</svg>

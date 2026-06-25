@@ -57,6 +57,8 @@ from app.api.routes.reasoning_test import (
 
 from app.api.routes.admin_agent_routes import router as admin_agent_router
 from app.api.routes.vendor_cleanup_routes import router as vendor_cleanup_router
+from app.api.routes.vendor_sync_routes import router as vendor_sync_router
+
 # =====================================
 # EXCEPTION HANDLERS
 # =====================================
@@ -137,7 +139,7 @@ from app.models.vendor_service import (
 
 from app.models.vendor_cleanup_log import VendorCleanupLog
 from app.models.vendor_cleanup_report import VendorCleanupReport
-
+from app.services.scheduler_service import start_scheduler
 
 # =====================================
 # CREATE TABLES
@@ -180,6 +182,7 @@ async def lifespan(app: FastAPI):
 
     import asyncio
     asyncio.ensure_future(_warm_up())
+    start_scheduler()
     yield
     # SHUTDOWN — nothing needed
 
@@ -401,4 +404,8 @@ app.include_router(
 
 app.include_router(
     vendor_cleanup_router
+)
+
+app.include_router(
+    vendor_sync_router
 )

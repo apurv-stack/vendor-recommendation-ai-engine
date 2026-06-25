@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Vendor Discovery & Recommendation Engine: Architecture & Systems Report</title>
+    <style>
+        /* SADD/TDD Formal Document styling */
+        @page {
+            size: A4;
+            margin: 25mm 20mm 25mm 20mm;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: #111111;
+            font-family: "Calibri", "Arial", sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            padding: 40px 0;
+        }
+
+        .report-paper {
+            background-color: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 25mm 20mm;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        /* Formal Report Headings */
+        h1, h2, h3, h4 {
+            font-family: "Georgia", "Times New Roman", serif;
+            color: #0f172a;
+            font-weight: bold;
+            page-break-inside: avoid;
+        }
+
+        h1 {
+            font-size: 20pt;
+            margin-top: 36pt;
+            margin-bottom: 18pt;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 6pt;
+        }
+
+        h2 {
+            font-size: 14pt;
+            margin-top: 24pt;
+            margin-bottom: 12pt;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4pt;
+        }
+
+        h3 {
+            font-size: 12pt;
+            margin-top: 18pt;
+            margin-bottom: 8pt;
+        }
+
+        p {
+            margin-bottom: 12pt;
+            text-align: justify;
+        }
+
+        /* Custom Cover Page Styling */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 240mm; /* Sized for cover margin spacing */
+            text-align: center;
+            padding: 20mm 0;
+            page-break-after: always;
+        }
+
+        .cover-header {
+            font-size: 12pt;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #475569;
+        }
+
+        .cover-title-group {
+            margin: auto 0;
+        }
+
+        .cover-title {
+            font-family: "Georgia", serif;
+            font-size: 28pt;
+            font-weight: bold;
+            line-height: 1.2;
+            color: #0f172a;
+            margin-bottom: 18pt;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            color: #475569;
+            font-style: italic;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .cover-footer {
+            font-size: 10pt;
+            color: #64748b;
+            line-height: 1.8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 18pt;
+        }
+
+        /* Header / Footer page elements */
+        .report-header {
+            position: absolute;
+            top: 10mm;
+            left: 20mm;
+            right: 20mm;
+            font-size: 8.5pt;
+            color: #64748b;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .report-footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 20mm;
+            right: 20mm;
+            font-size: 8.5pt;
+            color: #64748b;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Code Block formatting */
+        code {
+            font-family: "Consolas", "Courier New", monospace;
+            background-color: #f8fafc;
+            color: #b91c1c;
+            padding: 1px 4px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 9.5pt;
+        }
+
+        pre {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 12pt;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 14pt;
+            page-break-inside: avoid;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #0f172a;
+            padding: 0;
+            border: none;
+            font-size: 9pt;
+        }
+
+        /* Table Design */
+        .table-container {
+            margin-bottom: 18pt;
+            page-break-inside: avoid;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5pt;
+        }
+
+        th, td {
+            padding: 8pt 10pt;
+            border: 1px solid #94a3b8;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Figure and SVG container */
+        .figure-container {
+            text-align: center;
+            margin: 24pt 0;
+            page-break-inside: avoid;
+        }
+
+        .figure-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            background-color: #ffffff;
+            display: inline-block;
+        }
+
+        .figure-caption {
+            font-family: "Georgia", serif;
+            font-size: 9.5pt;
+            color: #334155;
+            margin-top: 8pt;
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        /* Callouts / Warnings */
+        .callout {
+            background-color: #f8fafc;
+            border-left: 4px solid #475569;
+            padding: 12pt 16pt;
+            margin-bottom: 16pt;
+            page-break-inside: avoid;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .callout-header {
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 4pt;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .callout-note { border-left-color: #2563eb; background-color: #f0f6ff; }
+        .callout-warning { border-left-color: #d97706; background-color: #fffbeb; }
+        .callout-tip { border-left-color: #059669; background-color: #f0fdf4; }
+        .callout-important { border-left-color: #7c3aed; background-color: #faf5ff; }
+        .callout-caution { border-left-color: #dc2626; background-color: #fef2f2; }
+
+        /* List Spacing */
+        ul, ol {
+            margin-left: 20pt;
+            margin-bottom: 12pt;
+        }
+
+        li {
+            margin-bottom: 4pt;
+        }
+
+        /* Math styling */
+        .equation {
+            background-color: #f8fafc;
+            padding: 10pt;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 12pt;
+            border-radius: 4px;
+            font-family: "Georgia", serif;
+        }
+
+        .inline-equation {
+            font-family: "Georgia", serif;
+            font-style: italic;
+        }
+
+        /* Links styling for reports */
+        a {
+            color: #0f172a;
+            text-decoration: none;
+            border-bottom: 1px solid #64748b;
+        }
+
+        /* Print Media queries override */
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+            }
+
+            .report-paper {
+                box-shadow: none;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            pre, blockquote, table, tr, img, .figure-container, .callout {
+                page-break-inside: avoid;
+            }
+            
+            /* Hide absolute headers/footers in printing; browser handles default margins */
+            .report-header, .report-footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-paper">
+        <!-- Floating simulated headers/footers for web-view (hidden in print) -->
+        <div class="report-header">
+            <span>AI Vendor Recommendation Engine – Systems Architecture Manual</span>
+            <span>v1.0.0</span>
+        </div>
+        
+        <div class="report-footer">
+            <span>Handover Design Documentation</span>
+            <span>Generated: 2026-06-25 16:05:27</span>
+        </div>
+
+        <!-- 1. Formal Cover Page -->
+        <div class="cover-page">
+            <div class="cover-header">
+                Apurv Stack Systems Handover Manual
+            </div>
+            
+            <div class="cover-title-group">
+                <div class="cover-title">AI Vendor Discovery &amp; Recommendation Engine</div>
+                <div class="cover-subtitle">A Technical Design and System Architecture Handover Manual for Enterprise Discovery Agents</div>
+            </div>
+            
+            <div class="cover-footer">
+                <strong>Author:</strong> Technical Systems Architect &amp; Engineering Team<br>
+                <strong>Version:</strong> v1.0.0<br>
+                <strong>Date:</strong> June 25, 2026<br>
+                <strong>Workspace:</strong> apurv-stack/vendor-recommendation-ai-engine
+            </div>
+        </div>
+
+        <!-- 2. Master Report Body -->
+        <div class="report-body">
+            <h1 id="cover-page" class="">Cover Page</h1>
+<h1 id="ai-vendor-discovery-recommendation-engine-consolidated-technical-manual" class="page-break">AI Vendor Discovery & Recommendation Engine: Consolidated Technical Manual</h1>
+<ul><li>*Technical Handover and Systems Engineering Documentation**
+</li><li>*Version:** v1.0.0  
+</li><li>*Date:** June 25, 2026  
+</li><li>*Author:** Technical Systems Architect / Engineering Handover Team  
+</li><li>*Workspace:** <code>apurv-stack/vendor-recommendation-ai-engine</code>
+</li></ul>
+<hr>
+<h1 id="table-of-contents" class="">Table of Contents</h1>
+<ol><li><a href="#cover-page">Cover Page</a>
+</li><li><a href="#revision-history">Revision History</a>
+</li><li><a href="#executive-summary">Executive Summary</a>
+</li><li><a href="#business-objective">Business Objective</a>
+</li><li><a href="#technology-stack">Technology Stack</a>
+</li><li><a href="#high-level-architecture">High Level Architecture</a>
+</li><li><a href="#complete-system-architecture">Complete System Architecture</a>
+</li><li><a href="#agentic-ai-workflow">Agentic AI Workflow</a>
+</li><li><a href="#langgraph-processing-pipeline">LangGraph Processing Pipeline</a>
+</li><li><a href="#recommendation-engine">Recommendation Engine</a>
+</li><li><a href="#ranking-scoring-system">Ranking & Scoring System</a>
+</li><li><a href="#database-design">Database Design</a>
+</li><li><a href="#erd-explanation">ERD Explanation</a>
+</li><li><a href="#authentication-authorization">Authentication & Authorization</a>
+</li><li><a href="#session-management">Session Management</a>
+</li><li><a href="#vendor-synchronization-engine">Vendor Synchronization Engine</a>
+</li><li><a href="#vendor-cleanup-audit-engine">Vendor Cleanup & Audit Engine</a>
+</li><li><a href="#api-reference">API Reference</a>
+</li><li><a href="#deployment-architecture">Deployment Architecture</a>
+</li><li><a href="#security-architecture">Security Architecture</a>
+</li><li><a href="#monitoring-logging">Monitoring & Logging</a>
+</li><li><a href="#technical-challenges">Technical Challenges</a>
+</li><li><a href="#optimizations-implemented">Optimizations Implemented</a>
+</li><li><a href="#future-enhancements">Future Enhancements</a>
+</li><li><a href="#conclusion">Conclusion</a>
+</li></ol>
+<hr>
+<h1 id="revision-history" class="page-break">Revision History</h1>
+<p>Below is the changelog mapping the document modifications, verification audits, and schema updates:</p>
+<div class="table-container"><table>
+<thead><tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Description</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>v1.0.0</strong></td>
+<td>2026-06-25</td>
+<td>Technical Systems Architect</td>
+<td>Consolidated modular technical documentation files into one master technical manual. Incorporated all corrections from <code>diagram_audit_report.md</code> and <code>final_verification_report.md</code>. Corrected ERD table mappings (adding <code>categories</code> and <code>vendor_services</code>), adjusted the <code>conversations.session_id</code> constraint, standardized route prefixes to <code>/vendors/service</code>, documented Swagger login endpoint <code>/auth/token</code>, and embedded the complete dark/light SVG diagram suite.</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h1 id="executive-summary" class="page-break">Executive Summary</h1>
+<p>The <strong>AI Vendor Discovery & Recommendation Engine</strong> is an intelligent conversational search, matchmaking, and evaluation platform. It allows clients to search, filter, rank, and compare vendor profiles (e.g., caterers, DJs, venue hosts, photographers, decorators) using unstructured natural language.</p>
+<p>Traditional marketplace directories rely on rigid, dropdown-heavy search filters. This system implements a stateful agentic reasoning loop using <strong>FastAPI</strong>, <strong>PostgreSQL</strong>, and <strong>LangGraph</strong>. The system leverages:</p>
+<ol><li><strong>Local Parameter Extraction:</strong> A local <strong>Ollama</strong> service (running the <code>qwen2.5:7b</code> model) parses unstructured user queries to extract filters (city, category, guest capacity, pricing boundaries).
+</li><li><strong>Contextual History Tracking:</strong> A thread-safe, memory-locked caching session system compiles dialogue sequences and updates missing search criteria.
+</li><li><strong>Multi-Agent Execution Pipeline:</strong> LangGraph coordinates supervisor, context, analyzer, discovery, tool-calling, ranking, comparison, and response nodes.
+</li><li><strong>Weighted Suitability Scoring:</strong> An algorithm scores and ranks candidates using category-tailored criteria weights and availability priorities.
+</li><li><strong>Data Quality Operations:</strong> Automated daemons run periodic spreadsheet data ingestion synchronization and audit database records for duplicates and format anomalies.
+</li><li><strong>High-Speed Conversational Response:</strong> A remote <strong>Groq Cloud</strong> API (<code>llama3-8b-8192</code>) translates raw candidate matrices and comparison cards into friendly, warm responses.
+</li></ol>
+<p>This manual serves as the primary system design reference and internship handover documentation.</p>
+<hr>
+<h1 id="business-objective" class="page-break">Business Objective</h1>
+<p>In the event management and hospitality industries, matching clients with vendor profiles is a manual and time-consuming process. Planners spend hours filtering directory catalogs based on locations, budgets, rating averages, and service types.</p>
+<p>The <strong>AI Vendor Discovery Engine</strong> automates matchmaking via an intuitive conversational interface:</p>
+<ul><li><strong>Fuzzy Parsing:</strong> Interprets natural language statements (e.g., "I need a budget photographer in Mumbai who does candid shots") and translates them into database queries.
+</li><li><strong>Proactive Interceptions:</strong> Detects incomplete queries and prompts the user for missing fields (such as city or category) to establish search parameters before querying the database.
+</li><li><strong>Category-Tailored Scoring:</strong> Emphasizes different parameters based on category (e.g., location proximity for venues, price boundaries for caterers, average ratings for decorators).
+</li><li><strong>Head-to-Head Comparisons:</strong> Resolves comparison queries by presenting structured metrics and winner/loser verdicts based on prices, ratings, and verifications.
+</li><li><strong>Continuous Integrity:</strong> Runs background tasks to identify duplicate records, formatting issues, and price inconsistencies.
+</li></ul>
+<hr>
+<h1 id="technology-stack" class="page-break">Technology Stack</h1>
+<p>The platform is built using a cloud-native, Python-centric technology stack:</p>
+<ul><li><strong>Backend API Framework:</strong> <strong>FastAPI (v0.100+)</strong>
+<ul><li>*Rationale:* High-performance asynchronous execution, Pydantic data validation, auto-generated OpenAPI documentation, and dependency injection.
+</li></ul>
+</li><li><strong>Database & ORM:</strong> <strong>PostgreSQL</strong> with <strong>SQLAlchemy ORM (v2.0+)</strong>
+<ul><li>*Rationale:* Transactional safety, GIN indexing for JSONB context data, and type-safe SQLAlchemy 2.0 object-relational mapping.
+</li></ul>
+</li><li><strong>Database Migration tool:</strong> <strong>Alembic</strong>
+<ul><li>*Rationale:* Version-controlled schema migrations.
+</li></ul>
+</li><li><strong>Agentic Framework:</strong> <strong>LangGraph</strong> and <strong>LangChain</strong>
+<ul><li>*Rationale:* Coordinates multi-agent workflows as state machines. Manages states, node transitions, and conditional routing.
+</li></ul>
+</li><li><strong>AI Orchestration & Providers:</strong>
+<ul><li><strong>Ollama (Local - Qwen 2.5:7b):</strong> Primary engine for query understanding, intent extraction, and parameter parsing. Kept local to preserve user data privacy.
+</li><li><strong>Groq Cloud (Remote - Llama 3-8b-8192):</strong> Generates fast, conversational summaries and comparative responses.
+</li><li>*Note:* All references to Gemini and ModelScope have been removed, as the application uses local Ollama and remote Groq.
+</li></ul>
+</li><li><strong>Background Scheduler:</strong> <strong>APScheduler (Advanced Python Scheduler)</strong>
+<ul><li>*Rationale:* In-process daemon for database synchronization and cleanup tasks.
+</li></ul>
+</li></ul>
+<hr>
+<h1 id="high-level-architecture" class="page-break">High Level Architecture</h1>
+<p>The codebase is organized using clean architecture principles, dividing responsibilities into distinct layers:</p>
+<ol><li><strong>API Router Layer (FastAPI):</strong> Exposes endpoints, validates input payloads, and verifies JWT tokens.
+</li><li><strong>Service Layer (Business Logic):</strong> Handles core features, session context generation, sheet uploads, and admin operations.
+</li><li><strong>Reasoning Graph Layer (LangGraph):</strong> Orchestrates multi-agent node steps and manages <code>AgentState</code>.
+</li><li><strong>Repository Layer (Data Access):</strong> Executes optimized database queries using SQLAlchemy <code>joinedload</code> techniques to prevent N+1 queries.
+</li><li><strong>Database Layer (PostgreSQL):</strong> Stores relational schemas and JSONB conversation details.
+</li><li><strong>Integration Layer (LLM API Clients):</strong> Manages connection clients for Ollama and Groq.
+</li></ol>
+<hr>
+<h1 id="complete-system-architecture" class="page-break">Complete System Architecture</h1>
+<p>The following diagrams illustrate the relationship between the Vite Frontend UI, the FastAPI Application Server, the PostgreSQL database, local Ollama, and the remote Groq Cloud API:</p>
+<h3 id="high-level-system-architecture-light-mode">High-Level System Architecture - Light Mode</h3>
+<p><div class="figure-container"><img src="./assets/diagrams/high_level_architecture_light.svg" alt="High-Level System Integration - Light Mode"><div class="figure-caption">Figure 1 – High-Level System Architecture</div></div></p>
+<h3 id="high-level-system-architecture-dark-mode">High-Level System Architecture - Dark Mode</h3>
+<hr>
+<h1 id="agentic-ai-workflow" class="page-break">Agentic AI Workflow</h1>
+<p>The conversational reasoning loop is structured using <strong>LangGraph</strong>, compiling nodes into an acyclic state machine:</p>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/langgraph_workflow_light.svg" alt="LangGraph Workflow - Light Mode"><div class="figure-caption">Figure 2 – LangGraph Workflow Process</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<hr>
+<h1 id="langgraph-processing-pipeline" class="page-break">LangGraph Processing Pipeline</h1>
+<h3 id="langgraph-workflow-diagrams">LangGraph Workflow Diagrams</h3>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/langgraph_workflow_light.svg" alt="LangGraph Workflow - Light Mode"><div class="figure-caption">Figure 2 – LangGraph Workflow Process</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<h3 id="shared-state-definition-agentstate">Shared State Definition (`AgentState`)</h3>
+<p>The <code>AgentState</code> is a shared dictionary passed between agents. It contains the following keys:</p>
+<ul><li><strong>Request Context:</strong> <code>query</code> (str), <code>session_id</code> (str), <code>user_id</code> (str), <code>db</code> (Session), <code>access_token</code> (str | None).
+</li><li><strong>Routing Metadata:</strong> <code>intent</code> (str), <code>secondary_intents</code> (List[str]), <code>confidence</code> (float).
+</li><li><strong>Constraint Extraction:</strong> <code>filters</code> (Dict[str, Any] containing category, city, budget, guest count), <code>validation</code> (Dict[str, Any]), <code>search_payload</code> (Dict[str, Any]).
+</li><li><strong>Database & Tool Outputs:</strong> <code>tool_name</code> (str), <code>tool_input</code> (Dict[str, Any]), <code>tool_output</code> (Dict[str, Any]), <code>tool_status</code> (str), <code>tool_error</code> (str | None), <code>vendors</code> (List[Any]), <code>ranked_vendors</code> (List[Any]).
+</li><li><strong>Workflow Trace:</strong> <code>current_agent</code> (str), <code>workflow_trace</code> (List[Dict[str, Any]]), <code>errors</code> (List[str]), <code>ai_response</code> (str).
+</li></ul>
+<h3 id="node-specifications">Node Specifications</h3>
+<ul><li><strong><code>supervisor</code> (in <a href="app/agents/supervisor_agent.py">app/agents/supervisor_agent.py</a>):</strong> Determines query intent. If intent is resolved upstream by the router, it bypasses LLM classification to minimize latency. Otherwise, it calls <code>IntentExtractor</code>.
+</li><li><strong><code>context</code> (in <a href="app/agents/context_agent.py">app/agents/context_agent.py</a>):</strong> Loads user preference history and the last 10 messages. Bypasses database queries for simple greetings.
+</li><li><strong><code>query_analysis</code> (in <a href="app/agents/query_analysis_agent.py">app/agents/query_analysis_agent.py</a>):</strong> Parses filters (category, city, budget, guest count) using system prompt templates from the database and local Ollama.
+</li><li><strong><code>tool_calling</code> (in <a href="app/agents/tool_calling_agent.py">app/agents/tool_calling_agent.py</a>):</strong> Invokes tool executors. Catches database failures to update state.
+</li><li><strong><code>discovery</code> (in <a href="app/agents/discovery_agent.py">app/agents/discovery_agent.py</a>):</strong> Fetches matching vendors, applying limits from database configurations.
+</li><li><strong><code>ranking</code> (in <a href="app/agents/ranking_agent.py">app/agents/ranking_agent.py</a>):</strong> Passes vendor datasets and weights to <code>RecommendationEngine.rank_vendors</code>.
+</li><li><strong><code>comparison</code> (in <a href="app/agents/comparison_agent.py">app/agents/comparison_agent.py</a>):</strong> Handles head-to-head comparisons. Resolves spelling variations using word-intersection checks.
+</li><li><strong><code>response</code> (in <a href="app/agents/response_agent.py">app/agents/response_agent.py</a>):</strong> Generates client responses (including tables and comparison summaries) using Groq.
+</li><li><strong><code>error</code> (in <a href="app/agents/error_agent.py">app/agents/error_agent.py</a>):</strong> Outputs user-friendly fallback error messages.
+</li></ul>
+<h3 id="routing-logic">Routing Logic</h3>
+<p>The graph uses conditional routers to transition between nodes:</p>
+<ul><li><strong><code>route_from_supervisor</code>:</strong> Checks <code>state["intent"]</code>.
+<ul><li>If search-related (<code>'vendor_search'</code>, <code>'vendor_recommendation'</code>, <code>'pricing_query'</code>, <code>'service_query'</code>, <code>'session_query'</code>), routes to <code>context</code>.
+</li><li>If <code>'comparison_query'</code>, routes to <code>comparison</code>.
+</li><li>Otherwise, routes to <code>response</code>.
+</li></ul>
+</li><li><strong><code>route_after_analysis</code>:</strong> Checks filters.
+<ul><li>If <code>'comparison_query'</code>, routes to <code>comparison</code>.
+</li><li>If discovery-related, routes to <code>tool_calling</code>.
+</li></ul>
+</li><li><strong><code>route_after_tool_calling</code>:</strong>
+<ul><li>If <code>'session_query'</code>, routes to <code>response</code>.
+</li><li>If discovery-related, routes to <code>discovery</code>.
+</li></ul>
+</li></ul>
+<hr>
+<h1 id="recommendation-engine" class="page-break">Recommendation Engine</h1>
+<p>The recommendation engine ranks candidate vendors based on multi-dimensional relevance. Once matching vendors are returned from the database, they are scored using a weighted algorithm.</p>
+<p>The system calculates seven sub-scores, applies category-specific weights, adds verification bonuses, and applies availability metrics to generate a final suitability score (0-100%).</p>
+<h3 id="recommendation-scoring-pipeline-diagrams">Recommendation Scoring Pipeline Diagrams</h3>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/recommendation_pipeline_light.svg" alt="Recommendation Scoring Pipeline - Light Mode"><div class="figure-caption">Figure 3 – Recommendation Scoring Pipeline</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<hr>
+<h1 id="ranking-scoring-system" class="page-break">Ranking & Scoring System</h1>
+<h3 id="core-formula">Core Formula</h3>
+<p>The final suitability score for a vendor is computed using a weighted sum of seven sub-scores:</p>
+<p><div class="equation">\text{Final Score} = \sum (\text{Sub-Score}_i \times \text{Weight}_i)</div></p>
+<p><div class="equation">\text{Final Score} = (\text{Category} \times W_{cat}) + (\text{Budget} \times W_{bud}) + (\text{Location} \times W_{loc}) + (\text{Rating} \times W_{rat}) + (\text{Reviews} \times W_{rev}) + (\text{Verified} \times W_{ver}) + (\text{Available} \times W_{av})</div></p>
+<p>The final score is rounded to the nearest integer and capped at 100%.</p>
+<h3 id="sub-score-computations">Sub-Score Computations</h3>
+<ol><li><strong>Category Fit Score (0-100):</strong> Synonym checks mapping equivalent terms (e.g. "photo", "videographer" to canonical <code>'photography'</code>). Returns 100 for exact matches, 75 for partial matches, 60 for keyword description matches, and 0 for mismatches.
+</li><li><strong>Budget Relevance Score (0-100):</strong> Evaluates pricing compatibility:
+<ul><li>If budget lies within <span class="inline-equation">[Price_{min}, Price_{max}]</span>: Returns 100.
+</li><li>Max price under budget (affordable undershoot): Returns 80 (within 20% margin) or 60.
+</li><li>Min price over budget (overshoot): Returns 70 (within 10% overshoot), 40 (within 25%), 20 (within 50%), or 0.
+</li></ul>
+</li><li><strong>Location Score (0 or 100):</strong> Binary check. Returns 100 if the vendor's city matches the query city, else 0.
+</li><li><strong>Rating Score (0-100):</strong> Normalizes average ratings: <span class="inline-equation">(\text{Average Rating} / 5.0) \times 100</span>.
+</li><li><strong>Review Count Score (10-100):</strong> Confidence indexing: <span class="inline-equation">\ge 200 \rightarrow 100</span>, <span class="inline-equation">\ge 100 \rightarrow 80</span>, <span class="inline-equation">\ge 50 \rightarrow 60</span>, <span class="inline-equation">\ge 20 \rightarrow 40</span>, <span class="inline-equation">> 0 \rightarrow 20</span>, <span class="inline-equation">0 \rightarrow 10</span>.
+</li><li><strong>Verification Score (0 or 100):</strong> Returns 100 if verified, else 0.
+</li><li><strong>Availability Score (0-100):</strong> Returns 100 if available, 0 if unavailable, and 50 if unspecified.
+</li></ol>
+<h3 id="category-specific-weights">Category-Specific Weights</h3>
+<div class="table-container"><table>
+<thead><tr>
+<th>Category</th>
+<th><span class="inline-equation">W_{cat}</span> (Category)</th>
+<th><span class="inline-equation">W_{bud}</span> (Budget)</th>
+<th><span class="inline-equation">W_{loc}</span> (Location)</th>
+<th><span class="inline-equation">W_{rat}</span> (Rating)</th>
+<th><span class="inline-equation">W_{rev}</span> (Reviews)</th>
+<th><span class="inline-equation">W_{ver}</span> (Verified)</th>
+<th><span class="inline-equation">W_{av}</span> (Available)</th>
+</tr></thead><tbody>
+<tr>
+<td><strong><code>default</code></strong></td>
+<td>35%</td>
+<td>20%</td>
+<td>15%</td>
+<td>15%</td>
+<td>10%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>photography</code></strong></td>
+<td>25%</td>
+<td>10%</td>
+<td>10%</td>
+<td>30%</td>
+<td>20%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>catering</code></strong></td>
+<td>25%</td>
+<td>30%</td>
+<td>10%</td>
+<td>15%</td>
+<td>15%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>venue</code></strong></td>
+<td>25%</td>
+<td>20%</td>
+<td>30%</td>
+<td>12%</td>
+<td>8%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>decoration</code></strong></td>
+<td>25%</td>
+<td>15%</td>
+<td>10%</td>
+<td>28%</td>
+<td>17%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>dj</code></strong></td>
+<td>25%</td>
+<td>15%</td>
+<td>10%</td>
+<td>28%</td>
+<td>17%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>entertainment</code></strong></td>
+<td>25%</td>
+<td>12%</td>
+<td>10%</td>
+<td>30%</td>
+<td>18%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong><code>music</code></strong></td>
+<td>25%</td>
+<td>12%</td>
+<td>10%</td>
+<td>30%</td>
+<td>18%</td>
+<td>3%</td>
+<td>2%</td>
+</tr>
+</tbody></table></div>
+<h3 id="dynamic-overrides">Dynamic Overrides</h3>
+<p>Administrators can override scoring weights via the admin dashboard. The custom weights are fetched from database configuration settings. If the <strong>Availability Priority</strong> option is enabled, the availability weight is increased to 40% (ranking available vendors first) while reducing rating weights to balance the equation.</p>
+<h3 id="duplicate-filtering">Duplicate Filtering</h3>
+<p>To prevent duplicate listings in recommendation outputs:</p>
+<ul><li><strong>Database Grouping:</strong> SQL queries in <code>search_vendors</code> group results by <code>Vendor.vendor_id</code> to ensure unique vendor rows are returned.
+</li><li><strong>Hierarchical Deduplication:</strong> De-duplicates category-team listings, showing parent company profiles rather than listing individual sub-teams.
+</li></ul>
+<hr>
+<h1 id="database-design" class="page-break">Database Design</h1>
+<p>The relational database is built using PostgreSQL. Relations are modeled via SQLAlchemy ORM (using Python type annotations).</p>
+<h3 id="database-erd-diagrams">Database ERD Diagrams</h3>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/database_erd_light.svg" alt="Database Entity Relationship - Light Mode"><div class="figure-caption">Figure 4 – Database Entity Relationship Diagram (ERD)</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<hr>
+<h1 id="erd-explanation" class="page-break">ERD Explanation</h1>
+<h3 id="core-table-definitions-constraints">Core Table Definitions & Constraints</h3>
+<h4 id="1-users-model-user-in-appmodelsuserpyappmodelsuserpy">1. `users` (Model: `User` in [app/models/user.py](app/models/user.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>user_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Unique Constraints:</strong> <code>username</code>, <code>email</code>
+</li><li><strong>Check Constraints:</strong> 
+<ul><li><code>check_full_name</code>: <code>length(trim(full_name)) > 0</code>
+</li><li><code>check_username</code>: <code>length(trim(username)) > 0</code>
+</li><li><code>check_email</code>: <code>length(trim(email)) > 0</code>
+</li><li><code>check_phone</code>: <code>phone_number IS NULL OR length(trim(phone_number)) > 0</code>
+</li><li><code>check_role</code>: <code>role IN ('user','vendor','admin')</code>
+</li></ul>
+</li></ul>
+<h4 id="2-categories-model-category-in-appmodelscategorypyappmodelscategorypy">2. `categories` (Model: `Category` in [app/models/category.py](app/models/category.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>category_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Unique Constraints:</strong> <code>name</code>, <code>slug</code>
+</li><li><strong>Fields:</strong> <code>name</code> (String, nullable=False), <code>slug</code> (String, nullable=False), <code>description</code> (Text, nullable=True), <code>is_active</code> (Boolean, default=True), <code>created_at</code> (DateTime), <code>updated_at</code> (DateTime).
+</li></ul>
+<h4 id="3-vendors-model-vendor-in-appmodelsvendorpyappmodelsvendorpy">3. `vendors` (Model: `Vendor` in [app/models/vendor.py](app/models/vendor.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>vendor_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Keys:</strong> 
+<ul><li><code>user_id</code> <span class="inline-equation">\rightarrow</span> <code>users.user_id</code> (Unique, Nullable)
+</li><li><code>parent_vendor_id</code> <span class="inline-equation">\rightarrow</span> <code>vendors.vendor_id</code> (Self-referencing hierarchy link, Nullable)
+</li><li><code>category_id</code> <span class="inline-equation">\rightarrow</span> <code>categories.category_id</code> (Nullable)
+</li></ul>
+</li><li><strong>Check Constraints:</strong>
+<ul><li><code>check_vendor_name</code>: <code>length(trim(name)) > 0</code>
+</li><li><code>check_business_email</code>: <code>length(trim(business_email)) > 0</code>
+</li><li><code>check_contact_phone</code>: <code>length(trim(contact_phone)) > 0</code>
+</li><li><code>check_price_min</code>: <code>price_min IS NULL OR price_min >= 0</code>
+</li><li><code>check_price_max</code>: <code>price_max IS NULL OR price_max >= 0</code>
+</li><li><code>check_price_order</code>: <code>(price_min IS NULL OR price_max IS NULL) OR (price_min <= price_max)</code>
+</li><li><code>check_rating</code>: <code>avg_rating >= 0 AND avg_rating <= 5</code>
+</li><li><code>check_review_count</code>: <code>review_count >= 0</code>
+</li></ul>
+</li></ul>
+<h4 id="4-services-model-service-in-appmodelsservicepyappmodelsservicepy">4. `services` (Model: `Service` in [app/models/service.py](app/models/service.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>service_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Key:</strong> <code>category_vendor_id</code> <span class="inline-equation">\rightarrow</span> <code>vendors.vendor_id</code> (Cascade delete)
+</li><li><strong>Unique Constraint:</strong> <code>unique_service_per_category</code> on (<code>category_vendor_id</code>, <code>service_name</code>)
+</li></ul>
+<h4 id="5-vendorservices-model-vendorservice-in-appmodelsvendorservicepyappmodelsvendorservicepy">5. `vendor_services` (Model: `VendorService` in [app/models/vendor_service.py](app/models/vendor_service.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>service_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Key:</strong> <code>vendor_id</code> <span class="inline-equation">\rightarrow</span> <code>vendors.vendor_id</code> (Nullable=False)
+</li><li><strong>Check Constraints:</strong>
+<ul><li><code>check_service_name</code>: <code>length(trim(service_name)) > 0</code>
+</li><li><code>check_service_price</code>: <code>price IS NULL OR price >= 0</code>
+</li></ul>
+</li><li><strong>Fields:</strong> <code>service_name</code> (String, nullable=False), <code>description</code> (Text, nullable=True), <code>price</code> (Integer, nullable=True), <code>is_active</code> (Boolean, default=True), timestamps.
+</li></ul>
+<h4 id="6-chatsessions-model-chatsession-in-appmodelschatsessionpyappmodelschatsessionpy">6. `chat_sessions` (Model: `ChatSession` in [app/models/chat_session.py](app/models/chat_session.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>session_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Key:</strong> <code>user_id</code> <span class="inline-equation">\rightarrow</span> <code>users.user_id</code>
+</li><li><strong>Fields:</strong> <code>status</code> (String, default=<code>'ACTIVE'</code>), <code>context_data</code> (JSONB), <code>missing_fields</code> (JSONB).
+</li><li><strong>Indexes:</strong> 
+<ul><li><code>idx_chat_session_user</code> on <code>user_id</code>
+</li><li><code>idx_chat_session_status</code> on <code>status</code>
+</li></ul>
+</li></ul>
+<h4 id="7-conversations-model-conversation-in-appmodelsconversationpyappmodelsconversationpy">7. `conversations` (Model: `Conversation` in [app/models/conversation.py](app/models/conversation.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>conversation_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Key:</strong> <code>user_id</code> <span class="inline-equation">\rightarrow</span> <code>users.user_id</code> (Nullable=False)
+</li><li><strong>Session ID Column:</strong> <code>session_id</code> (UUID, Nullable=False) - *Note: No database-level ForeignKey constraint exists on this column to optimize write operations. It is indexed and handled at the service layer.*
+</li><li><strong>Metadata Fields (JSONB & Text):</strong>
+<ul><li><code>detected_intent</code> (String, nullable=True)
+</li><li><code>applied_filters</code> (Text, nullable=True)
+</li><li><code>is_follow_up</code> (Boolean, default=False)
+</li><li><code>context_summary</code> (Text, nullable=True)
+</li><li><code>recommendations</code> (JSONB, nullable=True)
+</li></ul>
+</li><li><strong>Indexes:</strong> 
+<ul><li><code>idx_conversation_session</code> on <code>session_id</code>
+</li><li><code>idx_conversation_user</code> on <code>user_id</code>
+</li><li><code>idx_conversation_intent</code> on <code>detected_intent</code>
+</li><li><code>idx_conversation_user_created</code> on (<code>user_id</code>, <code>created_at</code>)
+</li></ul>
+</li></ul>
+<h4 id="8-userpreferences-model-userpreference-in-appmodelsuserpreferencepyappmodelsuserpreferencepy">8. `user_preferences` (Model: `UserPreference` in [app/models/user_preference.py](app/models/user_preference.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>preference_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Keys:</strong>
+<ul><li><code>user_id</code> <span class="inline-equation">\rightarrow</span> <code>users.user_id</code> (Unique)
+</li><li><code>favorite_vendor_id</code> <span class="inline-equation">\rightarrow</span> <code>vendors.vendor_id</code>
+</li></ul>
+</li><li><strong>Indexes:</strong>
+<ul><li><code>idx_user_preference_category</code> on <code>preferred_category</code>
+</li><li><code>idx_user_preference_vendor</code> on <code>favorite_vendor_id</code>
+</li></ul>
+</li></ul>
+<h4 id="9-reviews-model-review-in-appmodelsreviewpyappmodelsreviewpy">9. `reviews` (Model: `Review` in [app/models/review.py](app/models/review.py))</h4>
+<ul><li><strong>Primary Key:</strong> <code>review_id</code> (UUID, Default: <code>uuid4</code>)
+</li><li><strong>Foreign Keys:</strong>
+<ul><li><code>user_id</code> <span class="inline-equation">\rightarrow</span> <code>users.user_id</code>
+</li><li><code>vendor_id</code> <span class="inline-equation">\rightarrow</span> <code>vendors.vendor_id</code> (Cascade delete)
+</li></ul>
+</li><li><strong>Fields:</strong> <code>rating</code> (Float, nullable=False), <code>comment</code> (Text), timestamps.
+</li></ul>
+<hr>
+<h1 id="authentication-authorization" class="page-break">Authentication & Authorization</h1>
+<p>The system enforces signed <strong>JWT Access Tokens</strong> and rotation cookies:</p>
+<ol><li><strong>Access Token:</strong> Short-lived JWT (15 minutes). Exchanged in the HTTP headers:
+<ul><li><code>Authorization: Bearer <JWT_ACCESS_TOKEN></code>
+</li></ul>
+</li><li><strong>Refresh Token:</strong> Long-lived token (7 days). Set by the server in a secure, <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite=Lax</code> cookie. Automatically read at the <code>/auth/refresh</code> endpoint to rotate access tokens.
+</li><li><strong>Role Checks:</strong> Injectable route dependencies enforce role restrictions: <code>user</code>, <code>vendor</code>, and <code>admin</code>.
+</li></ol>
+<h3 id="authentication-token-rotation-sequence-diagrams">Authentication & Token Rotation Sequence Diagrams</h3>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/authentication_flow_light.svg" alt="Authentication Flow - Light Mode"><div class="figure-caption">Figure 5 – Authentication & Token Rotation Flow</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<hr>
+<h1 id="session-management" class="page-break">Session Management</h1>
+<p>The conversation session flow manages active user states:</p>
+<h3 id="chat-session-lifecycle-diagrams">Chat Session Lifecycle Diagrams</h3>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/session_lifecycle_light.svg" alt="Chat Session Lifecycle - Light Mode"><div class="figure-caption">Figure 6 – Chat Session Lifecycle Flow</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<h3 id="lifecycle-design">Lifecycle Design</h3>
+<ul><li><strong>Creation:</strong> Triggers when a POST request is sent to <code>/chat/message</code> with a new <code>session_id</code>. If a session is missing, it closes older active sessions for the user and creates a new <code>ChatSession</code> record. <strong>Older active sessions are marked as <code>"COMPLETED"</code> (not <code>"EXPIRED"</code>) to ensure isolation.</strong>
+</li><li><strong>Update:</strong> Dialogues are saved to the <code>conversations</code> table, and extracted filters are merged with <code>ChatSession.context_data</code> JSONB parameters.
+</li><li><strong>Expiration:</strong> Cache records use a thread-safe cleanup routine with a 2-hour TTL sliding window. A background scheduler runs database updates to mark PostgreSQL sessions inactive for over 24 hours as <code>"EXPIRED"</code>.
+</li><li><strong>Persistence:</strong> Histories are stored in PostgreSQL to support multi-device syncing, and preferences are saved in the <code>user_preferences</code> table.
+</li></ul>
+<hr>
+<h1 id="vendor-synchronization-engine" class="page-break">Vendor Synchronization Engine</h1>
+<p>The backend utilizes <strong>APScheduler</strong> to execute periodic background operations.</p>
+<h3 id="database-ingestion-sync-pipeline-vendorsyncservice">Database Ingestion Sync Pipeline (`VendorSyncService`)</h3>
+<ul><li><strong>Execution Interval:</strong> Scheduled to run every 30 minutes.
+</li><li><strong>Operations:</strong> Reads external vendor records, validates required fields (name, email, phone), and retries failed syncs up to 3 times.
+</li><li><strong>Logging:</strong> Saves results to <code>SyncJobRun</code> and errors to <code>SyncActivityLog</code>.
+</li></ul>
+<hr>
+<h1 id="vendor-cleanup-audit-engine" class="page-break">Vendor Cleanup & Audit Engine</h1>
+<h3 id="database-quality-audit-cleanup-pipeline-vendorcleanupservice">Database Quality Audit & Cleanup Pipeline (`VendorCleanupService`)</h3>
+<ul><li><strong>Anomalies Checked:</strong> Runs quality audits to flag duplicates (matching name-email or name-phone pairs), validate email formats, check phone numbers, check for missing cities, and identify pricing errors (<span class="inline-equation">Price_{min} > Price_{max}</span>).
+</li><li><strong>Review Cycle:</strong> Audit logs are saved to <code>VendorCleanupLog</code> with a <code>'pending'</code> status. Administrators can review logs and update their status to <code>'reviewed'</code>, <code>'resolved'</code>, or <code>'ignored'</code>.
+</li><li><strong>Metrics:</strong> Scans are recorded in <code>VendorCleanupReport</code> to track metrics like total scanned profiles, issues detected, and issues resolved.
+</li></ul>
+<h3 id="sync-cleanup-workflow-diagrams">Sync & Cleanup Workflow Diagrams</h3>
+<h4 id="light-mode">Light Mode:</h4>
+<p><div class="figure-container"><img src="./assets/diagrams/sync_cleanup_workflow_light.svg" alt="Sync & Cleanup Workflow - Light Mode"><div class="figure-caption">Figure 7 – Ingestion Sync & Cleanup Workflow</div></div></p>
+<h4 id="dark-mode">Dark Mode:</h4>
+<hr>
+<h1 id="api-reference" class="page-break">API Reference</h1>
+<h3 id="1-authentication-router-auth">1. Authentication Router (`/auth`)</h3>
+<ul><li><strong>POST <code>/auth/register</code></strong>
+<ul><li>*Purpose:* Registers a new user or vendor account.
+</li><li>*Auth Required:* Public (None)
+</li><li>*Request Schema:* <code>RegisterRequest</code>
+<ul><li><code>username</code> (str, required): 3–30 chars, alphanumeric.
+</li><li><code>full_name</code> (str, required): 2–100 chars.
+</li><li><code>email</code> (str, required): Valid email string.
+</li><li><code>password</code> (str, required): 8–100 chars.
+</li><li><code>confirm_password</code> (str, required): Must match <code>password</code> exactly.
+</li><li><code>role</code> (str, optional, default: <code>"user"</code>): <code>"user"</code> or <code>"vendor"</code>.
+</li><li><code>business_email</code> (str, optional): Required for vendors.
+</li><li><code>phone_number</code> (str, optional): Required for vendors.
+</li></ul>
+</li><li>*Response Schema:* <code>RegisterResponse</code>
+<ul><li><code>success</code> (bool): <code>true</code> if registered.
+</li><li><code>message</code> (str): Status message.
+</li><li><code>user</code> (object): User details metadata.
+</li></ul>
+</li><li>*Example Request:*
+<ul><li>```json
+</li><li>{
+<ul><li>"username": "jane_doe",
+</li><li>"full_name": "Jane Doe",
+</li><li>"email": "jane@example.com",
+</li><li>"password": "Password123!",
+</li><li>"confirm_password": "Password123!",
+</li><li>"role": "user"
+</li></ul>
+</li><li>}
+</li><li>```
+</li></ul>
+</li><li>*Example Response:*
+<ul><li>```json
+</li><li>{
+<ul><li>"success": true,
+</li><li>"message": "User registered successfully",
+</li><li>"user": {
+<ul><li>"user_id": "d3b07384-d113-49cd-a5d6-8cf815f94d9a",
+</li><li>"username": "jane_doe",
+</li><li>"full_name": "Jane Doe",
+</li><li>"email": "jane@example.com",
+</li><li>"role": "user"
+</li></ul>
+</li><li>}
+</li></ul>
+</li><li>}
+</li><li>```
+</li></ul>
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/auth/login</code></strong>
+<ul><li>*Purpose:* Authenticates credentials and sets HTTP refresh token cookie.
+</li><li>*Auth Required:* Public (None)
+</li><li>*Request Schema:* <code>LoginRequest</code>
+<ul><li><code>identifier</code> (str, required): Username or email.
+</li><li><code>password</code> (str, required): Verification password.
+</li></ul>
+</li><li>*Response Schema:* <code>LoginResponse</code>
+<ul><li><code>success</code> (bool): <code>true</code> if logged in.
+</li><li><code>message</code> (str): Status message.
+</li><li><code>access_token</code> (str): Access token JWT.
+</li><li><code>token_type</code> (str): <code>"bearer"</code>.
+</li></ul>
+</li><li>*Response Cookie:* <code>Set-Cookie: refresh_token=<REFRESH_JWT>; HttpOnly; Secure; SameSite=Lax; Max-Age=604800</code>
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/auth/refresh</code></strong>
+<ul><li>*Purpose:* Renews access tokens using the refresh cookie.
+</li><li>*Auth Required:* Public (HttpOnly cookie check)
+</li><li>*Response Schema:* <code>access_token</code> (str), <code>token_type</code> (<code>"bearer"</code>).
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/auth/logout</code></strong>
+<ul><li>*Purpose:* Clears the refresh token cookie and invalidates session.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/auth/token</code></strong>
+<ul><li>*Purpose:* OAuth2 password form endpoint used by Swagger for authentication.
+</li><li>*Auth Required:* Public (Form inputs)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/auth/check-username/{username}</code></strong>
+<ul><li>*Purpose:* Instantly checks if a username is available.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/auth/check-email/{email}</code></strong>
+<ul><li>*Purpose:* Instantly checks if an email is registered.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/auth/me</code></strong>
+<ul><li>*Purpose:* Resolves the current user's profile metadata.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="2-conversational-chat-router-chat">2. Conversational Chat Router (`/chat`)</h3>
+<ul><li><strong>POST <code>/chat/message</code></strong>
+<ul><li>*Purpose:* Main conversational chat interface.
+</li><li>*Auth Required:* Bearer Token
+</li><li>*Request Schema:* <code>ChatRequest</code>
+<ul><li><code>message</code> (str, required): 1-500 characters.
+</li><li><code>session_id</code> (str, optional): Existing chat session UUID.
+</li></ul>
+</li><li>*Response Schema:* <code>ChatResponse</code>
+<ul><li><code>success</code> (bool): <code>true</code> if successful.
+</li><li><code>message</code> (str): Dialogue response text.
+</li><li><code>session_id</code> (str): Active session UUID.
+</li><li><code>response_type</code> (str): <code>"chat"</code>, <code>"validation_error"</code>, or <code>"error"</code>.
+</li><li><code>current_question</code> (str | None): Question about missing search criteria.
+</li><li><code>missing_fields</code> (list): Fields still required (e.g. <code>["city", "category"]</code>).
+</li><li><code>recommendations</code> (list): Matching candidate cards.
+</li></ul>
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="3-query-parsing-router-query">3. Query Parsing Router (`/query`)</h3>
+<ul><li><strong>POST <code>/query/preprocess</code></strong>
+<ul><li>*Purpose:* Normalizes query strings.
+</li><li>*Auth Required:* Bearer Token
+</li><li>*Request Schema:* <code>query</code> (str).
+</li><li>*Response Schema:* <code>normalized_query</code> (str).
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/query/understand</code></strong>
+<ul><li>*Purpose:* Returns extracted intents and filters using rule-based parsers.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/query/ai-understand</code></strong>
+<ul><li>*Purpose:* Triggers the LLM-driven structured filter extractor.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="4-ai-interactive-router-ai">4. AI Interactive Router (`/ai`)</h3>
+<ul><li><strong>POST <code>/ai/chat</code></strong>
+<ul><li>*Purpose:* Runs sandboxed prompts from templates, bypassing graph state.
+</li><li>*Auth Required:* Bearer Token
+</li><li>*Request Schema:* <code>query</code> (str), <code>workflow</code> (optional, default: <code>"vendor"</code>).
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="5-category-registry-management-categories">5. Category Registry Management (`/categories`)</h3>
+<ul><li><strong>POST <code>/categories/</code></strong>
+<ul><li>*Purpose:* Creates a new service category.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li><li>*Request Schema:* <code>name</code> (str), <code>slug</code> (str), <code>description</code> (str | None).
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/categories/</code></strong>
+<ul><li>*Purpose:* Lists all active categories.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/categories/{category_id}</code></strong>
+<ul><li>*Purpose:* Retrieves a single category.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>PATCH <code>/categories/{category_id}</code></strong>
+<ul><li>*Purpose:* Updates category properties.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>DELETE <code>/categories/{category_id}</code></strong>
+<ul><li>*Purpose:* Soft-deactivates a category.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="6-chat-session-router-sessions">6. Chat Session Router (`/sessions`)</h3>
+<ul><li><strong>GET <code>/sessions</code></strong>
+<ul><li>*Purpose:* Lists user sessions with pagination offsets.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/sessions/{session_id}</code></strong>
+<ul><li>*Purpose:* Retrieves session parameters and missing fields.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/sessions/{session_id}/history</code></strong>
+<ul><li>*Purpose:* Chronological message logs for a session.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/sessions/{session_id}/context</code></strong>
+<ul><li>*Purpose:* AI-generated summary of session preferences.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>PATCH <code>/sessions/{session_id}</code></strong>
+<ul><li>*Purpose:* Renames the session title.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>DELETE <code>/sessions/{session_id}</code></strong>
+<ul><li>*Purpose:* Deletes a session and its conversational history.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="7-vendor-directory-profiles-vendors">7. Vendor Directory & Profiles (`/vendors`)</h3>
+<ul><li><strong>GET <code>/vendors/profile</code></strong>
+<ul><li>*Purpose:* Retrieves the active vendor's business profile.
+</li><li>*Auth Required:* Bearer Token (Vendor only)
+</li></ul>
+</li></ul>
+<ul><li><strong>PUT <code>/vendors/profile</code></strong>
+<ul><li>*Purpose:* Updates the vendor business profile.
+</li><li>*Auth Required:* Bearer Token (Vendor only)
+</li></ul>
+</li></ul>
+<ul><li><strong>PUT <code>/vendors/{vendor_id}/rename</code></strong>
+<ul><li>*Purpose:* Renames a vendor business name.
+</li><li>*Auth Required:* Bearer Token (Vendor owner or Admin)
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/vendors/team</code></strong>
+<ul><li>*Purpose:* Creates a specialty sub-team nested under the root vendor profile.
+</li><li>*Auth Required:* Bearer Token (Vendor only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/internal-team</code></strong>
+<ul><li>*Purpose:* Returns sub-teams nested under the active vendor profile.
+</li><li>*Auth Required:* Bearer Token (Vendor only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/{vendor_id}/children</code></strong>
+<ul><li>*Purpose:* Public retrieval of sub-teams nested under a parent vendor ID.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/service/{service_id}</code></strong>
+<ul><li>*Purpose:* Retrieves a single service detail.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>PUT <code>/vendors/service/{service_id}/rename</code></strong>
+<ul><li>*Purpose:* Renames a specific service.
+</li><li>*Auth Required:* Bearer Token (Vendor owner or Admin)
+</li></ul>
+</li></ul>
+<ul><li><strong>DELETE <code>/vendors/service/{service_id}</code></strong>
+<ul><li>*Purpose:* Removes a service from the catalog.
+</li><li>*Auth Required:* Bearer Token (Vendor owner or Admin)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/search</code></strong>
+<ul><li>*Purpose:* Search endpoint with filtering and pagination.
+</li><li>*Auth Required:* Public
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/recommendations</code></strong>
+<ul><li>*Purpose:* Returns candidate vendors matching user preferences.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/preferences/me</code> | PUT <code>/vendors/preferences/me</code></strong>
+<ul><li>*Purpose:* Manages user search preferences.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/vendors/import</code></strong>
+<ul><li>*Purpose:* Ingests vendor profile listings (JSON payload).
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/vendors/import-file</code></strong>
+<ul><li>*Purpose:* Ingests vendor listings from CSV/Excel files.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>PATCH <code>/vendors/{vendor_id}/verify</code></strong>
+<ul><li>*Purpose:* Verification status toggle.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>PATCH <code>/vendors/{vendor_id}/reject</code></strong>
+<ul><li>*Purpose:* Flags a vendor profile as rejected.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>PATCH <code>/vendors/{vendor_id}/restore</code></strong>
+<ul><li>*Purpose:* Restores deactivated/rejected vendor profiles.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/vendors/admin/stats</code></strong>
+<ul><li>*Purpose:* Administrative analytics overview.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="8-ai-agent-administration-adminagents">8. AI Agent Administration (`/admin/agents`)</h3>
+<ul><li><strong>GET <code>/admin/agents</code> | POST <code>/admin/agents</code></strong>
+<ul><li>*Purpose:* Lists and creates reasoning agent nodes.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/agents/{agent_id}</code></strong>
+<ul><li>*Purpose:* Details for a specific reasoning agent.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>PATCH <code>/admin/agents/{agent_id}/status</code></strong>
+<ul><li>*Purpose:* Toggles active/inactive status of an agent.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/agents/{agent_id}/prompt</code> | PUT <code>/admin/agents/{agent_id}/prompt</code></strong>
+<ul><li>*Purpose:* Manages agent prompt versions.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/agents/{agent_id}/config</code> | PUT <code>/admin/agents/{agent_id}/config</code></strong>
+<ul><li>*Purpose:* Runtime parameter configs (e.g. model name, temperature, timeouts).
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/agents/{agent_id}/versions</code></strong>
+<ul><li>*Purpose:* Lists version logs for the system prompts.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/admin/agents/{agent_id}/rollback/{version_id}</code></strong>
+<ul><li>*Purpose:* Rolls back agent prompts to previous versions.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/agents/{agent_id}/audit-logs</code></strong>
+<ul><li>*Purpose:* Lists audit logs for the agent.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="9-vendor-quality-audit-cleanup-adminvendor-cleanup">9. Vendor Quality Audit & Cleanup (`/admin/vendor-cleanup`)</h3>
+<ul><li><strong>GET <code>/admin/vendor-cleanup/dashboard</code></strong>
+<ul><li>*Purpose:* Statistics of quality audit issues.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/admin/vendor-cleanup/run</code></strong>
+<ul><li>*Purpose:* Triggers database quality audits.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/vendor-cleanup/reports</code> | DELETE <code>/admin/vendor-cleanup/reports/{run_id}</code></strong>
+<ul><li>*Purpose:* Manages execution reports.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/vendor-cleanup/logs</code> | PATCH <code>/admin/vendor-cleanup/logs/{log_id}/status</code></strong>
+<ul><li>*Purpose:* Manages audit logs.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="10-vendor-ingestion-synchronization-adminvendor-sync">10. Vendor Ingestion & Synchronization (`/admin/vendor-sync`)</h3>
+<ul><li><strong>GET <code>/admin/vendor-sync/dashboard</code></strong>
+<ul><li>*Purpose:* Ingestion sync dashboard stats.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>POST <code>/admin/vendor-sync/run</code></strong>
+<ul><li>*Purpose:* Forces an immediate background ingestion sync run.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/vendor-sync/runs</code></strong>
+<ul><li>*Purpose:* Lists historical execution logs of ingestion sync jobs.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<ul><li><strong>GET <code>/admin/vendor-sync/logs</code></strong>
+<ul><li>*Purpose:* Lists detailed sync errors.
+</li><li>*Auth Required:* Bearer Token (Admin only)
+</li></ul>
+</li></ul>
+<hr>
+<h3 id="11-langgraph-pipeline-execution-reasoning">11. LangGraph Pipeline Execution (`/reasoning`)</h3>
+<ul><li><strong>POST <code>/reasoning/test</code></strong>
+<ul><li>*Purpose:* Executes the LangGraph agent state graph synchronously and returns complete tracing metrics for debugging queries.
+</li><li>*Auth Required:* Bearer Token
+</li></ul>
+</li></ul>
+<hr>
+<h1 id="deployment-architecture" class="page-break">Deployment Architecture</h1>
+<p>The platform uses a modular, cloud-native architecture:</p>
+<ul><li><strong>Vite Frontend UI:</strong> Serves static assets compiled with <code>npm run build</code> via Nginx (port <code>5173</code> in development).
+</li><li><strong>FastAPI Application Server:</strong> Executed via Uvicorn/Gunicorn. It runs on port <code>8000</code>, exposes API endpoints, and drives background task processing.
+</li><li><strong>PostgreSQL Database:</strong> The transactional data store (port <code>5432</code>).
+</li><li><strong>Local AI Engine (Ollama):</strong> A local service running on port <code>11434</code> hosting the <code>qwen2.5:7b</code> model. Used for parsing query intents and extracting parameter filters.
+</li><li><strong>Remote Response Generator (Groq):</strong> A remote API provider hosting <code>llama3-8b-8192</code>. Fast token generation is used to summarize search results and explain head-to-head comparisons.
+</li></ul>
+<hr>
+<h1 id="security-architecture" class="page-break">Security Architecture</h1>
+<ul><li><strong>JWT signature configurations:</strong> Configured with <code>SECRET_KEY</code> and the <code>HS256</code> signing algorithm. Access tokens are valid for 15 minutes, and refresh tokens are valid for 7 days.
+</li><li><strong>HttpOnly Cookies:</strong> Refresh tokens are written to client browsers via secure, HttpOnly cookies with <code>SameSite=lax</code> policies. This protects the tokens from XSS-based theft.
+</li><li><strong>Access Token Rotation Flow:</strong>
+<ol><li>The client requests a token refresh at <code>/auth/refresh</code>.
+</li><li>The server reads the HttpOnly cookie and validates the refresh token.
+</li><li>The server generates a new temporary access token and returns it in the response body.
+</li></ol>
+</li><li><strong>Role Verification Dependency:</strong> Injectable dependencies (<code>require_role(["admin"])</code> and <code>require_role(["vendor"])</code>) validate scopes before executing route actions.
+</li></ul>
+<hr>
+<h1 id="monitoring-logging" class="page-break">Monitoring & Logging</h1>
+<ul><li><strong>Request Logging Middleware:</strong> The server uses <code>RequestLoggingMiddleware</code> to intercept every incoming API call. It logs the HTTP method, path, response status code, and request duration in milliseconds.
+</li><li><strong>Audit Logs:</strong> Schema modifications, prompt changes, and system rollbacks write audit records to the <code>AgentAuditLog</code> database table. This helps track administrative operations.
+</li><li><strong>Data Ingestion logs:</strong> Sync runs write execution statistics (success ratios, failed items) to <code>SyncJobRun</code> and <code>SyncActivityLog</code> tables for easy debugging.
+</li></ul>
+<hr>
+<h1 id="technical-challenges" class="page-break">Technical Challenges</h1>
+<ul><li><strong>Ollama Latency and Timeout:</strong> Running heavy LLM models locally can be slow. If prompts are too long, Ollama slows down dramatically. Solved by capping prompt lengths to 3000 characters for sandbox runs and utilizing Groq Cloud as the high-speed response agent.
+</li><li><strong>Stateful Conversational Flows:</strong> Maintaining filters across messages requires a dual-layer caching strategy. Resolving comparison requests requires caching previous candidate lists in <code>SessionManager</code>.
+</li><li><strong>N+1 Query Operations:</strong> Database queries on nested entities (vendors, sub-teams, service price lists) could cause database performance bottlenecks. Solved by implementing SQLAlchemy <code>joinedload</code> on relationships.
+</li><li><strong>Transactional Data Cleaning:</strong> Bulk sync feeds can ingest bad data. Solved by wrapping sync in transaction scopes, logging job runs, and designing the separate audit/cleanup pipeline to flag price limits, formats, and duplicates.
+</li></ul>
+<hr>
+<h1 id="optimizations-implemented" class="page-break">Optimizations Implemented</h1>
+<ul><li><strong>Selective Caching:</strong> The <code>ToolCallingAgent</code> caches category-city searches for 5 minutes, avoiding duplicate database queries for identical queries. Incomplete searches bypass the cache to ensure the user receives appropriate follow-up questions.
+</li><li><strong>Model Warmups:</strong> Lifespan starts up in the background and warms up Ollama by generate-pinging the model on port 11434 with <code>keep_alive</code> set to <code>10m</code>.
+</li><li><strong>Fuzzy Match Logic:</strong> Direct word-intersection scoring matches user queries to actual vendor profile names.
+</li></ul>
+<hr>
+<h1 id="future-enhancements" class="page-break">Future Enhancements</h1>
+<ul><li><strong>Vector Search (Semantic Embedding):</strong> Implement pgvector to match user requirements to vendor descriptions using semantic similarity embeddings.
+</li><li><strong>Real-time Webhook Ingestions:</strong> Transition from 30-minute periodic sync runs to webhook-based event streams for real-time catalog updates.
+</li><li><strong>Interactive Admin Sandbox:</strong> Visual UI sandbox allowing admins to test prompts, inspect traces, and roll back prompt versions.
+</li></ul>
+<hr>
+<h1 id="conclusion" class="page-break">Conclusion</h1>
+<p>The <strong>AI Vendor Discovery & Recommendation Engine</strong> represents a modern approach to business matchmaking. By combining local private NLP parsing via <strong>Ollama</strong> with high-speed remote generation via <strong>Groq</strong>, the system achieves low latency, high relevance, and strong data integrity. The clean layering of services, state graphs, database transactions, and background audits ensures the platform remains scalable, secure, and easy to maintain.</p>
+        </div>
+    </div>
+
+</body>
+</html>

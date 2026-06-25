@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" width="100%" height="100%">
+  <defs>
+    <!-- Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0B0F19"/>
+
+  <!-- Title -->
+  <text x="30" y="45" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#F8FAFC">Recommendation Scoring Pipeline</text>
+  <text x="30" y="68" font-family="system-ui, sans-serif" font-size="13" fill="#94A3B8">Flow from raw database queries, sub-score calculations, dynamic weighting parameters, to final rankings (Dark Mode)</text>
+
+  <!-- Inputs Panel -->
+  <g transform="translate(30, 110)" filter="url(#shadow)">
+    <rect width="180" height="360" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="180" height="40" rx="10" fill="#0F172A" stroke="none"/>
+    <path d="M 0 40 L 180 40" stroke="#334155" stroke-width="1.5"/>
+    <text x="90" y="25" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#F8FAFC" text-anchor="middle">Pipeline Inputs</text>
+
+    <!-- Raw Vendors -->
+    <rect x="12" y="55" width="156" height="85" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="22" y="78" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#E2E8F0">Raw DB Candidates</text>
+    <text x="22" y="98" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Matching name, city</text>
+    <text x="22" y="113" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Category team logs</text>
+
+    <!-- User Constraints -->
+    <rect x="12" y="155" width="156" height="85" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="22" y="178" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#E2E8F0">User Query Rules</text>
+    <text x="22" y="198" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Target Budget limit</text>
+    <text x="22" y="213" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Guest counts, cuisines</text>
+
+    <!-- User Preferences -->
+    <rect x="12" y="255" width="156" height="85" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="22" y="278" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#E2E8F0">User preferences</text>
+    <text x="22" y="298" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Favorite category</text>
+    <text x="22" y="313" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Favorite city match</text>
+  </g>
+
+  <!-- Middle: Scoring Calculators Container -->
+  <g transform="translate(260, 110)" filter="url(#shadow)">
+    <rect width="260" height="360" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="260" height="40" rx="12" fill="#4C1D95" stroke="none" fill-opacity="0.2"/>
+    <path d="M 0 40 L 260 40" stroke="#334155" stroke-width="1.5"/>
+    <text x="130" y="25" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#C084FC" text-anchor="middle">Sub-Score Evaluators</text>
+
+    <!-- Category -->
+    <rect x="15" y="55" width="230" height="35" rx="6" fill="#0F172A" stroke="#D946EF" stroke-width="1"/>
+    <text x="25" y="76" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#F472B6">1. Category Normalizer Fit</text>
+
+    <!-- Budget Fit -->
+    <rect x="15" y="98" width="230" height="35" rx="6" fill="#0F172A" stroke="#3B82F6" stroke-width="1"/>
+    <text x="25" y="119" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#60A5FA">2. Budget Relevance Fit</text>
+
+    <!-- Location -->
+    <rect x="15" y="141" width="230" height="35" rx="6" fill="#0F172A" stroke="#64748B" stroke-width="1"/>
+    <text x="25" y="162" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#94A3B8">3. Location City Match</text>
+
+    <!-- Rating -->
+    <rect x="15" y="184" width="230" height="35" rx="6" fill="#0F172A" stroke="#F59E0B" stroke-width="1"/>
+    <text x="25" y="205" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#FBBF24">4. Numerical Rating Score</text>
+
+    <!-- Reviews -->
+    <rect x="15" y="227" width="230" height="35" rx="6" fill="#0F172A" stroke="#F59E0B" stroke-width="1"/>
+    <text x="25" y="248" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#FBBF24">5. Review Step Confidence</text>
+
+    <!-- Trust -->
+    <rect x="15" y="270" width="230" height="35" rx="6" fill="#0F172A" stroke="#10B981" stroke-width="1"/>
+    <text x="25" y="291" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#34D399">6. Trust Verification Bonus</text>
+
+    <!-- Availability -->
+    <rect x="15" y="313" width="230" height="35" rx="6" fill="#0F172A" stroke="#22C55E" stroke-width="1"/>
+    <text x="25" y="334" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#4ADE80">7. Availability Match Index</text>
+  </g>
+
+  <!-- Category Weight Mapper -->
+  <g transform="translate(565, 150)" filter="url(#shadow)">
+    <rect width="180" height="240" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="180" height="40" rx="10" fill="#0F172A" stroke="none"/>
+    <path d="M 0 40 L 180 40" stroke="#334155" stroke-width="1.5"/>
+    <text x="90" y="25" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#F8FAFC" text-anchor="middle">Dynamic Category Weights</text>
+
+    <!-- Weights categories details -->
+    <text x="15" y="65" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">Catering: Budget prioritised (30%)</text>
+    <text x="15" y="85" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">Photography: Rating prioritised (30%)</text>
+    <text x="15" y="105" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">Venues: Location prioritised (30%)</text>
+    <path d="M 10 120 L 170 120" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="140" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#818CF8">Admin Weight Overrides</text>
+    <text x="15" y="160" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">Override coefficients from DB</text>
+    
+    <rect x="10" y="180" width="160" height="45" rx="4" fill="#1D4ED8" fill-opacity="0.2" stroke="#3B82F6" stroke-width="1"/>
+    <text x="20" y="198" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#60A5FA">Availability Priority Mode</text>
+    <text x="20" y="213" font-family="system-ui, sans-serif" font-size="8" fill="#93C5FD">Forces Avail score to 40% weight</text>
+  </g>
+
+  <!-- Output Panel: Ranked list -->
+  <g transform="translate(790, 190)" filter="url(#shadow)">
+    <rect width="180" height="180" rx="10" fill="#1E293B" stroke="#10B981" stroke-width="2"/>
+    <rect width="180" height="40" rx="10" fill="#064E3B" fill-opacity="0.4" stroke="none"/>
+    <path d="M 0 40 L 180 40" stroke="#10B981" stroke-width="1.5"/>
+    <text x="90" y="25" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#34D399" text-anchor="middle">Weighted Match Ranker</text>
+
+    <text x="15" y="65" font-family="system-ui, sans-serif" font-size="10" fill="#E2E8F0">• Multiplies sub-scores * weights</text>
+    <text x="15" y="85" font-family="system-ui, sans-serif" font-size="10" fill="#E2E8F0">• Sorts descending by match score</text>
+    <text x="15" y="105" font-family="system-ui, sans-serif" font-size="10" fill="#E2E8F0">• Deduplicates identical IDs</text>
+    <text x="15" y="125" font-family="system-ui, sans-serif" font-size="10" fill="#E2E8F0">• Caps final list to max_results</text>
+    <rect x="10" y="145" width="160" height="23" rx="4" fill="#064E3B" stroke="none"/>
+    <text x="90" y="160" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#34D399" text-anchor="middle">🏆 Top Matches List</text>
+  </g>
+
+  <!-- Connectors -->
+  <!-- Inputs -> Sub-score Evaluators -->
+  <path d="M 210 290 L 260 290" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <!-- Evaluators -> Weight Mapper -->
+  <path d="M 520 290 L 565 290" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <!-- Weight Mapper -> Ranker -->
+  <path d="M 745 280 L 790 280" fill="none" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+</svg>

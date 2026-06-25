@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 580" width="100%" height="100%">
+  <defs>
+    <!-- Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#60A5FA"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#34D399"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0B0F19"/>
+
+  <!-- Title -->
+  <text x="30" y="45" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#F8FAFC">Vendor Synchronization &amp; Cleanup Workflow</text>
+  <text x="30" y="68" font-family="system-ui, sans-serif" font-size="13" fill="#94A3B8">Background daemon schedulers, external data ingestion validations, and transactional database quality audits (Dark Mode)</text>
+
+  <!-- Section Separator Lanes -->
+  <!-- Sync Pipeline Lane -->
+  <rect x="210" y="105" width="780" height="215" rx="10" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,6"/>
+  <rect x="225" y="115" width="160" height="20" rx="4" fill="#1E293B" stroke="#3B82F6" stroke-width="1"/>
+  <text x="235" y="129" font-family="system-ui, sans-serif" font-size="9.5" font-weight="bold" fill="#60A5FA">1. VENDOR SYNC PIPELINE</text>
+
+  <!-- Cleanup Pipeline Lane -->
+  <rect x="210" y="335" width="780" height="215" rx="10" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,6"/>
+  <rect x="225" y="345" width="180" height="20" rx="4" fill="#1E293B" stroke="#10B981" stroke-width="1"/>
+  <text x="235" y="359" font-family="system-ui, sans-serif" font-size="9.5" font-weight="bold" fill="#34D399">2. VENDOR QUALITY AUDIT</text>
+
+  <!-- Scheduler Block (Left Column) -->
+  <g transform="translate(30, 220)" filter="url(#shadow)">
+    <rect width="150" height="120" rx="8" fill="#1E293B" stroke="#64748B" stroke-width="1.5"/>
+    <rect width="150" height="30" rx="8" fill="#0B0F19"/>
+    <line x1="0" y1="30" x2="150" y2="30" stroke="#64748B" stroke-width="1.5"/>
+    <text x="75" y="20" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#E2E8F0" text-anchor="middle">APScheduler Daemon</text>
+    <text x="15" y="55" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#E2E8F0">Runtimes:</text>
+    <text x="15" y="75" font-family="system-ui, sans-serif" font-size="9.5" fill="#94A3B8">• Sync: every 30m</text>
+    <text x="15" y="92" font-family="system-ui, sans-serif" font-size="9.5" fill="#94A3B8">• Cleanup: daily run</text>
+    <text x="15" y="108" font-family="system-ui, sans-serif" font-size="9" fill="#64748B">In-Memory Thread Pool</text>
+  </g>
+
+  <!-- Sync Pipeline (Row 1) -->
+  <!-- 1. Service Node -->
+  <g transform="translate(240, 150)" filter="url(#shadow)">
+    <rect width="180" height="85" rx="8" fill="#1E293B" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="90" y="24" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#60A5FA" text-anchor="middle">VendorSyncService</text>
+    <text x="15" y="46" font-family="system-ui, sans-serif" font-size="9.5" fill="#93C5FD">• Checks external vendor feed</text>
+    <text x="15" y="62" font-family="system-ui, sans-serif" font-size="9.5" fill="#93C5FD">• Maps API raw structures</text>
+    <text x="15" y="76" font-family="system-ui, sans-serif" font-size="9" fill="#3b82f6">Imports bulk records</text>
+  </g>
+
+  <!-- 2. Validation / Retries Node -->
+  <g transform="translate(480, 150)" filter="url(#shadow)">
+    <rect width="200" height="85" rx="8" fill="#1E293B" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="100" y="24" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#60A5FA" text-anchor="middle">Validation &amp; Retries</text>
+    <text x="15" y="46" font-family="system-ui, sans-serif" font-size="9" fill="#93C5FD">• Validates name, email, phone</text>
+    <text x="15" y="60" font-family="system-ui, sans-serif" font-size="9" fill="#93C5FD">• Schema type assertions</text>
+    <text x="15" y="74" font-family="system-ui, sans-serif" font-size="9.5" font-weight="bold" fill="#F59E0B">• Retry policy: Max 3 times</text>
+  </g>
+
+  <!-- 3. Sync Database Logs -->
+  <g transform="translate(740, 150)" filter="url(#shadow)">
+    <rect width="220" height="85" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <text x="110" y="24" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#F8FAFC" text-anchor="middle">Sync DB Logs</text>
+    <text x="15" y="46" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Writes total count to SyncJobRun</text>
+    <text x="15" y="60" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Logs errors to SyncActivityLog</text>
+    <text x="15" y="74" font-family="system-ui, sans-serif" font-size="9" fill="#64748B">Saves duration, success/fail ratios</text>
+  </g>
+
+  <!-- Cleanup Pipeline (Row 2) -->
+  <!-- 1. Service Node -->
+  <g transform="translate(240, 380)" filter="url(#shadow)">
+    <rect width="180" height="85" rx="8" fill="#1E293B" stroke="#10B981" stroke-width="1.5"/>
+    <text x="90" y="24" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#34D399" text-anchor="middle">VendorCleanupService</text>
+    <text x="15" y="46" font-family="system-ui, sans-serif" font-size="9.5" fill="#A7F3D0">• Initiates quality audits</text>
+    <text x="15" y="62" font-family="system-ui, sans-serif" font-size="9.5" fill="#A7F3D0">• Scans database records</text>
+    <text x="15" y="76" font-family="system-ui, sans-serif" font-size="9" fill="#059669">Queries all active vendors</text>
+  </g>
+
+  <!-- 2. Audit Rules Node -->
+  <g transform="translate(480, 360)" filter="url(#shadow)">
+    <rect width="200" height="125" rx="8" fill="#1E293B" stroke="#10B981" stroke-width="1.5"/>
+    <text x="100" y="22" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#34D399" text-anchor="middle">Quality Audit Rules</text>
+    <text x="15" y="42" font-family="system-ui, sans-serif" font-size="9.5" fill="#A7F3D0">1. Duplicate check (Name+Email/Phone)</text>
+    <text x="15" y="58" font-family="system-ui, sans-serif" font-size="9.5" fill="#A7F3D0">2. Format validity (Email &amp; Phone patterns)</text>
+    <text x="15" y="74" font-family="system-ui, sans-serif" font-size="9.5" fill="#A7F3D0">3. Limits verification (Price_min &lt;= Max)</text>
+    <text x="15" y="90" font-family="system-ui, sans-serif" font-size="9.5" fill="#A7F3D0">4. Missing location field audit</text>
+    <text x="15" y="110" font-family="system-ui, sans-serif" font-size="9" font-style="italic" fill="#059669">Sets record status to 'pending'</text>
+  </g>
+
+  <!-- 3. Audit Database Logs -->
+  <g transform="translate(740, 345)" filter="url(#shadow)">
+    <rect width="220" height="75" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <text x="110" y="22" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#F8FAFC" text-anchor="middle">Audit Logs &amp; Metrics</text>
+    <text x="15" y="42" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Scan summaries in VendorCleanupReport</text>
+    <text x="15" y="56" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">• Flagged anomalies in VendorCleanupLog</text>
+  </g>
+
+  <!-- 4. Admin Portal Portal -->
+  <g transform="translate(740, 450)" filter="url(#shadow)">
+    <rect width="220" height="85" rx="8" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="110" y="24" font-family="system-ui, sans-serif" font-size="11.5" font-weight="bold" fill="#FBBF24" text-anchor="middle">Admin Action Portal</text>
+    <text x="15" y="46" font-family="system-ui, sans-serif" font-size="9" fill="#FDE047">• Fetches flagged anomalies</text>
+    <text x="15" y="60" font-family="system-ui, sans-serif" font-size="9" fill="#FDE047">• Modifies status: resolved / ignored</text>
+    <text x="15" y="74" font-family="system-ui, sans-serif" font-size="9" fill="#FDE047">• Direct DB update of vendor info</text>
+  </g>
+
+  <!-- Connections -->
+  <!-- Scheduler -> Sync service -->
+  <path d="M 180 260 L 210 260 L 210 192 L 234 192" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="194" y="280" font-family="system-ui, sans-serif" font-size="9" font-weight="bold" fill="#E2E8F0" transform="rotate(-90 194 280)">Trigger: 30m</text>
+
+  <!-- Scheduler -> Cleanup service -->
+  <path d="M 180 300 L 210 300 L 210 422 L 234 422" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+  <text x="220" y="325" font-family="system-ui, sans-serif" font-size="9" fill="#94A3B8">Periodic / Daily</text>
+
+  <!-- Sync service -> Validation -->
+  <path d="M 420 192 L 474 192" fill="none" stroke="#60A5FA" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Validation -> DB Sync logs -->
+  <path d="M 680 192 L 734 192" fill="none" stroke="#60A5FA" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Cleanup service -> Audit Rules -->
+  <path d="M 420 422 L 474 422" fill="none" stroke="#34D399" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- Audit Rules -> DB Audit logs -->
+  <path d="M 680 400 L 734 400" fill="none" stroke="#34D399" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- Admin UI reads DB Audit logs -->
+  <path d="M 880 420 L 880 444" fill="none" stroke="#94A3B8" stroke-width="1" marker-end="url(#arrow-gray)"/>
+  <text x="886" y="436" font-family="system-ui, sans-serif" font-size="8.5" fill="#94A3B8">1. Read Logs</text>
+
+  <!-- Admin UI writes updates back to audit logs -->
+  <path d="M 800 450 L 800 426" fill="none" stroke="#94A3B8" stroke-width="1" marker-end="url(#arrow-gray)"/>
+  <text x="714" y="440" font-family="system-ui, sans-serif" font-size="8.5" fill="#94A3B8">2. Update Status</text>
+
+</svg>

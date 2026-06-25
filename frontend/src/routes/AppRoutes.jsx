@@ -57,6 +57,7 @@ import AIAgentsPage from "../pages/Admin/AIAgentsPage";
 import AgentConfigPage from "../pages/Admin/AgentConfigPage";
 import AgentTestSandbox from "../pages/Admin/AgentTestSandbox";
 import VendorCleanupPage from "../pages/Admin/VendorCleanupPage";
+import VendorSyncPage from "../pages/Admin/VendorSyncPage";
 
 const UnauthorizedPage=()=>{
 
@@ -410,6 +411,15 @@ allowedRoles={[
     element={
         <ProtectedRoute allowedRoles={["admin"]}>
             <VendorCleanupPage />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/admin/vendor-sync"
+    element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+            <VendorSyncPage />
         </ProtectedRoute>
     }
 />

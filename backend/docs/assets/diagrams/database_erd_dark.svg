@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="100%" height="100%">
+  <defs>
+    <!-- Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <!-- Relationship markers (crow's foot / lines) -->
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="3" fill="#64748B"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0B0F19"/>
+
+  <!-- Title -->
+  <text x="30" y="45" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#F8FAFC">Database Entity-Relationship Diagram (ERD)</text>
+  <text x="30" y="68" font-family="system-ui, sans-serif" font-size="13" fill="#94A3B8">Relational database schema mappings, primary/foreign keys, and constraint rules (Dark Mode)</text>
+
+  <!-- TABLE: users -->
+  <g transform="translate(380, 100)" filter="url(#shadow)">
+    <rect width="220" height="200" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="220" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 220 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">users</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 user_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" fill="#E2E8F0">  username : VARCHAR (UQ)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" fill="#E2E8F0">  email : VARCHAR (UQ)</text>
+    <text x="15" y="120" font-family="monospace" font-size="11" fill="#E2E8F0">  role : VARCHAR</text>
+    <text x="15" y="140" font-family="monospace" font-size="11" fill="#E2E8F0">  password_hash : VARCHAR</text>
+    <text x="15" y="160" font-family="monospace" font-size="11" fill="#94A3B8">  is_active : BOOLEAN</text>
+    <text x="15" y="180" font-family="monospace" font-size="11" fill="#94A3B8">  created_at : TIMESTAMP</text>
+  </g>
+
+  <!-- TABLE: user_preferences -->
+  <g transform="translate(40, 80)" filter="url(#shadow)">
+    <rect width="250" height="180" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="250" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 250 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">user_preferences</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 preference_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 user_id : UUID (FK)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" fill="#E2E8F0">  preferred_category : VARCHAR</text>
+    <text x="15" y="120" font-family="monospace" font-size="11" fill="#E2E8F0">  preferred_city : VARCHAR</text>
+    <text x="15" y="140" font-family="monospace" font-size="11" fill="#E2E8F0">  preferred_event_type : VARCHAR</text>
+    <text x="15" y="160" font-family="monospace" font-size="11" fill="#94A3B8">  favorite_vendor_id : UUID</text>
+  </g>
+
+  <!-- TABLE: chat_sessions -->
+  <g transform="translate(40, 290)" filter="url(#shadow)">
+    <rect width="250" height="160" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="250" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 250 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">chat_sessions</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 session_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 user_id : UUID (FK)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" fill="#E2E8F0">  status : VARCHAR ('ACTIVE'..)</text>
+    <text x="15" y="120" font-family="monospace" font-size="11" fill="#E2E8F0">  context_data : JSONB</text>
+    <text x="15" y="140" font-family="monospace" font-size="11" fill="#94A3B8">  missing_fields : JSONB</text>
+  </g>
+
+  <!-- TABLE: conversations -->
+  <g transform="translate(40, 480)" filter="url(#shadow)">
+    <rect width="250" height="140" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="250" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 250 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">conversations</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 conversation_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 user_id : UUID (FK)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" fill="#E2E8F0">  session_id : UUID (FK)</text>
+    <text x="15" y="120" font-family="monospace" font-size="11" fill="#94A3B8">  user_message / ai_response : TEXT</text>
+  </g>
+
+  <!-- TABLE: vendors -->
+  <g transform="translate(680, 80)" filter="url(#shadow)">
+    <rect width="280" height="240" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="280" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 280 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">vendors</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 vendor_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 user_id : UUID (FK, UQ)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 parent_vendor_id : UUID (FK)</text>
+    <text x="15" y="120" font-family="monospace" font-size="11" fill="#E2E8F0">  name : VARCHAR</text>
+    <text x="15" y="140" font-family="monospace" font-size="11" fill="#E2E8F0">  business_email : VARCHAR (UQ)</text>
+    <text x="15" y="160" font-family="monospace" font-size="11" fill="#E2E8F0">  city : VARCHAR</text>
+    <text x="15" y="180" font-family="monospace" font-size="11" fill="#E2E8F0">  price_min / price_max : INT</text>
+    <text x="15" y="200" font-family="monospace" font-size="11" fill="#94A3B8">  avg_rating / review_count : NUM</text>
+    <text x="15" y="220" font-family="monospace" font-size="11" fill="#94A3B8">  is_available / is_verified : BOOL</text>
+  </g>
+
+  <!-- TABLE: services -->
+  <g transform="translate(680, 360)" filter="url(#shadow)">
+    <rect width="280" height="120" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="280" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 280 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">services</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 service_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 category_vendor_id : UUID (FK)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" fill="#E2E8F0">  service_name : VARCHAR (UQ Composite)</text>
+  </g>
+
+  <!-- TABLE: reviews -->
+  <g transform="translate(380, 380)" filter="url(#shadow)">
+    <rect width="220" height="160" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="220" height="35" rx="8" fill="#0F172A" stroke="none"/>
+    <path d="M 0 35 L 220 35" stroke="#334155" stroke-width="1"/>
+    <text x="15" y="22" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F8FAFC">reviews</text>
+    
+    <!-- columns -->
+    <text x="15" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#60A5FA">🔑 review_id : UUID</text>
+    <text x="15" y="80" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 user_id : UUID (FK)</text>
+    <text x="15" y="100" font-family="monospace" font-size="11" font-weight="bold" fill="#818CF8">🔗 vendor_id : UUID (FK)</text>
+    <text x="15" y="120" font-family="monospace" font-size="11" fill="#E2E8F0">  rating : NUMERIC</text>
+    <text x="15" y="140" font-family="monospace" font-size="11" fill="#94A3B8">  comment : TEXT</text>
+  </g>
+
+  <!-- RELATIONSHIP LINES -->
+  <!-- users -> user_preferences (1 to 1) -->
+  <path d="M 380 180 L 290 180" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="335" y="170" font-family="sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">1 : 1</text>
+
+  <!-- users -> chat_sessions (1 to Many) -->
+  <path d="M 380 230 C 320 230, 300 290, 290 320" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="340" y="245" font-family="sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">1 : N</text>
+
+  <!-- users -> conversations (1 to Many) -->
+  <path d="M 380 270 C 310 270, 300 480, 290 510" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="330" y="380" font-family="sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">1 : N</text>
+
+  <!-- users -> vendors (1 to 1) -->
+  <path d="M 600 180 L 680 180" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)" marker-end="url(#dot)"/>
+  <text x="640" y="170" font-family="sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">1 : 1</text>
+
+  <!-- vendors -> services (1 to Many) -->
+  <path d="M 820 320 L 820 360" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="835" y="345" font-family="sans-serif" font-size="9" fill="#94A3B8">1 : N</text>
+
+  <!-- users -> reviews (1 to Many) -->
+  <path d="M 490 300 L 490 380" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="505" y="340" font-family="sans-serif" font-size="9" fill="#94A3B8">1 : N</text>
+
+  <!-- vendors -> reviews (1 to Many) -->
+  <path d="M 820 280 C 820 440, 610 440, 600 440" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="710" y="430" font-family="sans-serif" font-size="9" fill="#94A3B8">1 : N</text>
+
+  <!-- Self reference on vendors (hierarchy) -->
+  <path d="M 960 140 C 1000 140, 1000 200, 960 200" fill="none" stroke="#475569" stroke-width="1.5" marker-start="url(#dot)"/>
+  <text x="1005" y="175" font-family="sans-serif" font-size="9" fill="#94A3B8">Parent</text>
+</svg>

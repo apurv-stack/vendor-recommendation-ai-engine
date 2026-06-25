@@ -261,19 +261,16 @@ export default function VendorCleanupPage() {
         <div style={{
             background: theme.cardBg,
             border: `1px solid ${theme.cardBorder}`,
-            borderRadius: "16px", padding: "20px",
+            borderRadius: "14px", padding: "12px 14px", minHeight: "88px",
             display: "flex", flexDirection: "column", gap: "6px"
         }}>
-            <span style={{
-                fontSize: "10px", color: theme.textMuted,
-                fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.7px"
-            }}>
+            <span style={{ fontSize: "10px", color: theme.textMuted, fontWeight: 500, marginBottom: "4px" }}>
                 {label}
             </span>
-            <span style={{ fontSize: "28px", fontWeight: 800, color }}>
+            <span style={{ fontSize: "18px", fontWeight: 700, color }}>
                 {value ?? "—"}
             </span>
-            {sub && <span style={{ fontSize: "11px", color: theme.textMuted }}>{sub}</span>}
+            {sub && <span style={{ fontSize: "10px", color: theme.textFaint }}>{sub}</span>}
         </div>
     );
 
@@ -424,25 +421,29 @@ export default function VendorCleanupPage() {
                     </div>
                 )}
 
-                {/* ── KPI Stats ────────────────────────────────────────── */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(155px, 1fr))", gap: "14px" }}>
-                    <StatCard label="Parent Vendors" value={dashboard?.total_vendors} color="#7C5AF6"     sub="Analysed only" />
-                    <StatCard label="Total Runs"     value={dashboard?.total_runs}    color="#6B7280"     sub="Analysis history" />
-                    <StatCard
-                        label="Issues Detected"
-                        value={last?.issues_detected}
-                        color={last?.issues_detected > 0 ? "#F59E0B" : "#22C55E"}
-                        sub="Last run"
-                    />
-                    <StatCard
-                        label="Needs Review"
-                        value={last?.issues_pending}
-                        color={last?.issues_pending > 0 ? "#EF4444" : "#22C55E"}
-                        sub="Pending action"
-                    />
-                    <StatCard label="Auto Fixed" value={last?.issues_fixed ?? 0} color="#22C55E" sub="Resolved automatically" />
+                {/* ── Inline KPI bar ───────────────────────────────────── */}
+                <div style={{
+                    ...card, padding: "16px 24px",
+                    display: "flex", alignItems: "center", flexWrap: "wrap"
+                }}>
+                    {[
+                        { label: "Vendors Analysed", value: dashboard?.total_vendors ?? "—", color: "#7C5AF6" },
+                        { label: "Total Runs",        value: dashboard?.total_runs ?? "—",    color: "#6B7280" },
+                        { label: "Issues Detected",   value: last?.issues_detected ?? "—",    color: last?.issues_detected > 0 ? "#F59E0B" : "#22C55E" },
+                        { label: "Needs Review",      value: last?.issues_pending ?? "—",     color: last?.issues_pending > 0 ? "#EF4444" : "#22C55E" },
+                        { label: "Auto Fixed",        value: last?.issues_fixed ?? 0,         color: "#22C55E" },
+                    ].map((item, i, arr) => (
+                        <div key={item.label} style={{
+                            flex: 1, minWidth: "120px", padding: "8px 20px",
+                            borderRight: i < arr.length - 1 ? `1px solid ${theme.cardBorder}` : "none"
+                        }}>
+                            <div style={{ fontSize: "10px", fontWeight: 600, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
+                                {item.label}
+                            </div>
+                            <div style={{ fontSize: "20px", fontWeight: 800, color: item.color }}>{item.value}</div>
+                        </div>
+                    ))}
                 </div>
-
                 {/* ── Tabs ─────────────────────────────────────────────── */}
                 <div style={{
                     display: "flex", gap: "4px",
@@ -467,48 +468,81 @@ export default function VendorCleanupPage() {
                 ════════════════════════════════════════════════════ */}
                 {activeTab === "dashboard" && (
                     <div style={card}>
-                        <h3 style={{ fontSize: "15px", fontWeight: 700, color: theme.textPrimary, marginBottom: "18px" }}>
-                            Last Run Breakdown
-                        </h3>
-                        {last ? (<>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(155px, 1fr))", gap: "12px" }}>
-                                {[
-                                    ["Potential Duplicates", last.duplicates_found,      "#EF4444"],
-                                    ["Invalid Emails",       last.invalid_emails,        "#EF4444"],
-                                    ["Phone Issues",         last.missing_phones,        "#F59E0B"],
-                                    ["Price Issues",         last.price_inconsistencies, "#F59E0B"],
-                                    ["Inactive Vendors",     last.inactive_vendors,      "#6B7280"],
-                                    ["Missing Information",  last.missing_info,          "#6B7280"],
-                                ].map(([label, val, color]) => (
-                                    <div key={label} style={{
-                                        background: theme.pageBg,
-                                        border: `1px solid ${theme.cardBorder}`,
-                                        borderRadius: "14px", padding: "18px"
-                                    }}>
-                                        <div style={{ fontSize: "11px", color: theme.textMuted, marginBottom: "8px", fontWeight: 500 }}>{label}</div>
-                                        <div style={{ fontSize: "26px", fontWeight: 800, color }}>{val ?? 0}</div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+                            <div>
+                                <h3 style={{ fontSize: "15px", fontWeight: 700, color: theme.textPrimary, margin: 0 }}>Issue Breakdown</h3>
+                                {last && <p style={{ fontSize: "12px", color: theme.textMuted, margin: "4px 0 0" }}>
+                                    Last analysed {fmt(last.completed_at)} · {last.total_scanned} vendors scanned
+                                </p>}
+                            </div>
+                            {last && (
+                                <span style={{ fontSize: "12px", color: "#F59E0B", fontWeight: 700 }}>
+                                    {last.total_issues} total issues
+                                </span>
+                            )}
+                        </div>
+
+                        {last ? (
+                            <>
+                                {/* Issue severity progress */}
+                                <div style={{ marginBottom: "20px" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: theme.textMuted, marginBottom: "6px" }}>
+                                        <span>Data quality score</span>
+                                        <span style={{ fontWeight: 700, color: "#22C55E" }}>
+                                            {last.total_scanned > 0 ? Math.max(0, Math.round(((last.total_scanned - (last.duplicates_found + last.invalid_emails)) / last.total_scanned) * 100)) : 100}%
+                                        </span>
                                     </div>
-                                ))}
-                            </div>
-                            <div style={{
-                                marginTop: "16px", padding: "12px 18px",
-                                background: theme.pageBg,
-                                border: `1px solid ${theme.cardBorder}`,
-                                borderRadius: "12px", fontSize: "12px",
-                                color: theme.textMuted,
-                                display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "center"
-                            }}>
-                                <span>Last analysed: <strong style={{ color: theme.textPrimary }}>{fmt(last.completed_at)}</strong></span>
-                                <span>Parent vendors scanned: <strong style={{ color: theme.textPrimary }}>{last.total_scanned}</strong></span>
-                                <span>Total issues: <strong style={{ color: "#F59E0B" }}>{last.total_issues}</strong></span>
-                                <button
-                                    onClick={() => { setActiveTab("logs"); }}
-                                    style={btn("rgba(124,90,246,0.10)", "#7C5AF6", { marginLeft: "auto" })}
-                                >
-                                    <Eye size={12} /> View All Issues
-                                </button>
-                            </div>
-                        </>) : (
+                                    <div style={{ height: "8px", borderRadius: "4px", background: theme.pageBg, overflow: "hidden", border: `1px solid ${theme.cardBorder}` }}>
+                                        <div style={{
+                                            height: "100%", borderRadius: "4px",
+                                            width: `${last.total_scanned > 0 ? Math.max(0, Math.round(((last.total_scanned - (last.duplicates_found + last.invalid_emails)) / last.total_scanned) * 100)) : 100}%`,
+                                            background: "linear-gradient(90deg, #7C5AF6, #6366F1)", transition: "width 0.6s ease"
+                                        }} />
+                                    </div>
+                                </div>
+
+                                {/* Row-based breakdown */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1px", borderRadius: "12px", overflow: "hidden", border: `1px solid ${theme.cardBorder}` }}>
+                                    {[
+                                        { label: "Potential Duplicates", value: last.duplicates_found,      color: "#EF4444", icon: "⚠", severity: "critical" },
+                                        { label: "Invalid Emails",       value: last.invalid_emails,        color: "#EF4444", icon: "✉", severity: "critical" },
+                                        { label: "Phone Issues",         value: last.missing_phones,        color: "#F59E0B", icon: "📞", severity: "warning" },
+                                        { label: "Price Issues",         value: last.price_inconsistencies, color: "#F59E0B", icon: "₹", severity: "warning" },
+                                        { label: "Inactive Vendors",     value: last.inactive_vendors,      color: "#6B7280", icon: "○", severity: "info" },
+                                        { label: "Missing Information",  value: last.missing_info,          color: "#6B7280", icon: "i", severity: "info" },
+                                    ].map((row, i) => (
+                                        <div key={row.label} style={{
+                                            display: "flex", alignItems: "center", justifyContent: "space-between",
+                                            padding: "12px 18px",
+                                            background: i % 2 === 0 ? theme.pageBg : theme.cardBg,
+                                        }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                                <span style={{
+                                                    width: "6px", height: "6px", borderRadius: "50%",
+                                                    background: row.color, flexShrink: 0,
+                                                    display: "inline-block"
+                                                }} />
+                                                <span style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 500 }}>{row.label}</span>
+                                            </div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                                <span style={{ fontSize: "16px", fontWeight: 800, color: row.value > 0 ? row.color : "#22C55E" }}>{row.value ?? 0}</span>
+                                                <span style={{
+                                                    padding: "2px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: 600,
+                                                    background: row.severity === "critical" ? "#EF444415" : row.severity === "warning" ? "#F59E0B15" : "#6B728015",
+                                                    color: row.severity === "critical" ? "#EF4444" : row.severity === "warning" ? "#F59E0B" : "#6B7280"
+                                                }}>{row.severity}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div style={{ marginTop: "14px", display: "flex", justifyContent: "flex-end" }}>
+                                    <button onClick={() => setActiveTab("logs")} style={btn("rgba(124,90,246,0.10)", "#7C5AF6")}>
+                                        <Eye size={12} /> View All Issues
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
                             <div style={{ textAlign: "center", color: theme.textMuted, padding: "56px" }}>
                                 No analysis runs yet. Click <strong>Run Analysis</strong> to start.
                             </div>

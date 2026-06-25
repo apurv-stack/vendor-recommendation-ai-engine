@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="100%" height="100%">
+  <defs>
+    <!-- Shadows -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <!-- Arrow Markers -->
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/>
+    </marker>
+    <marker id="arrow-indigo" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366F1"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0B0F19"/>
+
+  <!-- Title -->
+  <text x="30" y="45" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#F8FAFC">High-Level System Architecture</text>
+  <text x="30" y="68" font-family="system-ui, sans-serif" font-size="13" fill="#94A3B8">Request cycle from Frontend Single Page Application to Database and AI Orchestrators (Dark Mode)</text>
+
+  <!-- vite UI Client -->
+  <g transform="translate(40, 150)" filter="url(#shadow)">
+    <rect width="180" height="360" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="180" height="45" rx="12" fill="#0F172A" stroke="none"/>
+    <path d="M 0 45 L 180 45" stroke="#334155" stroke-width="1.5"/>
+    <text x="90" y="27" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#F8FAFC" text-anchor="middle">Vite UI Frontend</text>
+    
+    <!-- UI components -->
+    <rect x="15" y="70" width="150" height="60" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="25" y="93" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#E2E8F0">Chat Interface</text>
+    <text x="25" y="113" font-family="system-ui, sans-serif" font-size="10" fill="#94A3B8">Conversational UI</text>
+
+    <rect x="15" y="150" width="150" height="60" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="25" y="173" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#E2E8F0">Vendor Profiles</text>
+    <text x="25" y="193" font-family="system-ui, sans-serif" font-size="10" fill="#94A3B8">Detail view &amp; Catalog</text>
+
+    <rect x="15" y="230" width="150" height="100" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+    <text x="25" y="253" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#E2E8F0">Admin Dashboard</text>
+    <text x="25" y="273" font-family="system-ui, sans-serif" font-size="10" fill="#94A3B8">• Agent Prompts/Config</text>
+    <text x="25" y="293" font-family="system-ui, sans-serif" font-size="10" fill="#94A3B8">• Data Quality &amp; Syncs</text>
+  </g>
+
+  <!-- API / FastAPI Container -->
+  <g transform="translate(300, 110)" filter="url(#shadow)">
+    <rect width="400" height="440" rx="16" fill="#1E293B" stroke="#3B82F6" stroke-width="2"/>
+    <rect width="400" height="50" rx="16" fill="#1D4ED8" stroke="none" fill-opacity="0.2"/>
+    <path d="M 0 50 L 400 50" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="20" y="31" font-family="system-ui, sans-serif" font-size="15" font-weight="bold" fill="#60A5FA">FastAPI Backend Application (Port 8000)</text>
+    
+    <!-- FastAPI Sub-Containers -->
+    <!-- REST Controllers -->
+    <rect x="20" y="75" width="360" height="70" rx="8" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+    <text x="35" y="100" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#F8FAFC">API Controllers (Routes)</text>
+    <text x="35" y="122" font-family="system-ui, sans-serif" font-size="11" fill="#94A3B8">Exposes routes: /auth, /chat, /query, /vendors, /sessions, /admin</text>
+
+    <!-- Services Layer -->
+    <rect x="20" y="165" width="360" height="70" rx="8" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+    <text x="35" y="190" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#F8FAFC">Business Service Layer</text>
+    <text x="35" y="212" font-family="system-ui, sans-serif" font-size="11" fill="#94A3B8">Orchestration services: Chat, Vendor, Cleanup, Ingestion Sync</text>
+
+    <!-- LangGraph Workflow -->
+    <rect x="20" y="255" width="360" height="75" rx="8" fill="#1D4ED8" fill-opacity="0.15" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="35" y="278" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#60A5FA">LangGraph Reasoning Workflow</text>
+    <text x="35" y="300" font-family="system-ui, sans-serif" font-size="11" fill="#93C5FD">Supervisor-driven multi-agent cycle (Context, Search, Compare)</text>
+    
+    <!-- Repositories & Tools -->
+    <rect x="20" y="350" width="360" height="70" rx="8" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+    <text x="35" y="375" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#F8FAFC">Database Tools &amp; Repositories</text>
+    <text x="35" y="397" font-family="system-ui, sans-serif" font-size="11" fill="#94A3B8">SQL repositories: VendorRepository, CategoryRepository</text>
+  </g>
+
+  <!-- PostgreSQL Database -->
+  <g transform="translate(410, 580)">
+    <rect x="-10" y="-10" width="200" height="50" rx="20" fill="#064E3B" fill-opacity="0.4" stroke="#10B981" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="90" y="21" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#34D399" text-anchor="middle">PostgreSQL Database</text>
+  </g>
+
+  <!-- AI Providers Box -->
+  <g transform="translate(770, 150)" filter="url(#shadow)">
+    <rect width="190" height="360" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <rect width="190" height="45" rx="12" fill="#4C1D95" stroke="none" fill-opacity="0.2"/>
+    <path d="M 0 45 L 190 45" stroke="#334155" stroke-width="1.5"/>
+    <text x="95" y="27" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#C084FC" text-anchor="middle">AI Model Providers</text>
+
+    <!-- Ollama -->
+    <rect x="15" y="70" width="160" height="80" rx="6" fill="#0F172A" stroke="#D946EF" stroke-width="1"/>
+    <text x="25" y="93" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#F472B6">Ollama (Local)</text>
+    <text x="25" y="113" font-family="system-ui, sans-serif" font-size="10" fill="#F075AA">Qwen2.5:7b (Extractor)</text>
+    <text x="25" y="133" font-family="system-ui, sans-serif" font-size="9" fill="#E879F9">Port 11434 / v1 Endpoint</text>
+
+    <!-- Groq -->
+    <rect x="15" y="165" width="160" height="80" rx="6" fill="#0F172A" stroke="#22C55E" stroke-width="1"/>
+    <text x="25" y="188" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#4ADE80">Groq Cloud (Remote)</text>
+    <text x="25" y="208" font-family="system-ui, sans-serif" font-size="10" fill="#86EFAC">Llama-3-8b (Responder)</text>
+    <text x="25" y="228" font-family="system-ui, sans-serif" font-size="9" fill="#A7F3D0">API Client Auth</text>
+
+    <!-- Gemini / Modelscope -->
+    <rect x="15" y="260" width="160" height="80" rx="6" fill="#0F172A" stroke="#64748B" stroke-width="1"/>
+    <text x="25" y="283" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#94A3B8">Fallback Providers</text>
+    <text x="25" y="303" font-family="system-ui, sans-serif" font-size="10" fill="#cbd5e1">Google GenAI / Qwen</text>
+    <text x="25" y="323" font-family="system-ui, sans-serif" font-size="9" fill="#94a3b8">Backup pipelines</text>
+  </g>
+
+  <!-- Connectors & Labels -->
+  <!-- Client <-> FastAPI -->
+  <path d="M 220 250 L 300 250" fill="none" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-blue)" marker-start="url(#arrow-blue)"/>
+  <text x="260" y="240" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#60A5FA" text-anchor="middle">HTTP REST</text>
+
+  <!-- FastAPI <-> DB -->
+  <path d="M 490 550 L 490 570" fill="none" stroke="#10B981" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="510" y="565" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#34D399">SQL / PG</text>
+
+  <!-- FastAPI <-> AI Providers -->
+  <path d="M 700 330 L 760 330" fill="none" stroke="#6366F1" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <text x="730" y="320" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#818CF8" text-anchor="middle">SDK API</text>
+</svg>
