@@ -43,7 +43,7 @@ class VendorCleanupService:
         }
 
         try:
-            vendors = db.query(Vendor).all()
+            vendors = db.query(Vendor).filter(Vendor.parent_vendor_id == None).all()
             stats["total_scanned"] = len(vendors)
 
             seen_emails        = {}
