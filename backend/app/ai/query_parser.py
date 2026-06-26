@@ -353,6 +353,10 @@ class QueryParser:
 
         if category:
             filters["category"] = category
+            # Also detect if multiple categories were requested
+            all_cats = QueryParser._extract_all_categories(query_lower)
+            if len(all_cats) > 1:
+                filters["multiple_categories"] = all_cats
 
         else:
     # Detect unknown category attempt
@@ -500,20 +504,29 @@ class QueryParser:
     def _extract_category(
         query: str
     ):
-
+        """Returns the FIRST matched category for single-category flows."""
         for category, terms in (
             QueryParser
             .CATEGORY_PATTERNS
             .items()
         ):
-
             if any(
                 term in query
                 for term in terms
             ):
                 return category
-
         return None
+
+    @staticmethod
+    def _extract_all_categories(
+        query: str
+    ):
+        """Returns ALL matched categories for multi-category queries."""
+        found = []
+        for category, terms in QueryParser.CATEGORY_PATTERNS.items():
+            if any(term in query for term in terms):
+                found.append(category)
+        return found
 
     @staticmethod
     def _extract_budget(

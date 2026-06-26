@@ -14,6 +14,25 @@ const VerificationQueuePage = () => {
     const [toast, setToast] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [actionLoading, setActionLoading] = useState(null);
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+
+        const handleResize = () => {
+
+            setScreenWidth(window.innerWidth);
+
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+
+    }, []);
+
+    const isMobile = screenWidth < 640;
+
+    const isTablet = screenWidth >= 640 && screenWidth < 1024;
 
     const showToast = (message, type = "success") => {
         setToast({ message, type });
@@ -95,7 +114,7 @@ const VerificationQueuePage = () => {
 
     return (
         <DashboardLayout>
-        <div style={{ minHeight: "100vh", background: theme.pageBg, padding: "20px" }}>
+        <div style={{ minHeight: "100vh", background: theme.pageBg, padding: isMobile ? "12px" : "20px" }}>
 
             {toast && (
                 <div style={{ position: "fixed", top: "24px", right: "24px", zIndex: 9999 }}>
@@ -103,7 +122,7 @@ const VerificationQueuePage = () => {
                 </div>
             )}
 
-            <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+            <div style={{ maxWidth: "1400px", margin: "0 auto", width: "100%"}}>
                 <div style={card}>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "18px" }}>
@@ -134,8 +153,8 @@ const VerificationQueuePage = () => {
                         </p>
                     ) : (
                         <>
-                            <div style={{ overflowX: "auto", borderRadius: "12px", border: `1px solid ${theme.cardBorder}` }}>
-                                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <div style={{ overflowX: "auto", width: "100%", borderRadius: "12px", border: `1px solid ${theme.cardBorder}` }}>
+                                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? "850px" : "600px" }}>
                                     <thead>
                                         <tr>
                                             {["Vendor Name", "Category", "City", "Action"].map(h => (

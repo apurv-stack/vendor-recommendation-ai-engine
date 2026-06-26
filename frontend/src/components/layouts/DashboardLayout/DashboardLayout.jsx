@@ -84,7 +84,7 @@ const DashboardLayout = ({ children }) => {
                         flex: 1,
                         overflowY: "auto",
                         overflowX: "hidden",
-                        padding: "32px",
+                        padding: "clamp(12px, 3vw, 32px)",
                         background: theme.pageBg
                     }}
                 >

@@ -63,6 +63,26 @@ const AIAgentsPage = () => {
         }
     };
 
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+
+        const handleResize = () => {
+
+            setScreenWidth(window.innerWidth);
+
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+
+    }, []);
+
+    const isMobile = screenWidth < 640;
+
+    const isTablet = screenWidth >= 640 && screenWidth < 1024;
+
     useEffect(() => { fetchAgents(); }, []);
 
     const filtered = agents.filter(a =>
@@ -138,7 +158,7 @@ const AIAgentsPage = () => {
 
     return (
         <DashboardLayout>
-            <div style={{ minHeight: "100vh", background: theme.pageBg, padding: "24px" }}>
+            <div style={{ minHeight: "100vh", background: theme.pageBg, padding: isMobile ? "12px" : "24px", }}>
 
                 {/* TOAST */}
                 {toast && (
@@ -154,7 +174,7 @@ const AIAgentsPage = () => {
                 )}
 
                 <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex",
-                              flexDirection: "column", gap: "20px" }}>
+                              flexDirection: "column", gap: isMobile ? "12px" : "20px", width: "100%"}}>
 
                     {/* ── HERO ── */}
                     <div style={{
@@ -193,7 +213,7 @@ const AIAgentsPage = () => {
                     </div>
 
                     {/* ── KPI CARDS ── */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(220px, 1fr))" , gap: "16px" }}>
 
                         <div style={kpiCard("#7C5AF6")}>
                             <div style={iconBox("#7C5AF6")}><Bot size={20} color="#7C5AF6" /></div>

@@ -65,6 +65,7 @@ export default function VendorSyncPage() {
     const [statusFilter, setStatusFilter] = useState("all");
     const [logPage,      setLogPage]      = useState(1);
 
+
     const showToast = (msg, type = "success") => {
         setToast({ message: msg, type });
         setTimeout(() => setToast(null), 3500);
@@ -88,6 +89,26 @@ export default function VendorSyncPage() {
             setLoading(false);
         }
     }, []);
+
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+
+        const handleResize = () => {
+
+            setScreenWidth(window.innerWidth);
+
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+
+    }, []);
+
+    const isMobile = screenWidth < 640;
+
+    const isTablet = screenWidth >= 640 && screenWidth < 1024;
 
     useEffect(() => { load(); }, [load]);
 
@@ -173,8 +194,8 @@ export default function VendorSyncPage() {
 
     return (
         <DashboardLayout>
-        <div style={{ minHeight: "100vh", background: theme.pageBg, padding: "20px" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ minHeight: "100vh", background: theme.pageBg, padding: isMobile ? "12px" : "20px" }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", gap: isMobile ? "12px" : "20px", width: "100%"}}>
 
             {toast && (
                 <div style={{ position: "fixed", top: "24px", right: "24px", zIndex: 9999 }}>
@@ -403,7 +424,7 @@ export default function VendorSyncPage() {
                     {runs.length === 0 ? (
                         <div style={{ color: theme.textMuted, textAlign: "center", padding: "48px" }}>No runs yet.</div>
                     ) : (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", overflowX: "auto", width: "100%", minWidth: 0 }}>
                             {runs.map(r => (
                                 <div key={r.run_id} style={{ border: `1px solid ${theme.cardBorder}`, borderRadius: "14px", overflow: "hidden" }}>
                                     <div
@@ -526,7 +547,9 @@ export default function VendorSyncPage() {
                     {pagedLogs.length > 0 && (
                         <div style={{
                             display: "grid",
-                            gridTemplateColumns: "1fr 100px 80px 1fr 130px",
+                            gridTemplateColumns: isMobile
+                                ? "220px 100px 90px 220px 140px"
+                                : "1fr 90px 70px 1fr 110px",
                             gap: "8px", padding: "8px 14px",
                             fontSize: "10px", fontWeight: 700,
                             color: theme.textMuted, textTransform: "uppercase",
@@ -551,7 +574,9 @@ export default function VendorSyncPage() {
                             {pagedLogs.map(l => (
                                 <div key={l.log_id} style={{
                                     display: "grid",
-                                    gridTemplateColumns: "1fr 100px 80px 1fr 130px",
+                                    gridTemplateColumns: isMobile
+                                        ? "220px 100px 90px 220px 140px"
+                                        : "1fr 90px 70px 1fr 110px",
                                     gap: "8px", padding: "12px 14px",
                                     borderRadius: "12px", alignItems: "center",
                                     background: statusBg(l.status),

@@ -25,22 +25,25 @@ Rules:
 
 Examples:
 
-Input:
+Photography
 
-Need premium photographers Delhi
+📸 Great choice! I've found some photography options that could capture your event beautifully. Take a look at the recommendations below.
 
-Output:
+Wedding Catering
 
-Found options matching your photography requirements.
+🍽️ I've found a few catering options that seem like a great fit for your celebration. Explore the recommendations below and see which one suits you best.
 
-Input:
+Luxury
 
-Need catering vendor Delhi
+✨ Excellent choice! I've shortlisted some premium options that align well with your requirements. Feel free to compare them below.
 
-Output:
+Budget
 
-Perfect. I found catering options matching your needs.
+💰 I've found some options that balance quality and budget nicely. Hopefully one of them fits exactly what you're looking for.
 
+Decoration
+
+🌸 I've found decoration options that could help bring your event vision to life. Have a look below.
 Input:
 
 Need luxury vendors
@@ -65,9 +68,13 @@ Output:
 
 Found decoration vendors suitable for your event needs.
 
-Keep responses concise.
+Keep responses between 2–4 short conversational sentences.
 
-Maximum 2 sentences.
+The frontend already renders vendor cards.
+
+Do not repeat vendor names.
+
+Instead, acknowledge the user's request naturally and invite them to explore the recommendations below.
 """
 
 

@@ -694,91 +694,32 @@ def search_vendors_ai(
     print("AFTER DB QUERY - total:", total)
     print("AFTER DB QUERY - vendors:", [v.name for v in vendors])
 
-    pricing=filters.get(
-
-        "pricing_preference"
-
-    )
+    pricing = (filters.get("pricing_preference") or "").lower()
 
     if pricing:
 
-        filtered=[]
+        if pricing in {"premium", "luxury"}:
 
-        keywords={
+            vendors.sort(
+                key=lambda v: (
+                    float(v.avg_rating or 0),
+                    int(v.review_count or 0),
+                    float(v.price_max or 0),
+                    bool(v.is_verified)
+                ),
+                reverse=True
+            )
 
-            "premium":[
+        elif pricing in {"budget", "cheap", "affordable"}:
 
-                "premium",
+            vendors.sort(
+                key=lambda v: (
+                    float(v.price_min or 0),
+                    -float(v.avg_rating or 0)
+                )   
+            )
 
-                "luxury"
-
-            ],
-
-            "luxury":[
-                "premium",
-                "luxury"
-            ],
-
-            "budget":[
-
-                "budget",
-
-                "cheap",
-
-                "affordable"
-
-            ],
-
-            "cheap":[
-                "budget",
-                "cheap",
-                "affordable"
-            ],
-
-            "affordable":[
-                "budget",
-                "cheap",
-                "affordable"
-            ]
-
-        }
-
-        allowed=keywords.get(
-
-            pricing,
-
-            []
-
-        )
-
-        if allowed:
-            matched = []
-            unmatched = []
-
-            for vendor in vendors:
-
-                text=(
-
-                    f"{vendor.name or ''} "
-
-                    f"{vendor.description or ''}"
-
-                ).lower()
-
-                if any(word in text for word in allowed):
-                    matched.append(vendor)
-                else:
-                    unmatched.append(vendor)
-
-            print("AFTER PRICING FILTER - vendors:", [v.name for v in vendors])
-            print("AFTER PRICING FILTER - total:", total)
-
-            # Prefer keyword-matched vendors, but fall back to all vendors
-            if matched:
-
-                vendors = matched + unmatched
-
-            total = len(vendors)
+        total = len(vendors)
 
     return {
 

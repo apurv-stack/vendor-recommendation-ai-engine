@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ConfirmModal from "../../components/common/ConfirmModal";
 import axiosInstance from "../../api/axiosInstance";
 import { useTheme } from "../../context/ThemeContext";
 import DashboardLayout from "../../components/layouts/DashboardLayout/DashboardLayout";
@@ -22,6 +23,27 @@ const VendorManagementPage = () => {
   const [toast, setToast]                 = useState(null);
   const [activeTab, setActiveTab]         = useState("all");
   const [selectedVendor, setSelectedVendor] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ open: false, vendorId: null, vendorName: "" });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+
+      const handleResize = () => {
+
+          setScreenWidth(window.innerWidth);
+
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      return () => window.removeEventListener("resize", handleResize);
+
+  }, []);
+
+  const isMobile = screenWidth < 640;
+
+  const isTablet = screenWidth >= 640 && screenWidth < 1024;
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -101,18 +123,22 @@ const VendorManagementPage = () => {
     }
   };
 
-  const handleDelete = async (vendorId, vendorName) => {
-    if (!window.confirm(`Delete "${vendorName}"? This cannot be undone.`)) return;
+  const handleDelete = (vendorId, vendorName) => {
+    setDeleteModal({ open: true, vendorId, vendorName });
+  };
+
+  const confirmDelete = async () => {
+    setDeleteLoading(true);
     try {
-      setActionLoading(vendorId + "_delete");
-      await axiosInstance.delete(`/vendors/${vendorId}`);
-      setVendors(prev => prev.filter(v => v.vendor_id !== vendorId));
-      if (selectedVendor?.vendor_id === vendorId) setSelectedVendor(null);
-      showToast(`"${vendorName}" deleted`);
+      await axiosInstance.delete(`/vendors/${deleteModal.vendorId}`);
+      setVendors(prev => prev.filter(v => v.vendor_id !== deleteModal.vendorId));
+      if (selectedVendor?.vendor_id === deleteModal.vendorId) setSelectedVendor(null);
+      showToast(`"${deleteModal.vendorName}" deleted`);
     } catch {
       showToast("Failed to delete vendor", "error");
     } finally {
-      setActionLoading(null);
+      setDeleteLoading(false);
+      setDeleteModal({ open: false, vendorId: null, vendorName: "" });
     }
   };
 
@@ -152,7 +178,7 @@ const VendorManagementPage = () => {
 
   return (
     <DashboardLayout>
-    <div style={{ minHeight: "100vh", background: theme.pageBg, padding: "20px" }}>
+    <div style={{ minHeight: "100vh", background: theme.pageBg, padding: isMobile ? "12px" : "20px" }}>
 
       {toast && (
         <div style={{ position: "fixed", top: "24px", right: "24px", zIndex: 9999 }}>
@@ -167,16 +193,16 @@ const VendorManagementPage = () => {
           margin: "0 auto",
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: isMobile ? "12px" : "20px",
           overflow: "hidden",
         }}
       >
 
         <div style={{ display: "grid",
-          gridTemplateColumns: selectedVendor
-            ? "minmax(0, 1fr) minmax(320px, 380px)"
+          gridTemplateColumns: selectedVendor && !isTablet && !isMobile
+            ? "1fr 360px"
             : "1fr",
-          gap: "16px", alignItems: "start" }}>
+          gap: "20px", alignItems: "start" }}>
 
           <div style={card}>
 
@@ -249,12 +275,12 @@ const VendorManagementPage = () => {
                   style={{
                     overflowX: "auto",
                     overflowY: "auto",
-                    maxHeight: "600px",
+                    maxHeight: isMobile ? "500px" : "600px",
                     borderRadius: "12px",
                     border: `1px solid ${theme.cardBorder}`
                   }}
                 >
-                  <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "600px" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? "900px" : "600px", }}>
                     <thead>
                       <tr>
                         {["Vendor","Email","City","Category","Rating","Status","Actions"].map(h => (
@@ -594,6 +620,16 @@ const VendorManagementPage = () => {
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
+    <ConfirmModal
+          isOpen={deleteModal.open}
+          title="Delete Vendor"
+          message={`Are you sure you want to delete "${deleteModal.vendorName}"? This action cannot be undone.`}
+          confirmText="Delete"
+          confirmColor="#EF4444"
+          loading={deleteLoading}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteModal({ open: false, vendorId: null, vendorName: "" })}
+      />
     </DashboardLayout>
   );
 };

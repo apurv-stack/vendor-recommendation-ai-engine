@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import ConfirmModal from "../common/ConfirmModal";
+import InputModal from "../common/InputModal";
 import { MessageSquare, Plus, Sparkles, MoreVertical, LogOut, Settings, User, Search, HelpCircle, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
@@ -11,6 +13,9 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
     const [loading, setLoading] = useState(true);
     const [profileOpen, setProfileOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [renameModal, setRenameModal] = useState({ open: false, id: null, current: "" });
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+    const [modalLoading, setModalLoading] = useState(false);
 
     const profileRef = useRef(null);
     const navigate = useNavigate();
@@ -39,15 +44,37 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
         }
     };
 
-    const handleRename = async (id) => {
-        const title = window.prompt("Enter new title");
-        if (!title) return;
-        try { await renameSession(id, title); await loadSessions(); } catch (e) { console.error(e); }
+    const handleRename = (id, currentTitle) => {
+        setRenameModal({ open: true, id, current: currentTitle || "" });
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Delete this chat?")) return;
-        try { await deleteSession(id); await loadSessions(); } catch (e) { console.error(e); }
+    const confirmRename = async (newTitle) => {
+        if (!newTitle?.trim()) return;
+        setModalLoading(true);
+        try {
+            await renameSession(renameModal.id, newTitle.trim());
+            await loadSessions();
+        } catch (e) { console.error(e); }
+        finally {
+            setModalLoading(false);
+            setRenameModal({ open: false, id: null, current: "" });
+        }
+    };
+
+    const handleDelete = (id) => {
+        setDeleteModal({ open: true, id });
+    };
+
+    const confirmDelete = async () => {
+        setModalLoading(true);
+        try {
+            await deleteSession(deleteModal.id);
+            await loadSessions();
+        } catch (e) { console.error(e); }
+        finally {
+            setModalLoading(false);
+            setDeleteModal({ open: false, id: null });
+        }
     };
 
     const handleLogout = async () => { await logout(); navigate("/login"); };
@@ -245,7 +272,7 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
                                     zIndex: 50, overflow: "hidden", minWidth: 120
                                 }}>
                                     {[
-                                        { label: "Rename", color: t.dropdownItemText, fn: () => { handleRename(session.session_id); setMenuOpen(null); } },
+                                        { label: "Rename", color: t.dropdownItemText, fn: () => { handleRename(session.session_id, session.title); setMenuOpen(null); } },
                                         { label: "Delete", color: "#f87171", fn: () => { handleDelete(session.session_id); setMenuOpen(null); } }
                                     ].map(({ label, color, fn }) => (
                                         <button key={label} onClick={fn} style={{
@@ -272,7 +299,13 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
             `}</style>
             <div className="dashboard-mobile-btn" style={{ flexShrink: 0, padding: "6px 8px" }}>
                 <button
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() =>
+                        navigate(
+                            user?.role === "admin"
+                                ? "/admin"
+                                : "/dashboard"
+                        )
+                    }
                     style={{
                         width: "100%", display: "flex", alignItems: "center", gap: 10,
                         padding: "10px 14px", borderRadius: 10,
@@ -320,7 +353,7 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
                         </div>
 
                         {[
-                            { icon: <User size={13} color="#7c5af6" />, label: "Profile", path: "/profile" },
+                            { icon: <User size={13} color="#7c5af6" />, label: "Profile", path: user?.role === "admin" ? "/admin" : "/profile"},
                             { icon: <Settings size={13} color="#7c5af6" />, label: "Settings", path: "/settings" },
                             { icon: <HelpCircle size={13} color="#7c5af6" />, label: "Help & Support", path: "/help" },
                         ].map(({ icon, label, path }) => (
@@ -407,6 +440,28 @@ const ChatHistorySidebar = ({ onSessionSelect, onNewChat, selectedSessionId, ref
                         display: "inline-block"
                     }}>⌄</span>
                 </button>
+
+                <ConfirmModal
+                    isOpen={deleteModal.open}
+                    title="Delete Chat"
+                    message="Are you sure you want to delete this chat? This action cannot be undone."
+                    confirmText="Delete"
+                    confirmColor="#EF4444"
+                    loading={modalLoading}
+                    onConfirm={confirmDelete}
+                    onCancel={() => setDeleteModal({ open: false, id: null })}
+                />
+                <InputModal
+                    isOpen={renameModal.open}
+                    title="Rename Chat"
+                    label="New title"
+                    placeholder="Enter new chat title"
+                    defaultValue={renameModal.current}
+                    confirmText="Save"
+                    loading={modalLoading}
+                    onConfirm={confirmRename}
+                    onCancel={() => setRenameModal({ open: false, id: null, current: "" })}
+                />
             </div>
         </div>
     );

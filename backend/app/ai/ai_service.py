@@ -357,13 +357,14 @@ class AIService:
         # PARSER FILTERS
         # -----------------------------------
 
-        parser_filters = dict(
-            QueryParser.extract_filters(
+        parser_filters = {
+            "_raw_query": user_message,
+            **QueryParser.extract_filters(
                 normalized_query,
                 previous,
                 qa_config
             )
-        )
+        }
 
         # Define these immediately after parser_filters
         # so they are available everywhere below
@@ -408,7 +409,10 @@ class AIService:
             qa_config
         )
 
-        if early_validation.get("errors"):
+        if (
+            not early_validation.get("is_valid", True)
+            or early_validation.get("errors")
+        ):
             return {
                 "intent": intent,
                 "filters": parser_filters,
@@ -551,7 +555,7 @@ class AIService:
         structured = (
             StructuredResponseBuilder.build(
                 parser_filters=
-                parser_filters,
+                final_filters,
 
                 llm_filters=
                 llm_filters,

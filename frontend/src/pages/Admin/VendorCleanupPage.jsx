@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import ConfirmModal from "../../components/common/ConfirmModal";
 import { useTheme } from "../../context/ThemeContext";
 import DashboardLayout from "../../components/layouts/DashboardLayout/DashboardLayout";
 import Toast from "../../components/common/Toast/Toast";
@@ -96,6 +97,8 @@ export default function VendorCleanupPage() {
 
     // Detail modal
     const [detailLog,    setDetailLog]    = useState(null);
+    const [deleteRunModal, setDeleteRunModal] = useState({ open: false, runId: null });
+    const [deleteRunLoading, setDeleteRunLoading] = useState(false);
 
     const showToast = (msg, type = "success") => {
         setToast({ message: msg, type });
@@ -122,6 +125,26 @@ export default function VendorCleanupPage() {
         }
     }, []);
 
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+
+        const handleResize = () => {
+
+            setScreenWidth(window.innerWidth);
+
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+
+    }, []);
+
+    const isMobile = screenWidth < 640;
+
+    const isTablet = screenWidth >= 640 && screenWidth < 1024;
+
     useEffect(() => { load(); }, [load]);
 
     const handleRun = async () => {
@@ -141,18 +164,24 @@ export default function VendorCleanupPage() {
         }
     };
 
-    const handleDeleteRun = async (runId, e) => {
+    const handleDeleteRun = (runId, e) => {
         e.stopPropagation();
-        if (!window.confirm("Delete this run and all its logs?")) return;
+        setDeleteRunModal({ open: true, runId });
+    };
+
+    const confirmDeleteRun = async () => {
+        setDeleteRunLoading(true);
         try {
-            await deleteRun(runId);
+            await deleteRun(deleteRunModal.runId);
             showToast("Run deleted");
             await load();
         } catch {
             showToast("Failed to delete run", "error");
+        } finally {
+            setDeleteRunLoading(false);
+            setDeleteRunModal({ open: false, runId: null });
         }
     };
-
     const handleUpdateStatus = async (logId, status) => {
         try {
             await updateLogStatus(logId, status);
@@ -204,7 +233,9 @@ export default function VendorCleanupPage() {
     // Filtered logs
     const filteredLogs = logs.filter(l => {
         const matchSeverity = logFilter    === "all" || l.severity     === logFilter;
-        const matchAction   = actionFilter === "all" || l.action       === actionFilter;
+        const matchAction   = actionFilter === "all"
+            || l.action === actionFilter
+            || (actionFilter === "MISSING_INFO" && (l.action === "CITY_MISSING" || l.action === "DESCRIPTION_MISSING"));
         const matchStatus   = statusFilter === "all" || (l.after_value || "pending") === statusFilter;
         const matchSearch   = !logSearch
             || (l.vendor_name || "").toLowerCase().includes(logSearch.toLowerCase())
@@ -278,8 +309,8 @@ export default function VendorCleanupPage() {
 
     return (
         <DashboardLayout>
-        <div style={{ minHeight: "100vh", background: theme.pageBg, padding: "20px" }}>
-            <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ minHeight: "100vh", background: theme.pageBg, padding: isMobile ? "12px" : "20px",}}>
+            <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", gap: isMobile ? "12px" : "20px", padding: isMobile ? "0 8px" : "0"}}>
 
                 {/* Toast */}
                 {toast && (
@@ -502,44 +533,53 @@ export default function VendorCleanupPage() {
                                 </div>
 
                                 {/* Row-based breakdown */}
-                                <div style={{ display: "flex", flexDirection: "column", gap: "1px", borderRadius: "12px", overflow: "hidden", border: `1px solid ${theme.cardBorder}` }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1px", borderRadius: "12px", overflow: "auto", minWidth: 0, border: `1px solid ${theme.cardBorder}` }}>
                                     {[
-                                        { label: "Potential Duplicates", value: last.duplicates_found,      color: "#EF4444", icon: "⚠", severity: "critical" },
-                                        { label: "Invalid Emails",       value: last.invalid_emails,        color: "#EF4444", icon: "✉", severity: "critical" },
-                                        { label: "Phone Issues",         value: last.missing_phones,        color: "#F59E0B", icon: "📞", severity: "warning" },
-                                        { label: "Price Issues",         value: last.price_inconsistencies, color: "#F59E0B", icon: "₹", severity: "warning" },
-                                        { label: "Inactive Vendors",     value: last.inactive_vendors,      color: "#6B7280", icon: "○", severity: "info" },
-                                        { label: "Missing Information",  value: last.missing_info,          color: "#6B7280", icon: "i", severity: "info" },
-                                    ].map((row, i) => (
-                                        <div key={row.label} style={{
-                                            display: "flex", alignItems: "center", justifyContent: "space-between",
-                                            padding: "12px 18px",
-                                            background: i % 2 === 0 ? theme.pageBg : theme.cardBg,
-                                        }}>
+                                        ["Potential Duplicates", last.duplicates_found,      "#EF4444", "POTENTIAL_DUPLICATE"],
+                                        ["Invalid Emails",       last.invalid_emails,        "#EF4444", "EMAIL_INVALID"],
+                                        ["Phone Issues",         last.missing_phones,        "#F59E0B", "PHONE_MISSING"],
+                                        ["Price Issues",         last.price_inconsistencies, "#F59E0B", "PRICE_INCONSISTENT"],
+                                        ["Inactive Vendors",     last.inactive_vendors,      "#6B7280", "INACTIVE_VENDOR"],
+                                        ["Missing Information",  last.missing_info,          "#6B7280", "MISSING_INFO"],
+                                    ].map(([label, val, color, actionKey], i) => (
+                                        <div
+                                            key={label}
+                                            onClick={() => {
+                                                if (val > 0) {
+                                                    setActiveTab("logs");
+                                                    setActionFilter(actionKey);
+                                                    setLogFilter("all");
+                                                    setStatusFilter("all");
+                                                }
+                                            }}
+                                            style={{
+                                                cursor: val > 0 ? "pointer" : "default",
+                                                display: "flex", alignItems: "center", justifyContent: "space-between",
+                                                padding: "12px 18px",
+                                                background: i % 2 === 0 ? theme.pageBg : theme.cardBg,
+                                            }}>
                                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                                 <span style={{
                                                     width: "6px", height: "6px", borderRadius: "50%",
-                                                    background: row.color, flexShrink: 0,
+                                                    background: color, flexShrink: 0,
                                                     display: "inline-block"
                                                 }} />
-                                                <span style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 500 }}>{row.label}</span>
+                                                <span style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 500 }}>{label}</span>
                                             </div>
-                                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                                <span style={{ fontSize: "16px", fontWeight: 800, color: row.value > 0 ? row.color : "#22C55E" }}>{row.value ?? 0}</span>
-                                                <span style={{
-                                                    padding: "2px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: 600,
-                                                    background: row.severity === "critical" ? "#EF444415" : row.severity === "warning" ? "#F59E0B15" : "#6B728015",
-                                                    color: row.severity === "critical" ? "#EF4444" : row.severity === "warning" ? "#F59E0B" : "#6B7280"
-                                                }}>{row.severity}</span>
-                                            </div>
+                                            <span style={{ fontSize: "16px", fontWeight: 800, color: val > 0 ? color : "#22C55E" }}>
+                                                {val ?? 0}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div style={{ marginTop: "14px", display: "flex", justifyContent: "flex-end" }}>
-                                    <button onClick={() => setActiveTab("logs")} style={btn("rgba(124,90,246,0.10)", "#7C5AF6")}>
-                                        <Eye size={12} /> View All Issues
-                                    </button>
+                                    <button
+                                    onClick={() => { setActiveTab("logs"); setActionFilter("all"); setLogFilter("all"); }}
+                                    style={btn("rgba(124,90,246,0.10)", "#7C5AF6", { marginLeft: "auto" })}
+                                >
+                                    <Eye size={12} /> View All Issues
+                                </button>
                                 </div>
                             </>
                         ) : (
@@ -724,8 +764,13 @@ export default function VendorCleanupPage() {
                                 <option value="ignored">Ignored</option>
                             </select>
 
-                            {/* Severity pills */}
-                            {["all", "critical", "warning", "info"].map(f => (
+                            {/* Severity pills with live counts */}
+                            {[
+                                ["all",      "All",      logs.length],
+                                ["critical", "Critical", logs.filter(l => l.severity === "critical").length],
+                                ["warning",  "Warning",  logs.filter(l => l.severity === "warning").length],
+                                ["info",     "Info",     logs.filter(l => l.severity === "info").length],
+                            ].map(([f, label, count]) => (
                                 <button key={f} onClick={() => setLogFilter(f)} style={{
                                     padding: "7px 13px", borderRadius: "8px",
                                     border: `1px solid ${logFilter === f ? "#7C5AF6" : theme.cardBorder}`,
@@ -733,9 +778,17 @@ export default function VendorCleanupPage() {
                                     color:      logFilter === f ? "#7C5AF6" : theme.textMuted,
                                     cursor: "pointer", fontSize: "12px",
                                     fontWeight: logFilter === f ? 600 : 400,
-                                    textTransform: "capitalize"
+                                    display: "flex", alignItems: "center", gap: "5px"
                                 }}>
-                                    {f}
+                                    {label}
+                                    {count > 0 && (
+                                        <span style={{
+                                            fontSize: "10px",
+                                            background: logFilter === f ? "#7C5AF6" : theme.cardBorder,
+                                            color: logFilter === f ? "#fff" : theme.textMuted,
+                                            borderRadius: "10px", padding: "1px 6px", fontWeight: 700
+                                        }}>{count}</span>
+                                    )}
                                 </button>
                             ))}
 
@@ -790,7 +843,9 @@ export default function VendorCleanupPage() {
                         {pagedLogs.length > 0 && (
                             <div style={{
                                 display: "grid",
-                                gridTemplateColumns: "32px 1fr 130px 90px 100px 130px 90px",
+                                gridTemplateColumns: isMobile
+                                    ? "32px 180px 120px 100px 110px 130px 100px"
+                                    : "32px minmax(100px,1fr) 100px 80px 90px 110px 80px",
                                 gap: "8px", padding: "8px 14px",
                                 fontSize: "10px", fontWeight: 700,
                                 color: theme.textMuted, textTransform: "uppercase",
@@ -828,7 +883,9 @@ export default function VendorCleanupPage() {
                                     return (
                                         <div key={l.log_id} style={{
                                             display: "grid",
-                                            gridTemplateColumns: "32px 1fr 130px 90px 100px 130px 90px",
+                                            gridTemplateColumns: isMobile
+                                                ? "32px 220px 150px 120px 120px 150px 120px"
+                                                : "32px 1fr 130px 90px 100px 130px 90px",
                                             gap: "8px", padding: "12px 14px",
                                             borderRadius: "12px", alignItems: "center",
                                             background: isSelected
@@ -990,6 +1047,16 @@ export default function VendorCleanupPage() {
                 }
             `}</style>
         </div>
+        <ConfirmModal
+            isOpen={deleteRunModal.open}
+            title="Delete Run"
+            message="Are you sure you want to delete this run and all its logs? This cannot be undone."
+            confirmText="Delete"
+            confirmColor="#EF4444"
+            loading={deleteRunLoading}
+            onConfirm={confirmDeleteRun}
+            onCancel={() => setDeleteRunModal({ open: false, runId: null })}
+        />
         </DashboardLayout>
     );
 }

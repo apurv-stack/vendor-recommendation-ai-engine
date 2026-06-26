@@ -250,6 +250,39 @@ class IntentExtractor:
                     "confidence":
                     0.99
                 }
+        
+        # ----------------------------------
+        # SESSION / MEMORY QUERY — checked early
+        # so "what budget did I mention" and
+        # "which city are we in" don't get
+        # misrouted to pricing/recommendation
+        # ----------------------------------
+
+        SESSION_STRONG = {
+            "history", "previous", "earlier",
+            "discussed", "before", "last time",
+            "we talked", "you said", "remember",
+            "what did i", "what was", "which city",
+            "what budget", "what city", "did i mention",
+            "did i say", "do you remember", "recall"
+        }
+
+        SESSION_QUESTION_PATTERNS = [
+            r"\bwhat\b.*(budget|city|category|event|guest)",
+            r"\bwhich\b.*(city|location|place)",
+            r"\bdo you remember\b",
+            r"\bwhat did i (mention|say|tell)\b",
+        ]
+
+        if tokens & SESSION_STRONG or any(
+            re.search(p, query)
+            for p in SESSION_QUESTION_PATTERNS
+        ):
+            return {
+                "intent": "session_query",
+                "secondary_intents": secondary_intents,
+                "confidence": 0.95
+            }
 
         # ----------------------------------
         # SERVICE QUERY
@@ -272,7 +305,8 @@ class IntentExtractor:
             }
 
         # ----------------------------------
-        # QUALITY QUERY
+        # QUALITY QUERY — treated as vendor_recommendation
+        # so the full pipeline runs
         # ----------------------------------
 
         if any(
@@ -280,23 +314,11 @@ class IntentExtractor:
             for term
             in IntentExtractor.QUALITY
         ):
-
-            secondary_intents.append(
-                "vendor_recommendation"
-            )
-
             return {
-
-                "intent":
-                "quality_query",
-
-                "secondary_intents":
-                secondary_intents,
-
-                "confidence":
-                0.95
+                "intent": "vendor_recommendation",
+                "secondary_intents": ["quality_query"],
+                "confidence": 0.95
             }
-
         # ----------------------------------
         # REVIEW QUERY
         # ----------------------------------
@@ -429,35 +451,6 @@ class IntentExtractor:
 
                 "confidence":
                 0.90
-            }
-        
-        # ----------------------------------
-        # SESSION QUERY
-        # ----------------------------------
-        SESSION_STRONG = {
-            "history",
-            "previous",
-            "earlier",
-            "discussed",
-            "before",
-            "last time",
-            "we talked",
-            "you said",
-            "remember"
-        }
-        
-        if tokens & SESSION_STRONG:
-
-            return {
-
-                "intent":
-                "session_query",
-
-                "secondary_intents":
-                secondary_intents,
-
-                "confidence":
-                0.95
             }
 
         # ----------------------------------

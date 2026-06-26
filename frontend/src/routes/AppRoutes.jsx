@@ -61,9 +61,9 @@ import VendorSyncPage from "../pages/Admin/VendorSyncPage";
 
 const UnauthorizedPage=()=>{
 
-const navigate=
+const navigate = useNavigate();
 
-useNavigate();
+const { user } = useAuth();
 
 return(
 
@@ -144,9 +144,9 @@ You are not authorized.
 onClick={()=>{
 
 navigate(
-
-"/dashboard"
-
+    user?.role === "admin"
+        ? "/admin"
+        : "/dashboard"
 );
 
 }}

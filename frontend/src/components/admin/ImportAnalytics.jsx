@@ -23,10 +23,7 @@ const ImportAnalytics = ({
         })
         : "No imports yet";
 
-    const hasImportData =
-        totalImported > 0 ||
-        successCount > 0 ||
-        failedCount > 0;
+    const hasImportData = false; // No import history tracking in backend yet
 
     const stats = [
         { label: "Records Imported", value: totalImported.toLocaleString(), color: theme.textPrimary },
@@ -69,8 +66,7 @@ const ImportAnalytics = ({
                 </p>
             </div>
 
-            {hasImportData && (
-    <div
+            <div
         style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
@@ -112,10 +108,8 @@ const ImportAnalytics = ({
             </div>
         ))}
     </div>
-)}
 
-            {hasImportData && (
-    <div
+            <div
         style={{
             width: "100%",
             height: "8px",
@@ -134,7 +128,6 @@ const ImportAnalytics = ({
             }}
         />
     </div>
-)}
         </Card>
     );
 };

@@ -374,7 +374,10 @@ const Navbar = ({ toggleSidebar, onChatOpen }) => {
               }}
             >
               <button
-                onClick={() => { navigate("/profile"); setProfileOpen(false); }}
+                onClick={() => {
+                  navigate(isAdmin ? "/admin" : "/profile");
+                  setProfileOpen(false);
+                }}
                 style={{
                   textAlign: "left",
                   padding: "8px 12px",

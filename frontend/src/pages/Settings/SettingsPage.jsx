@@ -146,13 +146,16 @@ const SettingsPage = () => {
 
             setSaving(true);
 
-            await axiosInstance.put(
-                "/vendors/profile",
-                {
-                    name:
-                        settings.displayName
-                }
-            );
+            if (!isAdmin) {
+
+                await axiosInstance.put(
+                    "/vendors/profile",
+                    {
+                        name: settings.displayName
+                    }
+                );
+
+            }
 
             localStorage.setItem(
                 STORAGE_KEY,

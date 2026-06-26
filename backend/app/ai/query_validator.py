@@ -40,6 +40,23 @@ class QueryValidator:
         "chitchat"
     }
 
+    @staticmethod
+    def _is_gibberish(query: str) -> bool:
+        """Detect random character strings with no real words."""
+        import re
+        words = re.findall(r"[a-zA-Z]{2,}", query)
+        if not words:
+            return False
+        # If >60% of words are consonant clusters with no vowels, it's gibberish
+        gibberish_count = 0
+        for word in words:
+            vowels = sum(1 for c in word.lower() if c in "aeiou")
+            if len(word) >= 4 and vowels == 0:
+                gibberish_count += 1
+            elif len(word) >= 6 and vowels / len(word) < 0.1:
+                gibberish_count += 1
+        return gibberish_count >= max(1, len(words) * 0.6)
+
     @classmethod
     def validate(
         cls,
@@ -48,11 +65,70 @@ class QueryValidator:
         config: Dict[str, Any] = None
     ) -> Dict[str, Any]:
         cfg = config or {}
+        # Detect gibberish before anything else
+        raw_query = filters.get("_raw_query", "")
+        if raw_query and cls._is_gibberish(raw_query):
+            return {
+                "is_valid": False,
+                "needs_clarification": False,
+                "missing_fields": [],
+                "errors": [
+                    "I didn't quite catch that! Could you tell me what kind of "
+                    "vendor you're looking for and for which city? "
+                    "I'll find the best options for you. 🎉"
+                ]
+            }
         valid_cities = set(cfg.get("valid_cities", [])) or cls.VALID_CITIES
         valid_categories = set(cfg.get("valid_categories", [])) or cls.VALID_CATEGORIES
         required_fields_override = cfg.get("required_fields", {})
         required_fields = {**cls.REQUIRED_FIELDS, **required_fields_override}
+        
+        # -------------------------------------------------------
+# Fictional / Impossible Requests
+# -------------------------------------------------------
 
+        FICTIONAL_TERMS = {
+            "alien",
+            "aliens",
+            "mars",
+            "moon",
+            "jupiter",
+            "saturn",
+            "pluto",
+            "dragon",
+            "dragons",
+            "unicorn",
+            "unicorns",
+            "zombie",
+            "zombies",
+            "ghost",
+            "ghosts",
+            "wizard",
+            "wizards",
+            "vampire",
+            "vampires"
+        }
+
+        import re
+
+        tokens = set(
+            re.findall(r"[a-zA-Z]+", raw_query.lower())
+        )
+
+        matched = tokens & FICTIONAL_TERMS
+
+        if matched:
+            return {
+                "is_valid": False,
+                "needs_clarification": False,
+                "missing_fields": [],
+                "errors": [
+                    "That's not something I can help with on this platform! "
+                    "I specialise in real event vendors — catering, photography, "
+                    "decoration, venue, music, makeup and more. "
+                    "What would you like help with for your event? 😊"
+                ]
+            }
         if intent in cls.SKIP_VALIDATION_INTENTS:
             return {
                 "is_valid": True,
@@ -102,8 +178,10 @@ class QueryValidator:
 
         if city and city.lower() not in valid_cities:
             errors.append(
-                f"'{city}' is not a supported city. "
-                f"We currently serve Delhi, Mumbai, Bangalore, Noida, Gurgaon and more."
+                f"Sorry, '{city}' isn't a location we currently support. "
+                f"We serve Delhi, Mumbai, Bangalore, Noida, Gurgaon, Hyderabad, "
+                f"Pune, Chennai, Kolkata, Jaipur and Ahmedabad. "
+                f"Which of these cities works for you? 🏙️"
             )
 
         # ----------------------------------

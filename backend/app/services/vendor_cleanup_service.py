@@ -299,7 +299,7 @@ class VendorCleanupService:
         )
 
     @staticmethod
-    def get_all_logs(db: Session, limit: int = 500):
+    def get_all_logs(db: Session, limit: int = 10000):
         return (
             db.query(VendorCleanupLog)
             .order_by(VendorCleanupLog.created_at.desc())

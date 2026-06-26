@@ -180,13 +180,7 @@ class StructuredResponseBuilder:
 
         if not category:
 
-            missing.append(
-
-                "category"
-
-            )
-
-            return missing
+            return ["category"]
 
         # ----------------------------------
         # LOCATION

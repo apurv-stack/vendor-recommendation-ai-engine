@@ -2,8 +2,6 @@ import { useState } from "react";
 
 import {
     Building2,
-    Eye,
-    EyeOff,
     Shield,
     User
 } from "lucide-react";
@@ -28,8 +26,6 @@ const RegisterForm=()=>{
 const navigate=useNavigate();
 
 const[loading,setLoading]=useState(false);
-const[showPassword,setShowPassword]=useState(false);
-const[showConfirm,setShowConfirm]=useState(false);
 const[success,setSuccess]=useState(false);
 const[message,setMessage]=useState("");
 const[errors,setErrors]=useState({});
@@ -183,38 +179,44 @@ return (
             </button>
           </div>
 
-          <Input label="Username" name="username" value={formData.username} onChange={handleChange}/>
+          <Input label="Username" name="username" value={formData.username} onChange={handleChange} required/>
           <p className="text-red-500 text-xs -mt-1">{errors.username}</p>
 
-          <Input label="Full Name" name="full_name" value={formData.full_name} onChange={handleChange}/>
+          <Input label="Full Name" name="full_name" value={formData.full_name} onChange={handleChange} required/>
           <p className="text-red-500 text-xs -mt-1">{errors.full_name}</p>
 
-          <Input label="Email" name="email" value={formData.email} onChange={handleChange}/>
-          <p className="text-red-500 text-xs -mt-1">{errors.email}</p>
+          <Input label="Email" name="email" value={formData.email} onChange={handleChange} required/>
+          <p className="text-red-500 text-xs -mt-1">{errors.email} </p>
 
           {formData.role==="vendor"&&(
             <>
-              <Input label="Business Email" name="business_email" value={formData.business_email} onChange={handleChange}/>
+              <Input label="Business Email" name="business_email" value={formData.business_email} onChange={handleChange} required/>
               <p className="text-red-500 text-xs -mt-1">{errors.business_email}</p>
             </>
           )}
 
-          <Input label="Phone Number" name="phone_number" value={formData.phone_number} onChange={handleChange}/>
+          <Input label="Phone Number" name="phone_number" value={formData.phone_number} onChange={handleChange} required/>
           <p className="text-red-500 text-xs -mt-1">{errors.phone_number}</p>
 
-          <div className="relative">
-            <Input label="Password" name="password" type={showPassword?"text":"password"} value={formData.password} onChange={handleChange}/>
-            <button type="button" onClick={()=>setShowPassword(prev=>!prev)} className="absolute right-4 top-9">
-              {showPassword?<EyeOff size={18}/>:<Eye size={18}/>}
-            </button>
-          </div>
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            error={errors.password}
+          />
 
-          <div className="relative">
-            <Input label="Confirm Password" name="confirm_password" type={showConfirm?"text":"password"} value={formData.confirm_password} onChange={handleChange}/>
-            <button type="button" onClick={()=>setShowConfirm(prev=>!prev)} className="absolute right-4 top-9">
-              {showConfirm?<EyeOff size={18}/>:<Eye size={18}/>}
-            </button>
-          </div>
+          <Input
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            error={errors.confirmPassword}
+          />
 
           <p className="text-red-500 text-xs -mt-1">{errors.confirm_password}</p>
 

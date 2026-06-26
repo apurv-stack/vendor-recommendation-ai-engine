@@ -36,12 +36,18 @@ const ImportExportPage = () => {
                     <VendorImportUpload />
                 </div>
 
-                <ImportAnalytics
-                    totalImported={0}
-                    successCount={0}
-                    failedCount={0}
-                    lastImportDate={null}
-                />
+                <div style={{
+                    background: theme.cardBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: "20px", padding: "24px"
+                }}>
+                    <h3 style={{ fontSize: "15px", fontWeight: 700, color: theme.textPrimary, margin: "0 0 8px" }}>
+                        Import History
+                    </h3>
+                    <p style={{ fontSize: "13px", color: theme.textMuted, margin: 0 }}>
+                        Import history tracking is not yet enabled. Each import result is returned immediately after upload. Use the upload panel above to import vendors via CSV or Excel.
+                    </p>
+                </div>
 
             </div>
         </div>

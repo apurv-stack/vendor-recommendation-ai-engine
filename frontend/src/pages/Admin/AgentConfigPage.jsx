@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import ConfirmModal from "../../components/common/ConfirmModal";
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "../../components/layouts/DashboardLayout/DashboardLayout";
 import { useTheme } from "../../context/ThemeContext";
@@ -664,6 +665,8 @@ const AgentConfigPage = () => {
     const [auditLogs,   setAuditLogs]   = useState([]);
     const [expandedLog, setExpandedLog] = useState(null);
     const [expandedVersion, setExpandedVersion] = useState(null);
+    const [rollbackModal, setRollbackModal] = useState({ open: false, versionId: null, versionNum: null });
+    const [rollbackLoading, setRollbackLoading] = useState(false);
     const [loading,     setLoading]     = useState(true);
     const [saving,      setSaving]      = useState(false);
     const [toast,       setToast]       = useState(null);
@@ -672,6 +675,26 @@ const AgentConfigPage = () => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3500);
     };
+
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+
+        const handleResize = () => {
+
+            setScreenWidth(window.innerWidth);
+
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+
+    }, []);
+
+    const isMobile = screenWidth < 640;
+
+    const isTablet = screenWidth >= 640 && screenWidth < 1024;
 
     // ── Fetch ────────────────────────────────────────────────────────────────
 
@@ -753,10 +776,14 @@ const AgentConfigPage = () => {
         }
     };
 
-    const handleRollback = async (versionId) => {
-        if (!window.confirm("Roll back to this version?")) return;
+    const openRollback = (versionId, versionNum) => {
+        setRollbackModal({ open: true, versionId, versionNum });
+    };
+
+    const handleRollback = async () => {
+        setRollbackLoading(true);
         try {
-            await rollbackPrompt(agentId, versionId);
+            await rollbackPrompt(agentId, rollbackModal.versionId);
             showToast("Rolled back successfully");
             const [pr, vr] = await Promise.all([getAgentPrompt(agentId), getVersionHistory(agentId)]);
             const p = pr?.prompt || {};
@@ -764,6 +791,9 @@ const AgentConfigPage = () => {
             setVersions(vr?.versions || []);
         } catch {
             showToast("Rollback failed", "error");
+        } finally {
+            setRollbackLoading(false);
+            setRollbackModal({ open: false, versionId: null, versionNum: null });
         }
     };
 
@@ -818,7 +848,7 @@ const AgentConfigPage = () => {
 
     return (
         <DashboardLayout>
-            <div style={{ minHeight: "100vh", background: theme.pageBg, padding: "24px" }}>
+            <div style={{ minHeight: "100vh", background: theme.pageBg, padding: isMobile ? "12px" : "24px" }}>
 
                 {/* TOAST */}
                 {toast && (
@@ -838,7 +868,7 @@ const AgentConfigPage = () => {
                 )}
 
                 <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex",
-                              flexDirection: "column", gap: "20px" }}>
+                              flexDirection: "column", gap: isMobile ? "12px" : "20px", width: "100%" }}>
 
                     {/* ── BREADCRUMB / HEADER ── */}
                     <div style={{ display: "flex", alignItems: "center", gap: "12px",
@@ -894,7 +924,7 @@ const AgentConfigPage = () => {
                     </div>
 
                     {/* ── MAIN CONTENT ── */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: "20px",
+                    <div style={{ display: "grid", gridTemplateColumns: isTablet || isMobile ? "1fr" : "1fr 280px", gap: "20px",
                                   alignItems: "start" }}>
 
                         {/* LEFT — Tab Content */}
@@ -1041,7 +1071,7 @@ const AgentConfigPage = () => {
                                                                     return notes;
                                                                 })()}
                                                             </span>,
-                                                            <button onClick={() => handleRollback(v.version_id)}
+                                                            <button onClick={() => openRollback(v.version_id, v.version_number)}
                                                                 style={{
                                                                     display: "flex", alignItems: "center", gap: "5px",
                                                                     padding: "5px 10px", borderRadius: "8px",
@@ -1372,6 +1402,16 @@ const AgentConfigPage = () => {
                     </div>
                 </div>
             </div>
+            <ConfirmModal
+                isOpen={rollbackModal.open}
+                title="Rollback Prompt"
+                message={`Are you sure you want to roll back to Version ${rollbackModal.versionNum}? The current prompt will be replaced.`}
+                confirmText="Rollback"
+                confirmColor="#F59E0B"
+                loading={rollbackLoading}
+                onConfirm={handleRollback}
+                onCancel={() => setRollbackModal({ open: false, versionId: null, versionNum: null })}
+            />
         </DashboardLayout>
     );
 };

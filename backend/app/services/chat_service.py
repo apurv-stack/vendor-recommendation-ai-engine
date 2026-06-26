@@ -228,14 +228,27 @@ class ChatService:
                     qa_config=qa_config
                 )
 
-                # Early validation error — return immediately, no Ollama, no graph
+                # Early validation error — return as chat message, not API error
                 errors = structured.get("errors", [])
                 if errors:
+                    error_message = errors[0]
+                    ConversationService.create_conversation(
+                        db=self.db,
+                        session_id=session_id,
+                        user_id=current_user.user_id,
+                        user_message=user_message,
+                        ai_response=error_message,
+                        detected_intent="validation_error",
+                        applied_filters={},
+                        is_follow_up=False,
+                        context_summary="Validation error"
+                    )
                     return {
-                        "success": False,
-                        "message": errors[0],
+                        "success": True,
+                        "message": error_message,
+                        "ai_response": error_message,
                         "session_id": session_id,
-                        "response_type": "error",
+                        "response_type": "validation_error",
                         "current_question": None,
                         "missing_fields": [],
                         "recommendations": [],
@@ -775,11 +788,20 @@ class ChatService:
         if not filters.get("city"):
             return "city"
 
-        if category == "catering":
+        # Categories that require budget
+        BUDGET_REQUIRED = {
+            "catering", "photography", "decoration",
+            "music", "makeup", "venue", "planner", "dj"
+        }
 
+        if category in BUDGET_REQUIRED:
             if not filters.get("budget"):
                 return "budget"
 
+        # Categories that also require guest count
+        GUEST_COUNT_REQUIRED = {"catering", "venue"}
+
+        if category in GUEST_COUNT_REQUIRED:
             if not filters.get("guest_count"):
                 return "guest_count"
 
