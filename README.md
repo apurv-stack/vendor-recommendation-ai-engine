@@ -1,24 +1,24 @@
 # 🤖 Vendor Recommendation AI Platform
 
-The **Vendor Recommendation AI Platform** is an enterprise-grade solution designed for intelligent, natural language vendor discovery and personalized matching. Driven by a sophisticated multi-agent AI orchestrator, the platform bridges the gap between unstructured procurement requests and verified vendor databases.
+This repository contains the source code for a Vendor Recommendation AI Platform designed to automate vendor discovery and evaluation through a natural language query interface. The system employs a React frontend, a FastAPI backend service, a PostgreSQL relational database, and a LangGraph-powered orchestration framework hosting Ollama (Qwen 2.5) for query analysis and response generation. When a user submits an inquiry, the backend extracts search criteria, retrieves relevant database records, applies a multi-criteria ranking algorithm, and utilizes the local language model to synthesize natural language explanations for each recommended vendor. The architecture integrates session memory, persistent user preference profiles, automated background catalog synchronization tasks, and role-based access control to deliver secure, context-aware procurement recommendations within a modular and extensible codebase.
 
 ---
 
 ## 🛡️ Badges
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-v0.136.1-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-v19.2.6-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v14%2B-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-AI%20Orchestrator-orange?style=flat-square&logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph)
-[![Ollama](https://img.shields.io/badge/Ollama-Qwen%202.5-black?style=flat-square)](https://ollama.com/)
+[![Python](https://img.shields.io/badge/Python-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![LangGraph](https://img.shields.io/badge/LangGraph-orange?style=flat-square&logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph)
+[![Ollama](https://img.shields.io/badge/Ollama-black?style=flat-square)](https://ollama.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 ---
 
 ## 📋 Project Overview
 
-Finding the right vendor is historically a tedious, manual process constrained by rigid keyword searches. This platform resolves this by providing a conversational interface for intelligent vendor discovery and matching. Users query the platform in plain, natural language, asking for specific services, budgets, or locations. By employing a multi-agent workflow powered by LangGraph and a local LLM, the system dynamically interprets user intent, extracts search constraints, retrieves verified vendor records from a PostgreSQL database, and determines a deterministic compatibility rank. AI improves discovery by translating unstructured prompts into structured database queries, learning user preferences over time, and generating clear, contextual explanations for why each vendor fits the request. This bridges the gap between conversational inquiry and reliable enterprise matchmaking.
+Procurement and vendor selection are historically slow, manual, and constrained by rigid keyword searches. This platform resolves this by providing a conversational interface for intelligent vendor discovery and matching. Users query the platform in plain, natural language to search for specific services, budgets, or locations. By employing a multi-agent workflow powered by LangGraph and Ollama (Qwen 2.5), the system interprets user intent, extracts search constraints, retrieves verified database records, and determines compatibility ranking. AI improves discovery by translating unstructured prompts into precise database queries, learning user preferences over time, and generating contextual explanations for recommendations. This bridges the gap between conversational inquiry and reliable database matchmaking.
 
 ---
 
@@ -52,23 +52,24 @@ Finding the right vendor is historically a tedious, manual process constrained b
 
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Frontend** | React | Component-based UI library for creating the client interface. |
-| | Vite | Next-generation frontend tooling and bundler for fast development. |
-| | Tailwind CSS | Utility-first CSS framework for custom responsive styling. |
-| | Axios | Promise-based HTTP client for API communication. |
-| | React Query | Handles declarative data fetching, caching, and server state updates. |
-| | Zustand | Lightweight state management for client-side configurations and active sessions. |
-| **Backend** | Python | Primary runtime environment for the API and orchestrator. |
-| | FastAPI | High-performance Python framework for building REST APIs. |
-| | SQLAlchemy | Object-Relational Mapper (ORM) for SQL transaction safety. |
-| | Alembic | Lightweight database migration tool for schema version control. |
-| | PostgreSQL | Enterprise relational database for robust storage and queries. |
-| **AI** | LangGraph | State-driven multi-agent framework for building complex LLM agents. |
-| | Ollama | Run LLMs locally to maintain search query privacy. |
-| | Qwen 2.5 | Local LLM used for intent analysis and extraction. |
-| **Utilities** | JWT | JSON Web Tokens for secure session authentication. |
-| | Swagger/OpenAPI | Native API documentation and interactive test panels. |
-| | APScheduler | Advanced Python Scheduler for orchestrating recurring database cleanups. |
+| **Frontend** | React | Component-based UI library. |
+| | Vite | Frontend build tool and dev server. |
+| | Tailwind CSS | Utility-first CSS styling framework. |
+| | Axios | HTTP client for backend API communication. |
+| | React Query | Data fetching and server state caching. |
+| | Zustand | Lightweight client-side state management. |
+| **Backend** | Python | Primary programming language. |
+| | FastAPI | Web framework for high-performance REST APIs. |
+| | Pydantic | Request and response validation using FastAPI schemas. |
+| | SQLAlchemy | Object-Relational Mapper (ORM) for DB queries. |
+| | Alembic | Database migrations version control. |
+| | PostgreSQL | Relational database. |
+| **AI** | LangGraph | State-driven agent orchestration. |
+| | Ollama | Local LLM hosting environment. |
+| | Qwen 2.5 | Reasoning LLM for matching. |
+| **Utilities** | JWT | Security authentication tokens. |
+| | Swagger/OpenAPI | Auto-generated API documentation. |
+| | APScheduler | Recurring background task scheduling. |
 
 ---
 
@@ -139,16 +140,7 @@ The AI engine orchestrates vendor recommendations through a structured pipeline 
                                                 └──────────────────┘
 ```
 
-1. **User Query:** The buyer submits a natural language requirement (e.g., "Find me a local software development vendor with a budget under $50k").
-2. **Query Processing:** The backend sanitizes inputs and identifies active session parameters.
-3. **Intent Detection:** The LLM parses the prompt to determine search intent or general conversational feedback.
-4. **Context Retrieval:** Historical chat logs are retrieved from the database to maintain conversational continuity.
-5. **Preference Learning:** The agent extracts constraints (e.g., price range, preferred locations) and persists them in the user profile.
-6. **Vendor Filtering:** The engine retrieves vendor candidates from PostgreSQL matching extracted categories.
-7. **Vendor Ranking:** Candidate vendors are scored based on ratings, pricing models, and preference fit metrics.
-8. **LLM Recommendation Generation:** The LLM synthesizes vendor facts and drafts a reasoning response explaining the matches.
-9. **Structured Response:** The backend formats the explanation alongside vendor metadata and scores.
-10. **Frontend Display:** The React interface parses the payload, presenting the response and interactive vendor cards.
+When a user submits a search query, the backend passes it to the LangGraph AI orchestrator, which coordinates the reasoning pipeline. The system detects user intent, extracts filter criteria like budget or location, and retrieves conversation history and stored user preferences. It then queries the PostgreSQL database to filter matching vendors and ranks them using ratings and constraint alignment. Finally, the local Qwen 2.5 model generates a conversational recommendation explaining the suitability of each match. This structured response, containing both explanatory text and vendor metadata, is sent back to the frontend for interactive display.
 
 ---
 
@@ -157,45 +149,13 @@ The AI engine orchestrates vendor recommendations through a structured pipeline 
 ```
 vendor-recommendation-ai-engine/
 ├── backend/
-│   ├── alembic/                  # Database schema migrations
 │   ├── app/                      # Backend application source code
-│   │   ├── agents/               # LLM prompts and agent templates
-│   │   ├── ai/                   # AI services and integration utilities
-│   │   ├── api/                  # API routing and schema validations
-│   │   ├── core/                 # App configurations, logging, and security
-│   │   ├── db/                   # Database engine and session handlers
-│   │   ├── graphs/               # LangGraph workflow graphs and states
-│   │   ├── integrations/         # Third-party vendor data endpoints
-│   │   ├── models/               # SQLAlchemy database models
-│   │   ├── repositories/         # Database operations and query layers
-│   │   ├── schemas/              # Pydantic schema declarations
-│   │   ├── scripts/              # Setup and seeding helper scripts
-│   │   ├── services/             # Background tasks and core logic
-│   │   ├── tools/                # Query tools bound to AI agents
-│   │   ├── utils/                # Helper utilities and custom formatters
-│   │   └── main.py               # FastAPI gateway entrypoint
 │   ├── docs/                     # Comprehensive system documentation
-│   │   ├── assets/               # Architecture and workflow diagrams
-│   │   └── pdf_gen/              # Tooling to compile documentation into PDF
-│   ├── requirements/             # Backend requirements folder
-│   │   └── dev.txt               # Development environment requirements
-│   ├── tests/                    # Backend testing suite
-│   ├── alembic.ini               # Database migration configurations
-│   └── pyproject.toml            # Code linter settings
+│   ├── alembic/                  # Database schema migrations
+│   └── tests/                    # Backend testing suite
 ├── frontend/
 │   ├── src/                      # Frontend client source code
-│   │   ├── api/                  # API client wrapper files
-│   │   ├── assets/               # Client-side style files and icons
-│   │   ├── components/           # Reusable client view components
-│   │   ├── context/              # Global React context definitions
-│   │   ├── hooks/                # Data-fetching custom hooks
-│   │   ├── pages/                # Parent routing page views
-│   │   ├── routes/               # Navigation guard configs
-│   │   ├── services/             # Client service call classes
-│   │   ├── App.jsx               # Main React entry component
-│   │   ├── index.css             # Client stylesheet configurations
-│   │   └── main.jsx              # React bootstrap render file
-│   ├── tailwind.config.js        # Tailwind CSS theme layout settings
+│   ├── public/                   # Static client assets
 │   └── vite.config.js            # Vite compiler configuration script
 ├── README.md                     # Landing page and project summary
 ├── requirements.txt              # Primary backend Python dependencies
@@ -240,7 +200,7 @@ Follow these steps to deploy a local instance of the Vendor Recommendation AI Pl
 5. Configure environment variables by creating a `.env` file in the `backend/` folder:
    ```env
    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vendor_ai
-   SECRET_KEY=generate_a_secure_jwt_secret_hash_here
+   SECRET_KEY=<your-secret-key>
    AI_PROVIDER=ollama
    AI_MODEL=qwen2.5:7b
    OLLAMA_BASE_URL=http://localhost:11434/v1
@@ -283,7 +243,7 @@ FastAPI automatically parses source code type annotations to serve structured AP
 
 - **Swagger UI (`/docs`):** An interactive sandbox page enabling developers to execute calls directly against the running API server.
 - **ReDoc (`/redoc`):** A clean, readable, single-page presentation layout documenting schema objects and paths.
-- **OpenAPI Specification (`/openapi.json`):** A raw JSON definition containing complete path mappings and endpoint configurations compliant with standard OpenAPI specifications.
+- **OpenAPI Specification (`/openapi.json`):** A raw JSON definition containing complete path mappings and configurations.
 
 ---
 
@@ -292,38 +252,32 @@ FastAPI automatically parses source code type annotations to serve structured AP
 The `backend/docs/` directory contains the complete technical handover manuals and reports for the platform. This README serves as a high-level entrypoint, while the dedicated documentation files provide in-depth engineering references.
 
 The [backend/docs/](backend/docs/) folder contains:
-- **HTML Documentation:** High-fidelity interactive reference manuals ([AI_Vendor_Discovery_Agent_Documentation.html](backend/docs/AI_Vendor_Discovery_Agent_Documentation.html)).
-- **PDF Documentation:** Compilation version of the technical handover documents ([AI_Vendor_Discovery_Agent_Documentation.pdf](backend/docs/AI_Vendor_Discovery_Agent_Documentation.pdf)).
-- **Complete Architecture Manual:** In-depth descriptions of systemic logic, class hierarchies, and database mapping logic.
-- **API Documentation:** Full endpoints mapping and schema configuration files.
-- **AI Workflow Documentation:** Detailed description of the LangGraph node transition rules and prompt configurations.
-- **Deployment Guide:** Complete guide to server staging and environment parameters configuration.
-- **Technical Handover Manual:** Architectural guidelines and operations checklist.
+- **Interactive Technical Documentation (HTML)** ([AI_Vendor_Discovery_Agent_Documentation.html](backend/docs/AI_Vendor_Discovery_Agent_Documentation.html))
+- **Printable Technical Documentation (PDF)** ([AI_Vendor_Discovery_Agent_Documentation.pdf](backend/docs/AI_Vendor_Discovery_Agent_Documentation.pdf))
+- **Complete System Architecture**
+- **API Documentation**
+- **AI Workflow Documentation**
+- **Deployment Documentation**
+- **Project Handover Manual**
 
 ---
 
 ## 🌐 Deployment
 
-- **Backend:** FastAPI Python service exposing REST APIs.
-- **Frontend:** React application compiled with Vite.
-- **Database:** PostgreSQL database for storing user, chat session, and vendor schemas.
-- **AI Model:** Ollama running Qwen 2.5 local inference model.
-
-The deployment strategy can be adapted depending on the hosting environment (such as containerized deployments, cloud VM instances, or platform-as-a-service providers).
+The React frontend serves the client application, while FastAPI exposes REST APIs. PostgreSQL stores application data, and Ollama hosts the local LLM. Deployment requires environment configuration and database initialization.
 
 ---
 
 ## 🗺️ Future Roadmap
 
 Planned enhancements for future releases:
-- **Multi-model LLM Support:** Toggle dynamically between Ollama, OpenAI, Gemini, and Groq reasoning engines based on performance quotas.
-- **Advanced Semantic Retrieval (Vector Search):** Integrate `pgvector` into PostgreSQL to perform semantic vector searches directly within database queries.
-- **Infrastructure as Code:** Implement Terraform modules for automated provisioning of cloud services.
-- **In-Memory Caching:** Integrate Redis layer for semantic caching and session query log optimization.
-- **Containerization & Orchestration:** Add Docker configurations and Kubernetes manifests for deployment.
-- **CI/CD & Cloud Hosting:** Setup automated deployment pipelines for platforms such as Vercel, Netlify, or AWS (ECS/Cloud Run/CloudFront).
-- **Enhanced Analytics Dashboards:** Build visual dashboards inside the vendor and admin panels showing query trends and matchmaking performance.
-- **Advanced Observability:** Real-time logging metrics of agent workflows for performance analysis.
+- **Multi-model LLM Support:** Toggle dynamically between Ollama, OpenAI, Gemini, and Groq reasoning engines.
+- **Vector Search:** Integrate `pgvector` into PostgreSQL to perform semantic similarity matches.
+- **Containerized Deployment (Docker):** Containerize backend and frontend services.
+- **CI/CD Integration:** Automate deployment pipelines for hosting providers.
+- **Performance Optimization:** Introduce Redis layer for semantic caching.
+- **Analytics Dashboard:** Build visual overview tools inside the vendor and admin panels.
+- **Monitoring & Observability:** Setup real-time logging and tracing metrics of agent workflows.
 
 ---
 
