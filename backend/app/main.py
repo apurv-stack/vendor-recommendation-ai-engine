@@ -360,11 +360,11 @@ app.include_router(
 
 )
 
-app.include_router(
+# app.include_router(
 
-    category_router
+#     category_router
 
-)
+# )
 
 app.include_router(
 
